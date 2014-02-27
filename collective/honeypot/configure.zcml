@@ -7,4 +7,20 @@
 
   <five:registerPackage package="." initialize=".initialize" />
 
+  <!-- Subscribe to before traverse event.
+       Note: should probably be zope.traversing.interfaces.IBeforeTraverseEvent
+       in Plone 4" -->
+  <subscriber
+      for="Products.CMFCore.interfaces.ISiteRoot
+           zope.app.publication.interfaces.IBeforeTraverseEvent"
+      handler="collective.honeypot.content.eventsubscribers.pre_traverse_check" />
+
+  <browser:page
+      for="*"
+      name="honeypot_fields"
+      class=".browser.HoneyFields"
+      permission="zope2.View"
+      template="honeypot.pt"
+      />
+
 </configure>

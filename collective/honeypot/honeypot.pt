@@ -1,0 +1,6 @@
+<div class="as_protected" style="display: none">
+  <input type="text" value=""
+         tal:attributes="name view/FORBIDDEN_HONEYPOT_FIELD" />
+  <input type="text" value=""
+         tal:attributes="name view/REQUIRED_HONEYPOT_FIELD" />
+</div>
