@@ -10,7 +10,7 @@
   <subscriber
       for="Products.CMFCore.interfaces.ISiteRoot
            zope.app.publication.interfaces.IBeforeTraverseEvent"
-      handler="collective.honeypot.content.eventsubscribers.pre_traverse_check" />
+      handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
 
   <browser:page
       for="*"
