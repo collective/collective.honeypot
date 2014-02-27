@@ -1,0 +1,4 @@
+graft collective
+graft docs
+include *rst *cfg bootstrap.py .travis.yml
+global-exclude *.pyc
