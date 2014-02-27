@@ -1,10 +1,3 @@
-"""Antispam honeypot configuration.
-
-Usage in forms:
-
-
-"""
-
 # Field that MAY be in some requests, but MUST be empty.
 FORBIDDEN_HONEYPOT_FIELD = 'protected_1'
 # Field that MUST be in some requests, but MAY be empty.  This is to
