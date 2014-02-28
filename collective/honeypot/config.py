@@ -14,3 +14,6 @@ PROTECTED_ACTIONS = (
     'join_form',
     'sendto_form',
     )
+WHITELISTED_ACTIONS = (
+    'jq_reveal_email',
+    )

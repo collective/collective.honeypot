@@ -1,6 +1,7 @@
 import logging
 from collective.honeypot.config import FORBIDDEN_HONEYPOT_FIELD
 from collective.honeypot.config import PROTECTED_ACTIONS
+from collective.honeypot.config import WHITELISTED_ACTIONS
 from collective.honeypot.config import REQUIRED_HONEYPOT_FIELD
 from zExceptions import Forbidden
 
@@ -54,19 +55,25 @@ def logpost(request):
     url = request.get('ACTUAL_URL', '')
     user = request.get('AUTHENTICATED_USER', '')
 
-    logger.info("POST from ip %s, user %r, url %r, referer %r, with form "
-                "%r", ip, user, url, referer, form)
     action = url.split('/')[-1]  # last part of url
-    if action in PROTECTED_ACTIONS:
-        result = found_honeypot(form)
-        logger.info("Checking honeypot fields for action %s. Result: %s.",
-                    action, result)
-        if result:
-            logger.warn("SPAMMER caught in honeypot: %s. ip %s, user %r, "
-                        "url %r, referer %r, with form %r",
-                        result, ip, user, url, referer, form)
-            # block the request:
-            deny()
+    action = action.lstrip('@')
+    if action in WHITELISTED_ACTIONS:
+        logger.info("Action whitelisted: %s.", action)
+        return
+    if action not in PROTECTED_ACTIONS:
+        return
+    result = found_honeypot(form)
+    logger.info("Checking honeypot fields for action %s. Result: %s.",
+                action, result)
+    if not result:
+        logger.info("POST from ip %s, user %r, url %r, referer %r, with form "
+                    "%r", ip, user, url, referer, form)
+        return
+    logger.warn("SPAMMER caught in honeypot: %s. ip %s, user %r, "
+                "url %r, referer %r, with form %r",
+                result, ip, user, url, referer, form)
+    # block the request:
+    deny()
 
 
 if __name__ == '__main__':
