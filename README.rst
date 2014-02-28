@@ -53,10 +53,20 @@ measures to make it protect forms.
 
 In a form you want to protect, you must add this::
 
-  <div tal:replace="structure context/@@honeypot_fields" />
+  <div tal:replace="structure context/@@honeypot_fields|nothing" />
 
 And you must add the page on which it appears in
 ``config.PROTECTED_ACTIONS``.
+
+TODO Actually, one field may be enough for both cases.  For all posts
+we then say:
+
+- if the forbidden field is filled in, we forbid this post
+
+- if the forbidden field is there but is empty, we accept this post
+
+- if the forbidden field is not there, and the action is explicitly in
+  PROTECTED_ACTIONS, then we forbid this post.
 
 
 Future
