@@ -65,12 +65,10 @@ def logpost(request):
     """
     if request.get('REQUEST_METHOD', '').upper() != 'POST':
         return
-    form = get_form(request)
     ip = request.get('HTTP_X_FORWARDED_FOR') or request.get('REMOTE_ADDR',
                                                             'unknown')
     referer = request.get('HTTP_REFERER', '')
     url = request.get('ACTUAL_URL', '')
-    user = request.get('AUTHENTICATED_USER', '')
 
     action = url.split('/')[-1]  # last part of url
     action = action.lstrip('@')
@@ -78,17 +76,18 @@ def logpost(request):
         logger.info("Action whitelisted: %s.", action)
         return
     if action not in PROTECTED_ACTIONS:
+        logger.info("Action not protected: %s.", action)
         return
+    form = get_form(request)
     result = found_honeypot(form)
     logger.info("Checking honeypot fields for action %s. Result: %s.",
                 action, result)
     if not result:
-        logger.info("POST from ip %s, user %r, url %r, referer %r, with form "
-                    "%r", ip, user, url, referer, form)
+        logger.info("ACCEPTED POST from ip %s, url %r, referer %r, with form "
+                    "%r", ip, url, referer, form)
         return
-    logger.warn("SPAMMER caught in honeypot: %s. ip %s, user %r, "
-                "url %r, referer %r, with form %r",
-                result, ip, user, url, referer, form)
+    logger.warn("SPAMMER caught in honeypot: %s.  ip %s, url %r",
+                result, ip, url)
     # block the request:
     deny()
 
