@@ -53,7 +53,7 @@ measures to make it protect forms.
 
 In a form you want to protect, you must add this::
 
-  <div tal:replace="context/@@honeypot_fields" />
+  <div tal:replace="structure context/@@honeypot_fields" />
 
 And you must add the page on which it appears in
 ``config.PROTECTED_ACTIONS``.
