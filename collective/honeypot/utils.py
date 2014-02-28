@@ -1,8 +1,10 @@
 import logging
+from copy import deepcopy
 from collective.honeypot.config import FORBIDDEN_HONEYPOT_FIELD
+from collective.honeypot.config import IGNORED_FORM_FIELDS
 from collective.honeypot.config import PROTECTED_ACTIONS
-from collective.honeypot.config import WHITELISTED_ACTIONS
 from collective.honeypot.config import REQUIRED_HONEYPOT_FIELD
+from collective.honeypot.config import WHITELISTED_ACTIONS
 from zExceptions import Forbidden
 
 logger = logging.getLogger('collective.honeypot')
@@ -36,6 +38,24 @@ def deny():
                     "Please contact us if we are wrong.")
 
 
+def get_form(request):
+    if hasattr(request, 'form'):
+        form = request.form
+    else:
+        form = request
+    # We may need to make a copy of the form.  This may be expensive
+    # in memory, so we make sure to do this only once when needed.
+    copied = False
+    for field in IGNORED_FORM_FIELDS:
+        if field not in form:
+            continue
+        if not copied:
+            form = deepcopy(form)
+            copied = True
+        form.pop(field)
+    return form
+
+
 def logpost(request):
     """Log a POST request.
 
@@ -45,10 +65,7 @@ def logpost(request):
     """
     if request.get('REQUEST_METHOD', '').upper() != 'POST':
         return
-    if hasattr(request, 'form'):
-        form = request.form
-    else:
-        form = request
+    form = get_form(request)
     ip = request.get('HTTP_X_FORWARDED_FOR') or request.get('REMOTE_ADDR',
                                                             'unknown')
     referer = request.get('HTTP_REFERER', '')

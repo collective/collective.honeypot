@@ -14,6 +14,13 @@ PROTECTED_ACTIONS = (
     'join_form',
     'sendto_form',
     )
+# Actions that are not checked:
 WHITELISTED_ACTIONS = (
     'jq_reveal_email',
+    )
+# Fields that are not logged:
+IGNORED_FORM_FIELDS = (
+    'password',
+    'password_confirm',
+    '__ac_password',
     )
