@@ -1,6 +1,6 @@
 <div class="as_protected" style="display: none">
   <input type="text" value=""
-         tal:attributes="name view/FORBIDDEN_HONEYPOT_FIELD" />
+         tal:attributes="name view/forbidden_field_name" />
   <input type="text" value=""
-         tal:attributes="name view/REQUIRED_HONEYPOT_FIELD" />
+         tal:attributes="name view/required_field_name" />
 </div>
