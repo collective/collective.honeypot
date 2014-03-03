@@ -14,8 +14,8 @@
 
   <browser:page
       for="*"
-      name="honeypot_fields"
-      class=".browser.HoneyFields"
+      name="honeypot_field"
+      class=".browser.HoneypotField"
       permission="zope2.View"
       template="honeypot.pt"
       />

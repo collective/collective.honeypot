@@ -4,8 +4,7 @@ import unittest
 
 from Acquisition import Implicit
 from Testing import makerequest
-from collective.honeypot.config import FORBIDDEN_HONEYPOT_FIELD
-from collective.honeypot.config import REQUIRED_HONEYPOT_FIELD
+from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.utils import check_post
 from collective.honeypot.utils import found_honeypot
 from collective.honeypot.utils import get_form
@@ -16,24 +15,21 @@ from zExceptions import Forbidden
 class UtilsTestCase(unittest.TestCase):
 
     def test_found_honeypot(self):
-        # 1. The required field MUST be there, but MAY be empty.
-        # 2. The forbidden field MAY be there, but MUST be empty.
-        self.assertEqual(found_honeypot({}), 'misses required field')
+        # 1. The honeypot field MUST be there if required is True.
+        self.assertFalse(found_honeypot({}, required=False))
+        self.assertEqual(found_honeypot({}, required=True),
+                         'misses required field')
+        # 2. The honeypot field MUST be empty.
         self.assertFalse(found_honeypot(
-            {REQUIRED_HONEYPOT_FIELD: ''}))
-        self.assertEqual(found_honeypot(
-            {FORBIDDEN_HONEYPOT_FIELD: ''}), 'misses required field')
+            {HONEYPOT_FIELD: ''}, required=False))
         self.assertFalse(found_honeypot(
-            {REQUIRED_HONEYPOT_FIELD: 'hello'}))
-        self.assertFalse(found_honeypot(
-            {REQUIRED_HONEYPOT_FIELD: '',
-             FORBIDDEN_HONEYPOT_FIELD: ''}))
+            {HONEYPOT_FIELD: ''}, required=True))
         self.assertEqual(found_honeypot(
-            {REQUIRED_HONEYPOT_FIELD: '',
-             FORBIDDEN_HONEYPOT_FIELD: 'hello'}), 'has forbidden field')
+            {HONEYPOT_FIELD: 'hello'}, required=False),
+            'has forbidden field')
         self.assertEqual(found_honeypot(
-            {REQUIRED_HONEYPOT_FIELD: 'hello',
-             FORBIDDEN_HONEYPOT_FIELD: 'hello'}), 'has forbidden field')
+            {HONEYPOT_FIELD: 'hello'}, required=True),
+            'has forbidden field')
 
     def test_get_form(self):
         # get_form gets the form fields, leaving out password fields.
@@ -72,13 +68,13 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEqual(check_post(self._request()), None)
         # Post forbidden data to a protected form.
         request = self._request(dest='/join_form',
-                                form={FORBIDDEN_HONEYPOT_FIELD: 'bear'})
+                                form={HONEYPOT_FIELD: 'bear'})
         self.assertRaises(Forbidden, check_post, request)
         # If it is a GET request, it is fine.
         request = self._request(dest='/join_form', method='GET',
-                                form={FORBIDDEN_HONEYPOT_FIELD: 'bear'})
+                                form={HONEYPOT_FIELD: 'bear'})
         self.assertEqual(check_post(self._request()), None)
         # When the field is empty, this is fine.
         request = self._request(dest='/join_form',
-                                form={FORBIDDEN_HONEYPOT_FIELD: ''})
+                                form={HONEYPOT_FIELD: ''})
         self.assertEqual(check_post(self._request()), None)

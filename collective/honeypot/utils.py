@@ -1,31 +1,28 @@
 import logging
 from copy import deepcopy
-from collective.honeypot.config import FORBIDDEN_HONEYPOT_FIELD
+from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
 from collective.honeypot.config import PROTECTED_ACTIONS
-from collective.honeypot.config import REQUIRED_HONEYPOT_FIELD
 from collective.honeypot.config import WHITELISTED_ACTIONS
 from zExceptions import Forbidden
 
 logger = logging.getLogger('collective.honeypot')
 
 
-def found_honeypot(form):
+def found_honeypot(form, required):
     """Did a spammer find a honeypot?
 
     We have two requirements:
 
-    1. The required field MUST be there, but MAY be empty.
-    2. The forbidden field MAY be there, but MUST be empty.
+    1. The honeypot field MUST be there if required is True.
+    2. The honeypot field MUST be empty.
 
     Return True when one of these requirements is not met.
     """
-    # The required field does not need to have a value, it just needs
-    # to be in the form.
-    if not REQUIRED_HONEYPOT_FIELD in form:
+    if required and HONEYPOT_FIELD not in form:
         # Spammer did not submit required field.
         return 'misses required field'
-    if form.get(FORBIDDEN_HONEYPOT_FIELD, False):
+    if form.get(HONEYPOT_FIELD):
         # Spammer submitted forbidden field with non-empty value.
         return 'has forbidden field'
     # All tests are clear.
@@ -75,11 +72,11 @@ def check_post(request):
     if action in WHITELISTED_ACTIONS:
         logger.info("Action whitelisted: %s.", action)
         return
-    if action not in PROTECTED_ACTIONS:
-        logger.info("Action not protected: %s.", action)
-        return
     form = get_form(request)
-    result = found_honeypot(form)
+    if action in PROTECTED_ACTIONS:
+        result = found_honeypot(form, required=True)
+    else:
+        result = found_honeypot(form, required=False)
     logger.info("Checking honeypot fields for action %s. Result: %s.",
                 action, result)
     if not result:
