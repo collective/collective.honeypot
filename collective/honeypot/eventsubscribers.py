@@ -1,4 +1,4 @@
-from collective.honeypot.utils import logpost
+from collective.honeypot.utils import check_post
 
 
 def pre_traverse_check(object, event):
@@ -8,4 +8,4 @@ def pre_traverse_check(object, event):
     We are mostly interested in POSTs that try to add comments and
     catch spammers.
     """
-    logpost(event.request)
+    check_post(event.request)

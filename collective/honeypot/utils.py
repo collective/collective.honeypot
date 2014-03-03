@@ -56,7 +56,7 @@ def get_form(request):
     return form
 
 
-def logpost(request):
+def check_post(request):
     """Log a POST request.
 
     And possibly forbid access.
