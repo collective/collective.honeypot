@@ -2,11 +2,15 @@
 
 import unittest
 
-from zope.publisher.browser import TestRequest
+from Acquisition import Implicit
+from Testing import makerequest
 from collective.honeypot.config import FORBIDDEN_HONEYPOT_FIELD
 from collective.honeypot.config import REQUIRED_HONEYPOT_FIELD
+from collective.honeypot.utils import check_post
 from collective.honeypot.utils import found_honeypot
 from collective.honeypot.utils import get_form
+from zope.publisher.browser import TestRequest
+from zExceptions import Forbidden
 
 
 class UtilsTestCase(unittest.TestCase):
@@ -51,3 +55,30 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEqual(secret_request.form['password'], 'secret')
         self.assertEqual(secret_request.form['password_confirm'], 'secret2')
         self.assertEqual(secret_request.form['__ac_password'], 'secret3')
+
+    def _request(self, dest='', method='POST', form=None):
+        # Return a proper request.  POST by default.
+        context = Implicit()
+        environ = {'REQUEST_METHOD': method, 'SCRIPT_NAME': dest}
+        obj = makerequest.makerequest(context, environ=environ)
+        request = obj.REQUEST
+        if form is not None:
+            request.form = form
+        return request
+
+    def test_check_post(self):
+        self.assertEqual(check_post(TestRequest()), None)
+        self.assertEqual(check_post(self._request(method='GET')), None)
+        self.assertEqual(check_post(self._request()), None)
+        # Post forbidden data to a protected form.
+        request = self._request(dest='/join_form',
+                                form={FORBIDDEN_HONEYPOT_FIELD: 'bear'})
+        self.assertRaises(Forbidden, check_post, request)
+        # If it is a GET request, it is fine.
+        request = self._request(dest='/join_form', method='GET',
+                                form={FORBIDDEN_HONEYPOT_FIELD: 'bear'})
+        self.assertEqual(check_post(self._request()), None)
+        # When the field is empty, this is fine.
+        request = self._request(dest='/join_form',
+                                form={FORBIDDEN_HONEYPOT_FIELD: ''})
+        self.assertEqual(check_post(self._request()), None)
