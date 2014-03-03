@@ -90,25 +90,3 @@ def logpost(request):
                 result, ip, url)
     # block the request:
     deny()
-
-
-if __name__ == '__main__':
-    # Quick test for honeypot checker.
-    # 1. The required field MUST be there, but MAY be empty.
-    # 2. The forbidden field MAY be there, but MUST be empty.
-    assert found_honeypot({}) == 'misses required field'
-    assert found_honeypot(
-        {REQUIRED_HONEYPOT_FIELD: ''}) is False
-    assert found_honeypot(
-        {FORBIDDEN_HONEYPOT_FIELD: ''}) == 'misses required field'
-    assert found_honeypot(
-        {REQUIRED_HONEYPOT_FIELD: 'hello'}) is False
-    assert found_honeypot(
-        {REQUIRED_HONEYPOT_FIELD: '',
-         FORBIDDEN_HONEYPOT_FIELD: ''}) is False
-    assert found_honeypot(
-        {REQUIRED_HONEYPOT_FIELD: '',
-         FORBIDDEN_HONEYPOT_FIELD: 'hello'}) == 'has forbidden field'
-    assert found_honeypot(
-        {REQUIRED_HONEYPOT_FIELD: 'hello',
-         FORBIDDEN_HONEYPOT_FIELD: 'hello'}) == 'has forbidden field'
