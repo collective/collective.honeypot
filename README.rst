@@ -113,6 +113,29 @@ IGNORED_FORM_FIELDS
     default ones to the list too.
 
 
+When are the checks *not* done?
+===============================
+
+This package ignores GET requests.  It only works on POST requests.
+
+If Zope does any traversal, only the original action is checked.  For
+example, a visitor makes a POST request to a ``my_form`` action.  The
+honeypot checks are done for that action.  The ``my_form`` action may
+be an old-style CMF form controller action that calls a validation
+script ``validate_my_form``.  This validation script does not get
+honeypot checks.  After validation, the action may do a traverse to a
+script ``do_action`` that does the real work, like changing the
+database or sending an email.  This script does not get honeypot
+checks.
+
+As an aside, if you have such a setup, you should make sure the
+``do_action`` script calls a validation script too and only accepts
+POST requests.  Otherwise a smart spammer can bypass the
+``validate_my_form`` validation script by requesting the ``do_action``
+script directly.  And he can bypass the honeypot checks by using a GET
+request.
+
+
 Future
 ======
 
