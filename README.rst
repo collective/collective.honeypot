@@ -64,8 +64,9 @@ invisible field that captures spammers if they fill it in.  A
 ``Forbidden`` exception is raised in that case.
 
 For extra protection, you can add the page on which it appears to the
-list in ``config.EXTRA_PROTECTED_ACTIONS``.  This means that the exception
-is also raised if the field is not submitted in the form at all.
+``EXTRA_PROTECTED_ACTIONS``.  This means that the exception is also
+raised if the field is not submitted in the form at all.  See the
+Configuration_ section.
 
 
 Configuration
