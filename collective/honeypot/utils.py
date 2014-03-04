@@ -19,6 +19,10 @@ def found_honeypot(form, required):
 
     Return True when one of these requirements is not met.
     """
+    if not HONEYPOT_FIELD:
+        # Apparently the user is only interested in logging the
+        # requests, not in stopping spammers.
+        return False
     if required and HONEYPOT_FIELD not in form:
         # Spammer did not submit required field.
         return 'misses required field'

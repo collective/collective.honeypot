@@ -85,7 +85,10 @@ this in ``buildout.cfg``::
 None of the options are required.
 
 HONEYPOT_FIELD
-    Name to use as input name of the honeypot field.
+    Name to use as input name of the honeypot field.  If you give no
+    value here, no honeypot checks are done, so you only get some
+    logging.  This is obviously not the main goal of this package, but
+    it may be useful when you need to do some debugging.
 
 EXTRA_PROTECTED_ACTIONS
     For these form actions the honeypot field is required: the field
@@ -120,6 +123,9 @@ When are the checks *not* done?
 ===============================
 
 This package ignores GET requests.  It only works on POST requests.
+
+If you have made the HONEYPOT_FIELD configuration option empty, no
+honeypot checks are done, so you only get some logging.
 
 If Zope does any traversal, only the original action is checked.  For
 example, a visitor makes a POST request to a ``my_form`` action.  The
