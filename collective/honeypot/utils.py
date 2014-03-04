@@ -2,7 +2,7 @@ import logging
 from copy import deepcopy
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
-from collective.honeypot.config import PROTECTED_ACTIONS
+from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import WHITELISTED_ACTIONS
 from zExceptions import Forbidden
 
@@ -70,15 +70,15 @@ def check_post(request):
     action = url.split('/')[-1]  # last part of url
     action = action.lstrip('@')
     if action in WHITELISTED_ACTIONS:
-        logger.info("Action whitelisted: %s.", action)
+        logger.debug("Action whitelisted: %s.", action)
         return
     form = get_form(request)
-    if action in PROTECTED_ACTIONS:
+    if action in EXTRA_PROTECTED_ACTIONS:
         result = found_honeypot(form, required=True)
     else:
         result = found_honeypot(form, required=False)
-    logger.info("Checking honeypot fields for action %s. Result: %s.",
-                action, result)
+    logger.debug("Checking honeypot fields for action %s. Result: %s.",
+                 action, result)
     if not result:
         logger.info("ACCEPTED POST from ip %s, url %r, referer %r, with form "
                     "%r", ip, url, referer, form)

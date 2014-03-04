@@ -64,8 +64,53 @@ invisible field that captures spammers if they fill it in.  A
 ``Forbidden`` exception is raised in that case.
 
 For extra protection, you can add the page on which it appears to the
-list in ``config.PROTECTED_ACTIONS``.  This means that the exception
+list in ``config.EXTRA_PROTECTED_ACTIONS``.  This means that the exception
 is also raised if the field is not submitted in the form at all.
+
+
+Configuration
+=============
+
+You can configure settings via environment variables in the
+``zope.conf`` of your zope instance.  The usual way would be to do
+this in ``buildout.cfg``::
+
+  [instance]
+  environment-vars =
+      HONEYPOT_FIELD pooh
+      EXTRA_PROTECTED_ACTIONS discussion_reply join_form sendto_form
+      WHITELISTED_ACTIONS jq_reveal_email
+      IGNORED_FORM_FIELDS password password_confirm __ac_password
+
+None of the options are required.
+
+HONEYPOT_FIELD
+    Name to use as input name of the honeypot field.
+
+EXTRA_PROTECTED_ACTIONS
+    For these form actions the honeypot field is required: the field
+    must be in the posted request, though it of course still needs to
+    be empty.  If you add actions here but do not change the forms,
+    they become unusable for visitors, which is not what you want.  On
+    the other hand, if you have a form that you no longer wish to use,
+    you can add it here and it will stop functioning.  For ``@@view``
+    simply use ``view`` and it will match both.
+
+WHITELISTED_ACTIONS
+    These form actions are not checked.  List here actions that are
+    harmless, for example actions that load some data via an AJAX
+    call.  Generally, actions that change nothing in the database and
+    do not send emails are safe to add here.
+
+IGNORED_FORM_FIELDS
+    We log information about post requests, to allow a system admin to
+    go through the log and discover posts that are obviously spam
+    attempts but are not caught yet and need extra handling, perhaps
+    an extra form that should get protection.  This information may
+    contain form fields that should be left secret or that are not
+    interesting.  By default we ignore standard Plone password fields.
+    If you have other fields you want to ignore, please add the
+    default ones to the list too.
 
 
 Future
