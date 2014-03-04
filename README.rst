@@ -100,7 +100,10 @@ WHITELISTED_ACTIONS
     These form actions are not checked.  List here actions that are
     harmless, for example actions that load some data via an AJAX
     call.  Generally, actions that change nothing in the database and
-    do not send emails are safe to add here.
+    do not send emails are safe to add here.  You could add
+    ``edit`` and ``atct_edit`` to avoid logging the large dexterity
+    and Archetypes edit forms.  But you may find this interesting, so
+    suit yourself.
 
 IGNORED_FORM_FIELDS
     We log information about post requests, to allow a system admin to
