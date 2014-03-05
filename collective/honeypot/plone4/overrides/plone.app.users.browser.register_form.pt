@@ -23,6 +23,7 @@
                             type="hidden"
                             name="came_from"
                             tal:attributes="value came_from" />
+                     <div tal:replace="structure context/@@honeypot_field|nothing" />
                    </tal:came_from>
                 </div>
             </tal:mailhost>
