@@ -1,16 +1,9 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.honeypot">
-
-  <!-- Subscribe to before traverse event.
-       Note: should probably be zope.traversing.interfaces.IBeforeTraverseEvent
-       in Plone 4" -->
-  <subscriber
-      for="Products.CMFCore.interfaces.ISiteRoot
-           zope.app.publication.interfaces.IBeforeTraverseEvent"
-      handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
 
   <browser:page
       for="*"
@@ -19,5 +12,19 @@
       permission="zope2.View"
       template="honeypot.pt"
       />
+
+  <!-- Subscribe to before traverse event. -->
+  <subscriber
+      zcml:condition="not-have plone-4"
+      for="Products.CMFCore.interfaces.ISiteRoot
+           zope.app.publication.interfaces.IBeforeTraverseEvent"
+      handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
+  <subscriber
+      zcml:condition="have plone-4"
+      for="Products.CMFCore.interfaces.ISiteRoot
+           zope.traversing.interfaces.IBeforeTraverseEvent"
+      handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
+
+  <include zcml:condition="have plone-4" package=".plone4" />
 
 </configure>
