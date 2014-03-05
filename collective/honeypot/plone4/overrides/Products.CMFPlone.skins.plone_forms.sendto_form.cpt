@@ -38,6 +38,8 @@
 
               <legend i18n:translate="legend_address_info">Address info</legend>
 
+              <div tal:replace="structure context/@@honeypot_field|nothing" />
+
               <div class="field"
                    tal:define="error errors/send_to_address|nothing;"
                    tal:attributes="class python:test(error, 'field error', 'field')">
