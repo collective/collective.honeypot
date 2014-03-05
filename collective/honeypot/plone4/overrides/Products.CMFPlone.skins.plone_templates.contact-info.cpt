@@ -50,6 +50,8 @@
                                   fullname python:request.get('fullname', not isAnon and member.getProperty('fullname', '') or None);
                                   email python:request.get('email', not isAnon and member.getProperty('email','') or None);">
 
+                <div tal:replace="structure context/@@honeypot_field|nothing" />
+
                 <input type="hidden" name="sender_fullname" value="fullname"
                        tal:attributes="value fullname"
                        tal:condition="fullname" />
