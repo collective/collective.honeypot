@@ -26,11 +26,19 @@ def found_honeypot(form, required):
     if required and HONEYPOT_FIELD not in form:
         # Spammer did not submit required field.
         return 'misses required field'
-    if form.get(HONEYPOT_FIELD):
-        # Spammer submitted forbidden field with non-empty value.
-        return 'has forbidden field'
-    # All tests are clear.
-    return False
+    value = form.get(HONEYPOT_FIELD)
+    if not value:
+        # All tests are clear.
+        return False
+    # Spammer submitted forbidden field with non-empty value.
+    # But: we could have made a mistake and put in the honeypot
+    # field twice, which means it gets submitted as a list.
+    if isinstance(value, list):
+        value = ''.join(value)
+        if not value:
+            # All clear
+            return False
+    return 'has forbidden field'
 
 
 def deny():
