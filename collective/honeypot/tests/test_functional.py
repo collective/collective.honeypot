@@ -69,6 +69,35 @@ class BasicTestCase(unittest.TestCase):
                           self.portal_url + '/sendto', 'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    def test_contact_info_empty(self):
+        self.browser.open(self.portal_url + '/contact-info')
+        form = self.browser.getForm(name='feedback_form')
+        form.submit()
+        self.assertTrue('Please correct the indicated errors.'
+                        in self.browser.contents)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_contact_info_normal(self):
+        self.browser.open(self.portal_url + '/contact-info')
+        form = self.browser.getForm(name='feedback_form')
+        self.browser.getControl(name='sender_fullname').value = 'Mr. Spammer'
+        self.browser.getControl(name='sender_from_address').value = 'spammer@example.org'
+        self.browser.getControl(name='subject').value = 'Spammmmmm'
+        self.browser.getControl(name='message').value = 'Spam, bacon and eggs'
+        form.submit()
+        self.assertTrue('Please correct the indicated errors.'
+                        not in self.browser.contents)
+        self.assertEqual(len(self.mailhost.messages), 1)
+
+    def test_contact_info_post_honey(self):
+        # Try a post with the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/contact-info', 'protected_1=bad')
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/send_feedback_site',
+                          'protected_1=bad')
+        self.assertEqual(len(self.mailhost.messages), 0)
+
 
 class FixesTestCase(BasicTestCase):
     # This DOES have our fixed templates and scripts activated.
@@ -105,6 +134,42 @@ class FixesTestCase(BasicTestCase):
             'comment': 'Spam, bacon and eggs'})
         self.browser.open(self.portal_url + '/sendto_form?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
+        # POST is required for the final script.
         self.assertRaises(Forbidden, self.browser.open,
                           self.portal_url + '/sendto?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_contact_info_spammer(self):
+        self.browser.open(self.portal_url + '/contact-info')
+        form = self.browser.getForm(name='feedback_form')
+        self.browser.getControl(name='sender_fullname').value = 'Mr. Spammer'
+        self.browser.getControl(name='sender_from_address').value = 'spammer@example.org'
+        self.browser.getControl(name='subject').value = 'Spammmmmm'
+        self.browser.getControl(name='message').value = 'Spam, bacon and eggs'
+        # Yummy, a honeypot!
+        self.browser.getControl(name='protected_1').value = 'Spammity spam'
+        self.assertRaises(Forbidden, form.submit)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_contact_info_post_no_honey(self):
+        # Try a post without the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/contact-info', '')
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/send_feedback_site', '')
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_contact_info_get(self):
+        # Try a GET.  This does not trigger our honeypot checks, but
+        # still it should not result in the sending of an email.
+        qs = urllib.urlencode({
+            'sender_fullname': 'Mr. Spammer',
+            'sender_from_address': 'spammer@example.org',
+            'subject': 'Spammmmmm',
+            'message': 'Spam, bacon and eggs'})
+        self.browser.open(self.portal_url + '/contact-info?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+        # POST is required for the final script.
+        self.assertRaises(Forbidden, self.browser.open,
+                          self.portal_url + '/send_feedback_site?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
