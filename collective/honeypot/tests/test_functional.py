@@ -28,7 +28,7 @@ class BasicTestCase(unittest.TestCase):
         # honeypot checks.
         self.browser.post(self.portal_url, 'innocent=true')
         self.assertRaises(Forbidden, self.browser.post,
-                          self.portal_url, 'protected_1=asdfsd')
+                          self.portal_url, 'protected_1=bad')
         # The subscriber is registered for the site root, but this
         # does not mean it only works for posts to the site root.
         # First create a folder.
@@ -37,10 +37,10 @@ class BasicTestCase(unittest.TestCase):
         folder = self.portal.f1
         self.assertRaises(Forbidden, self.browser.post,
                           folder.absolute_url(),
-                          'protected_1=asdfsd')
+                          'protected_1=bad')
         self.assertRaises(Forbidden, self.browser.post,
                           self.portal_url + '/non-existing-page',
-                          'protected_1=asdfsd')
+                          'protected_1=bad')
 
     def test_sendto_empty(self):
         self.browser.open(self.portal_url + '/sendto_form')
