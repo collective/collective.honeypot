@@ -68,6 +68,28 @@ For extra protection, you can add the page on which it appears to the
 raised if the field is not submitted in the form at all.  See the
 Configuration_ section.
 
+The package has fixes for some standard Plone templates.  You can
+explicitly use these by loading ``fixes.zcml``.  In your buildout
+config::
+
+  [instance]
+  zcml =
+      collective.honeypot-fixes
+
+What does that do?
+
+-  This registers overrides for several templates and scripts (using
+``z3c.jbot``).
+
+- It adds those templates and scripts to the list of extra protected
+  actions.  This means that a post request to these actions now needs
+  to have the honeypot field and it needs to be empty.
+
+- It also registers an override for the ``@@authenticator`` view from
+  ``plone.protect`` that is used in several templates for csrf
+  protection (cross site request forgery): any template that already
+  uses this, is now automatically loading our honeypot field.
+
 
 Configuration
 =============
@@ -162,11 +184,6 @@ This works on Plone 3 and Plone 4.  It does *not* work on Plone 2.5.
 
 TODO
 ====
-
-General:
-
-- Explain what we did with @@authenticator.  Determine if we want to
-  keep that.  Seems okay.
 
 
 Plone 4:

@@ -42,6 +42,22 @@ class BasicTestCase(unittest.TestCase):
                           self.portal_url + '/non-existing-page',
                           'protected_1=bad')
 
+    def test_authenticator(self):
+        authenticator = self.layer['portal'].restrictedTraverse(
+            '@@authenticator').authenticator()
+        self.assertTrue(authenticator.startswith(
+            '<input type="hidden" name="_authenticator" value='))
+        # Since fixes.zcml is not loaded, our honeypot field is not
+        # added to the authenticator.
+        self.assertTrue('protected' not in authenticator)
+
+    def test_honeypot_field_view(self):
+        self.browser.open(self.portal_url + '/@@honeypot_field')
+        self.assertEqual(self.browser.contents.strip(),
+        """<div class="as_protected" style="display: none">
+  <input type="text" value="" name="protected_1" />
+</div>""")
+
     ### Tests for the sendto form.
 
     def test_sendto_empty(self):
@@ -138,6 +154,22 @@ class FixesTestCase(BasicTestCase):
     # check that the standard forms still work, and override a few to
     # show that the honeypot field is present.
 
+    def test_authenticator(self):
+        authenticator = self.layer['portal'].restrictedTraverse(
+            '@@authenticator').authenticator()
+        self.assertTrue(authenticator.startswith(
+            '<input type="hidden" name="_authenticator" value='))
+        self.assertTrue('protected' in authenticator)
+        self.browser.open(self.portal_url + '/@@honeypot_field')
+        self.assertTrue(self.browser.contents.strip() in authenticator)
+
+    def test_honeypot_field_view(self):
+        self.browser.open(self.portal_url + '/@@honeypot_field')
+        self.assertEqual(self.browser.contents.strip(),
+        """<div class="as_protected" style="display: none">
+  <input type="text" value="" name="protected_1" />
+</div>""")
+
     ### Tests for the sendto form.
 
     def test_sendto_spammer(self):
@@ -218,7 +250,7 @@ class FixesTestCase(BasicTestCase):
         self.browser.getControl(name='form.username').value = 'spammer'
         self.browser.getControl(name='form.email').value = 'spammer@example.org'
         # Yummy, a honeypot!
-        self.browser.getControl(name='protected_1').value = 'Spammity spam'
+        self.browser.getControl(name='protected_1', index=0).value = 'Spammity spam'
         register_button = self.browser.getControl(name='form.actions.register')
         self.assertRaises(Forbidden, register_button.click)
         self.assertEqual(len(self.mailhost.messages), 0)

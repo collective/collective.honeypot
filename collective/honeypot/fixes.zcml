@@ -13,6 +13,7 @@
   -->
 
   <include package="z3c.jbot" />
+  <includeOverrides file="authenticator-overrides.zcml" />
   <include zcml:condition="have plone-4" package=".plone4" />
 
 </configure>
