@@ -58,24 +58,16 @@ class BasicFixture(PloneSandboxLayer):
         unpatch_mailhost(portal)
 
 
-class FixesFixture(PloneSandboxLayer):
+class FixesFixture(BasicFixture):
     # Fixture that loads fixes.zcml.  This activates the improved
     # templates and scripts.
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        # Load ZCML
+        super(FixesFixture, self).setUpZope(app, configurationContext)
+        # Load extra ZCML
         import collective.honeypot
-        self.loadZCML(package=collective.honeypot)
-        self.loadZCML(package=collective.honeypot, name='overrides.zcml')
         self.loadZCML(package=collective.honeypot, name='fixes.zcml')
-
-    def setUpPloneSite(self, portal):
-        patch_mailhost(portal)
-        enable_self_registration(portal)
-
-    def teardownPloneSite(self, portal):
-        unpatch_mailhost(portal)
 
 
 BASIC_FIXTURE = BasicFixture()
