@@ -78,3 +78,11 @@ class FixesTestCase(BasicTestCase):
         self.browser.getControl(name='protected_1').value = 'Spammity spam'
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_sendto_post(self):
+        # Try a post without the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/sendto_form', '')
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/sendto', '')
+        self.assertEqual(len(self.mailhost.messages), 0)
