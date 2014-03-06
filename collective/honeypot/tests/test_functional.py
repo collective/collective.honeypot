@@ -102,6 +102,34 @@ class BasicTestCase(unittest.TestCase):
                           'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    ### Tests for the register form.
+
+    def test_register_empty(self):
+        self.browser.open(self.portal_url + '/@@register')
+        # We could get the form, but with this general id it seems a
+        # bad idea:
+        #form = self.browser.getForm(id='zc.page.browser_form')
+        self.browser.getControl(name='form.actions.register').click()
+        self.assertTrue('There were errors' in self.browser.contents)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_register_normal(self):
+        self.browser.open(self.portal_url + '/@@register')
+        self.browser.getControl(name='form.fullname').value = 'Mr. Spammer'
+        self.browser.getControl(name='form.username').value = 'spammer'
+        self.browser.getControl(name='form.email').value = 'spammer@example.org'
+        self.browser.getControl(name='form.actions.register').click()
+        self.assertTrue('There were errors' not in self.browser.contents)
+        self.assertEqual(len(self.mailhost.messages), 1)
+
+    def test_register_post_honey(self):
+        # Try a post with the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/@@register', 'protected_1=bad')
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/register', 'protected_1=bad')
+        self.assertEqual(len(self.mailhost.messages), 0)
+
 
 class FixesTestCase(BasicTestCase):
     # This DOES have our fixed templates and scripts activated.
@@ -180,4 +208,25 @@ class FixesTestCase(BasicTestCase):
         # POST is required for the final script.
         self.assertRaises(Forbidden, self.browser.open,
                           self.portal_url + '/send_feedback_site?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    ### Tests for the register form.
+
+    def test_register_spammer(self):
+        self.browser.open(self.portal_url + '/@@register')
+        self.browser.getControl(name='form.fullname').value = 'Mr. Spammer'
+        self.browser.getControl(name='form.username').value = 'spammer'
+        self.browser.getControl(name='form.email').value = 'spammer@example.org'
+        # Yummy, a honeypot!
+        self.browser.getControl(name='protected_1').value = 'Spammity spam'
+        register_button = self.browser.getControl(name='form.actions.register')
+        self.assertRaises(Forbidden, register_button.click)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_register_post_no_honey(self):
+        # Try a post without the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/@@register', '')
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/register', '')
         self.assertEqual(len(self.mailhost.messages), 0)
