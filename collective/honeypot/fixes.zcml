@@ -1,0 +1,18 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml">
+
+  <!-- Note: this is not loaded automatically.  In your buildout.cfg
+       you need something like this:
+
+       [instance]
+       eggs =
+           collective.honeypot
+       zcml =
+           collective.honeypot-fixes
+  -->
+
+  <include package="z3c.jbot" />
+  <include zcml:condition="have plone-4" package=".plone4" />
+
+</configure>

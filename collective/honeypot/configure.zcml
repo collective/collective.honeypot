@@ -25,6 +25,4 @@
            zope.traversing.interfaces.IBeforeTraverseEvent"
       handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
 
-  <include zcml:condition="have plone-4" package=".plone4" />
-
 </configure>

@@ -32,6 +32,11 @@ setup(name='collective.honeypot',
           'setuptools',
           'z3c.jbot',
       ],
+      extras_require = {
+          'test': [
+              'plone.app.testing',
+              ],
+      },
       entry_points="""
       # -*- Entry points: -*-
 
