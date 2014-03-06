@@ -158,3 +158,27 @@ Compatibility
 =============
 
 This works on Plone 3 and Plone 4.  It does *not* work on Plone 2.5.
+
+
+TODO
+====
+
+General:
+
+- Explain what we did with @@authenticator.  Determine if we want to
+  keep that.  Seems okay.
+
+
+Plone 4:
+
+- We need to protect plone.app.discussion.  Best seems to be to create
+  our own CaptchaExtender variation.
+
+
+Plone 3:
+
+- Check which of our Plone 4 fixes work on Plone 3 too.
+
+- Protect discussion_reply.
+
+- Protect join_form.
