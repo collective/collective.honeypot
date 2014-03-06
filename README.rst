@@ -63,14 +63,20 @@ This is all that is needed to have the basic protection of an
 invisible field that captures spammers if they fill it in.  A
 ``Forbidden`` exception is raised in that case.
 
-For extra protection, you can add the page on which it appears to the
-``EXTRA_PROTECTED_ACTIONS``.  This means that the exception is also
-raised if the field is not submitted in the form at all.  See the
-Configuration_ section.
+Some forms may get that invisible field automatically.  This package
+registers an override for the ``@@authenticator`` view from
+``plone.protect`` that is used in several templates for csrf
+protection (cross site request forgery).  So any template that already
+uses this, is automatically loading our honeypot field.
 
-The package has fixes for some standard Plone templates.  You can
-explicitly use these by loading ``fixes.zcml``.  In your buildout
-config::
+For extra protection, you can add the page on which the form appears
+to the ``EXTRA_PROTECTED_ACTIONS``.  This means that the ``Forbidden``
+exception is also raised if the field is not submitted in the form at
+all.  See the Configuration_ section.
+
+The package has fixes for some standard Plone templates.  If you want
+to use them, you need to explicitly enable them by loading
+``fixes.zcml``.  In your buildout config::
 
   [instance]
   zcml =
@@ -84,11 +90,6 @@ What does that do?
 - It adds those templates and scripts to the list of extra protected
   actions.  This means that a post request to these actions now needs
   to have the honeypot field and it needs to be empty.
-
-- It also registers an override for the ``@@authenticator`` view from
-  ``plone.protect`` that is used in several templates for csrf
-  protection (cross site request forgery): any template that already
-  uses this, is now automatically loading our honeypot field.
 
 
 Configuration

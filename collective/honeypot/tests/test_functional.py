@@ -47,9 +47,9 @@ class BasicTestCase(unittest.TestCase):
             '@@authenticator').authenticator()
         self.assertTrue(authenticator.startswith(
             '<input type="hidden" name="_authenticator" value='))
-        # Since fixes.zcml is not loaded, our honeypot field is not
-        # added to the authenticator.
-        self.assertTrue('protected' not in authenticator)
+        self.assertTrue('protected' in authenticator)
+        self.browser.open(self.portal_url + '/@@honeypot_field')
+        self.assertTrue(self.browser.contents.strip() in authenticator)
 
     def test_honeypot_field_view(self):
         self.browser.open(self.portal_url + '/@@honeypot_field')
@@ -153,22 +153,6 @@ class FixesTestCase(BasicTestCase):
     # Note that we inherit the test methods from BasicTestCase, to
     # check that the standard forms still work, and override a few to
     # show that the honeypot field is present.
-
-    def test_authenticator(self):
-        authenticator = self.layer['portal'].restrictedTraverse(
-            '@@authenticator').authenticator()
-        self.assertTrue(authenticator.startswith(
-            '<input type="hidden" name="_authenticator" value='))
-        self.assertTrue('protected' in authenticator)
-        self.browser.open(self.portal_url + '/@@honeypot_field')
-        self.assertTrue(self.browser.contents.strip() in authenticator)
-
-    def test_honeypot_field_view(self):
-        self.browser.open(self.portal_url + '/@@honeypot_field')
-        self.assertEqual(self.browser.contents.strip(),
-        """<div class="as_protected" style="display: none">
-  <input type="text" value="" name="protected_1" />
-</div>""")
 
     ### Tests for the sendto form.
 

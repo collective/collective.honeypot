@@ -48,6 +48,7 @@ class BasicFixture(PloneSandboxLayer):
         # Load ZCML
         import collective.honeypot
         self.loadZCML(package=collective.honeypot)
+        self.loadZCML(package=collective.honeypot, name='overrides.zcml')
 
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
@@ -66,6 +67,7 @@ class FixesFixture(PloneSandboxLayer):
         # Load ZCML
         import collective.honeypot
         self.loadZCML(package=collective.honeypot)
+        self.loadZCML(package=collective.honeypot, name='overrides.zcml')
         self.loadZCML(package=collective.honeypot, name='fixes.zcml')
 
     def setUpPloneSite(self, portal):
