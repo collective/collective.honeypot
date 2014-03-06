@@ -13,6 +13,7 @@ def patch_mailhost(portal):
     portal._updateProperty('email_from_address', 'webmaster@example.org')
     portal._original_MailHost = portal.MailHost
     portal.MailHost = mailhost = MockMailHost('MailHost')
+    mailhost.smtp_host = 'localhost'
     sm = getSiteManager(context=portal)
     sm.unregisterUtility(provided=IMailHost)
     sm.registerUtility(mailhost, provided=IMailHost)
@@ -26,6 +27,19 @@ def unpatch_mailhost(portal):
                        provided=IMailHost)
 
 
+def enable_self_registration(portal):
+    # Taken from plone.app.controlpanel
+    app_perms = portal.rolesOfPermission(permission='Add portal member')
+    reg_roles = []
+    for appperm in app_perms:
+        if appperm['selected'] == 'SELECTED':
+            reg_roles.append(appperm['name'])
+    if 'Anonymous' not in reg_roles:
+        reg_roles.append('Anonymous')
+    portal.manage_permission('Add portal member', roles=reg_roles,
+                             acquire=0)
+
+
 class BasicFixture(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
@@ -37,6 +51,7 @@ class BasicFixture(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
+        enable_self_registration(portal)
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
@@ -55,6 +70,7 @@ class FixesFixture(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
+        enable_self_registration(portal)
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
