@@ -42,6 +42,8 @@ class BasicTestCase(unittest.TestCase):
                           self.portal_url + '/non-existing-page',
                           'protected_1=bad')
 
+    ### Tests for the sendto form.
+
     def test_sendto_empty(self):
         self.browser.open(self.portal_url + '/sendto_form')
         form = self.browser.getForm(name='sendto_form')
@@ -68,6 +70,8 @@ class BasicTestCase(unittest.TestCase):
         self.assertRaises(Forbidden, self.browser.post,
                           self.portal_url + '/sendto', 'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    ### Tests for the contact-info form.
 
     def test_contact_info_empty(self):
         self.browser.open(self.portal_url + '/contact-info')
@@ -106,6 +110,8 @@ class FixesTestCase(BasicTestCase):
     # check that the standard forms still work, and override a few to
     # show that the honeypot field is present.
 
+    ### Tests for the sendto form.
+
     def test_sendto_spammer(self):
         self.browser.open(self.portal_url + '/sendto_form')
         form = self.browser.getForm(name='sendto_form')
@@ -138,6 +144,8 @@ class FixesTestCase(BasicTestCase):
         self.assertRaises(Forbidden, self.browser.open,
                           self.portal_url + '/sendto?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    ### Tests for the contact-info form.
 
     def test_contact_info_spammer(self):
         self.browser.open(self.portal_url + '/contact-info')
