@@ -61,6 +61,14 @@ class BasicTestCase(unittest.TestCase):
                         not in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 1)
 
+    def test_sendto_post_honey(self):
+        # Try a post with the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/sendto_form', 'protected_1=bad')
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/sendto', 'protected_1=bad')
+        self.assertEqual(len(self.mailhost.messages), 0)
+
 
 class FixesTestCase(BasicTestCase):
     # This DOES have our fixed templates and scripts activated.
@@ -80,7 +88,7 @@ class FixesTestCase(BasicTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    def test_sendto_post(self):
+    def test_sendto_post_no_honey(self):
         # Try a post without the honeypot field.
         self.assertRaises(Forbidden, self.browser.post,
                           self.portal_url + '/sendto_form', '')

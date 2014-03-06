@@ -2,7 +2,7 @@ from collective.honeypot import config
 
 protected = [
     'sendto_form',
-    'sendto',  # Need to let this require POST
+    'sendto',
     'contact-info',
     'send_feedback_site',
     'register',
