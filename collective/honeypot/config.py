@@ -32,9 +32,5 @@ WHITELISTED_ACTIONS = get_multi('WHITELISTED_ACTIONS', (
 logger.info('Whitelisted actions: %r', WHITELISTED_ACTIONS)
 
 # Fields that are not logged:
-IGNORED_FORM_FIELDS = get_multi('IGNORED_FORM_FIELDS', (
-    'password',
-    'password_confirm',
-    '__ac_password',
-    ))
+IGNORED_FORM_FIELDS = get_multi('IGNORED_FORM_FIELDS', ())
 logger.info('Ignored form fields: %r', IGNORED_FORM_FIELDS)

@@ -81,7 +81,7 @@ this in ``buildout.cfg``::
       HONEYPOT_FIELD pooh
       EXTRA_PROTECTED_ACTIONS discussion_reply join_form sendto_form
       WHITELISTED_ACTIONS jq_reveal_email
-      IGNORED_FORM_FIELDS password password_confirm __ac_password
+      IGNORED_FORM_FIELDS secret_field
 
 None of the options are required.
 
@@ -115,9 +115,8 @@ IGNORED_FORM_FIELDS
     attempts but are not caught yet and need extra handling, perhaps
     an extra form that should get protection.  This information may
     contain form fields that should be left secret or that are not
-    interesting.  By default we ignore standard Plone password fields.
-    If you have other fields you want to ignore, please add the
-    default ones to the list too.
+    interesting.  No matter what you fill in here, we always ignore
+    fields that contain the term `password`.
 
 
 When are the checks *not* done?

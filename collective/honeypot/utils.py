@@ -54,6 +54,14 @@ def get_form(request):
             form = deepcopy(form)
             copied = True
         form.pop(field)
+    # Remove all password fields.
+    for field in form:
+        if 'password' not in field:
+            continue
+        if not copied:
+            form = deepcopy(form)
+            copied = True
+        form.pop(field)
     return form
 
 

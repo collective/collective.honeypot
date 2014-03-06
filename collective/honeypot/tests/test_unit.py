@@ -43,6 +43,7 @@ class UtilsTestCase(unittest.TestCase):
                   'password': 'secret',
                   'password_confirm': 'secret2',
                   '__ac_password': 'secret3',
+                  'somepasswordfield': 'secret4',
                   '__ac_name': 'admin',
                   })
         self.assertEqual(get_form(secret_request),
@@ -51,6 +52,7 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEqual(secret_request.form['password'], 'secret')
         self.assertEqual(secret_request.form['password_confirm'], 'secret2')
         self.assertEqual(secret_request.form['__ac_password'], 'secret3')
+        self.assertEqual(secret_request.form['somepasswordfield'], 'secret4')
 
     def _request(self, dest='', method='POST', form=None):
         # Return a proper request.  POST by default.
