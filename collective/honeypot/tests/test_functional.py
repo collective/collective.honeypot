@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import urllib
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
@@ -85,4 +86,16 @@ class FixesTestCase(BasicTestCase):
                           self.portal_url + '/sendto_form', '')
         self.assertRaises(Forbidden, self.browser.post,
                           self.portal_url + '/sendto', '')
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_sendto_get(self):
+        # Try a GET.  This does not trigger our honeypot checks, but
+        # still it should not result in the sending of an email.
+        qs = urllib.urlencode({
+            'send_to_address': 'joe@example.org',
+            'send_from_address': 'spammer@example.org',
+            'comment': 'Spam, bacon and eggs'})
+        self.browser.open(self.portal_url + '/sendto_form?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+        self.browser.open(self.portal_url + '/sendto?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
