@@ -97,5 +97,6 @@ class FixesTestCase(BasicTestCase):
             'comment': 'Spam, bacon and eggs'})
         self.browser.open(self.portal_url + '/sendto_form?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
-        self.browser.open(self.portal_url + '/sendto?' + qs)
+        self.assertRaises(Forbidden, self.browser.open,
+                          self.portal_url + '/sendto?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
