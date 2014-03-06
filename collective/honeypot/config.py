@@ -7,9 +7,9 @@ logger = logging.getLogger('collective.honeypot')
 def get_multi(key, default):
     value = os.environ.get(key, None)
     if value is None:
-        return frozenset(default)
+        return set(default)
     value = value.strip().replace(',', ' ').replace('@', ' ')
-    value = frozenset(value.split())
+    value = set(value.split())
     return value
 
 # Field that MAY be in some requests, but MUST be empty.
