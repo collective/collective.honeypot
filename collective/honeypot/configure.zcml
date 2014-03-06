@@ -8,7 +8,7 @@
   <browser:page
       for="*"
       name="honeypot_field"
-      class=".browser.HoneypotField"
+      class=".browser.HoneypotAuthenticatorView"
       permission="zope2.View"
       template="honeypot.pt"
       />

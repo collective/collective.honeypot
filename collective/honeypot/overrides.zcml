@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <browser:page
+      for="*"
+      name="authenticator"
+      class=".browser.HoneypotAuthenticatorView"
+      permission="zope.Public"
+      allowed_interface="plone.protect.interfaces.IAuthenticatorView"
+      template="honeypot.pt"
+      />
+
+</configure>
