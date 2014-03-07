@@ -25,4 +25,7 @@
            zope.traversing.interfaces.IBeforeTraverseEvent"
       handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
 
+  <include zcml:condition="installed plone.app.z3cform"
+           package=".z3cform" />
+
 </configure>

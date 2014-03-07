@@ -1,0 +1,13 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c">
+
+  <include package="plone.app.z3cform" />
+  <z3c:widgetTemplate
+      mode="hidden"
+      widget="collective.honeypot.z3cform.widget.IHoneypotWidget"
+      layer="z3c.form.interfaces.IFormLayer"
+      template="../honeypot.pt"
+      />
+
+</configure>
