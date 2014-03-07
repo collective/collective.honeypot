@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import pkg_resources
 from Acquisition import aq_base
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
-from plone.app.discussion.interfaces import IDiscussionSettings
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.registry.interfaces import IRegistry
 from zope.component import getSiteManager
 from zope.component import queryUtility
+
+try:
+    pkg_resources.get_distribution('plone.app.discussion')
+except pkg_resources.DistributionNotFound:
+    HAS_DISCUSSION = False
+else:
+    HAS_DISCUSSION = True
+    from plone.app.discussion.interfaces import IDiscussionSettings
+    from plone.registry.interfaces import IRegistry
 
 
 def patch_mailhost(portal):
@@ -56,11 +64,12 @@ class BasicFixture(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
         enable_self_registration(portal)
-        # Enable commenting.
-        registry = queryUtility(IRegistry)
-        settings = registry.forInterface(IDiscussionSettings)
-        settings.globally_enabled = True
-        settings.anonymous_comments = True
+        if HAS_DISCUSSION:
+            # Enable commenting.
+            registry = queryUtility(IRegistry)
+            settings = registry.forInterface(IDiscussionSettings)
+            settings.globally_enabled = True
+            settings.anonymous_comments = True
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)

@@ -1,0 +1,9 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Extend plone.app.discussion comment form. -->
+  <adapter
+      factory=".z3cformextender.HoneypotExtender"
+      provides="plone.z3cform.fieldsets.interfaces.IFormExtender" />
+
+</configure>

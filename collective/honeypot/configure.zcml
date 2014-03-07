@@ -15,17 +15,20 @@
 
   <!-- Subscribe to before traverse event. -->
   <subscriber
-      zcml:condition="not-have plone-4"
+      zcml:condition="not-have plone-41"
       for="Products.CMFCore.interfaces.ISiteRoot
            zope.app.publication.interfaces.IBeforeTraverseEvent"
       handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
   <subscriber
-      zcml:condition="have plone-4"
+      zcml:condition="have plone-41"
       for="Products.CMFCore.interfaces.ISiteRoot
            zope.traversing.interfaces.IBeforeTraverseEvent"
       handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
 
   <include zcml:condition="installed plone.app.z3cform"
            package=".z3cform" />
+
+  <include zcml:condition="installed plone.app.discussion"
+           package=".discussion" />
 
 </configure>
