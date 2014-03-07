@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import textwrap
 import transaction
 import unittest
 import urllib
@@ -55,10 +56,11 @@ class BasicTestCase(unittest.TestCase):
 
     def test_honeypot_field_view(self):
         self.browser.open(self.portal_url + '/@@honeypot_field')
-        self.assertEqual(self.browser.contents.strip(),
-        """<div class="as_protected" style="display: none">
-  <input type="text" value="" name="protected_1" />
-</div>""")
+        text = textwrap.dedent("""
+            <div style="display: none">
+              <input type="text" value="" name="protected_1" />
+            </div>""")
+        self.assertEqual(self.browser.contents.strip(), text.strip())
 
     ### Tests for the sendto form.
 

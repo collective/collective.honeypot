@@ -1,4 +1,4 @@
-<div class="as_protected" style="display: none">
+<div style="display: none">
   <input type="text" value=""
          tal:attributes="name view/honeypot_field_name" />
 </div>
