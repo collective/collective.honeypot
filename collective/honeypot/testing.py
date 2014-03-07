@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from zope.component import getSiteManager
 from Acquisition import aq_base
-from Products.MailHost.interfaces import IMailHost
 from Products.CMFPlone.tests.utils import MockMailHost
+from Products.MailHost.interfaces import IMailHost
+from plone.app.discussion.interfaces import IDiscussionSettings
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.registry.interfaces import IRegistry
+from zope.component import getSiteManager
+from zope.component import queryUtility
 
 
 def patch_mailhost(portal):
@@ -53,6 +56,11 @@ class BasicFixture(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
         enable_self_registration(portal)
+        # Enable commenting.
+        registry = queryUtility(IRegistry)
+        settings = registry.forInterface(IDiscussionSettings)
+        settings.globally_enabled = True
+        settings.anonymous_comments = True
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)

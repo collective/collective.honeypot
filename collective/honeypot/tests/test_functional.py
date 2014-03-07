@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import transaction
 import unittest
 import urllib
+from plone.app.discussion.interfaces import IConversation
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
@@ -146,6 +148,41 @@ class BasicTestCase(unittest.TestCase):
                           self.portal_url + '/register', 'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    ### Tests for the comment form.
+
+    def _create_commentable_doc(self):
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal.invokeFactory('Document', 'doc', title=u"Document 1")
+        self.portal.doc.allowDiscussion(True)
+        # Need to commit, otherwise the browser does not see it.
+        transaction.commit()
+
+    def test_comment_empty(self):
+        self._create_commentable_doc()
+        self.browser.open(self.portal_url + '/doc')
+        self.browser.getControl(name='form.buttons.comment').click()
+        self.assertTrue('Required input is missing.' in self.browser.contents)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_comment_normal(self):
+        self._create_commentable_doc()
+        self.browser.open(self.portal_url + '/doc')
+        self.browser.getControl(name='form.widgets.author_name').value = 'Mr. Spammer'
+        self.browser.getControl(name='form.widgets.text').value = 'Spam spam.'
+        self.browser.getControl(name='form.buttons.comment').click()
+        self.assertTrue('Required input is missing.' not in self.browser.contents)
+        # The comment is added.
+        conversation = IConversation(self.portal.doc)
+        self.assertEqual(len(list(conversation.getComments())), 1)
+        # No mails are sent.
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_comment_post_honey(self):
+        # Try a post with the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/doc', 'protected_1=bad')
+        self.assertEqual(len(self.mailhost.messages), 0)
+
 
 class FixesTestCase(BasicTestCase):
     # This DOES have our fixed templates and scripts activated.
@@ -246,3 +283,21 @@ class FixesTestCase(BasicTestCase):
         self.assertRaises(Forbidden, self.browser.post,
                           self.portal_url + '/register', '')
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    ### Tests for the comment form.
+
+    def test_comment_spammer(self):
+        self._create_commentable_doc()
+        self.browser.open(self.portal_url + '/doc')
+        self.browser.getControl(name='form.widgets.author_name').value = 'Mr. Spammer'
+        self.browser.getControl(name='form.widgets.text').value = 'Spam spam.'
+        # Yummy, a honeypot!
+        self.browser.getControl(name='protected_1', index=0).value = 'Spammity spam'
+        button = self.browser.getControl(name='form.buttons.comment')
+        self.assertRaises(Forbidden, button.click)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    # Note: we do not try a post without the honeypot field, because
+    # there is no special action that the form posts to: it simply
+    # posts to the current view, and we cannot explicitly protect all
+    # views.
