@@ -17,6 +17,9 @@
   <include zcml:condition="installed plone.app.discussion"
            package=".discussion" />
 
+  <include zcml:condition="not-installed plone.app.discussion"
+           package=".oldcomments" />
+
   <include zcml:condition="have plone-4" package=".plone4" />
 
 </configure>
