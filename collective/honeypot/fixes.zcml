@@ -14,6 +14,9 @@
 
   <include package="z3c.jbot" />
 
+  <include zcml:condition="installed plone.app.discussion"
+           package=".discussion" />
+
   <include zcml:condition="have plone-4" package=".plone4" />
 
 </configure>

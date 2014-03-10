@@ -28,7 +28,4 @@
   <include zcml:condition="installed plone.app.z3cform"
            package=".z3cform" />
 
-  <include zcml:condition="installed plone.app.discussion"
-           package=".discussion" />
-
 </configure>
