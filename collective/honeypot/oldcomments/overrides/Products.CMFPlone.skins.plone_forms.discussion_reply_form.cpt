@@ -78,6 +78,8 @@
               tal:attributes="action string:${context/@@plone_context_state/object_url}/${template/getId}"
               tal:define="isAnon context/@@plone_portal_state/anonymous;">
 
+            <div tal:replace="structure context/@@honeypot_field|nothing" />
+
             <input type="hidden" name="Creator" value=""
                    tal:define="member context/@@plone_portal_state/member;"
                    tal:attributes="value member/getUserName" />
