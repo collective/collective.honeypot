@@ -369,11 +369,17 @@ class FixesTestCase(BasicTestCase):
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_comment_post_no_honey(self):
-            # Try a post without the honeypot field.
+            # Try a post without the honeypot field.  It is not very
+            # useful in this case, because we cannot easily require
+            # the empty honeypot field for the form.  And we can
+            # require it for the final script, but normally that
+            # script is traversed to after validation of the form, so
+            # our event subscriber does not kick in.
             self._create_commentable_doc()
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/doc/discussion_reply_form', '')
+            # This should be allowed, because it simply opens the actual form.
+            self.browser.post(self.portal_url + '/doc/discussion_reply_form', '')
             self.assertEqual(len(self.mailhost.messages), 0)
+            # The final script is protected.
             self.assertRaises(Forbidden, self.browser.post,
                               self.portal_url + '/doc/discussion_reply', '')
             self.assertEqual(len(self.mailhost.messages), 0)
