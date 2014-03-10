@@ -2,6 +2,7 @@
 
 import pkg_resources
 from Acquisition import aq_base
+from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
 from plone.app.testing import FunctionalTesting
@@ -70,6 +71,10 @@ class BasicFixture(PloneSandboxLayer):
             settings = registry.forInterface(IDiscussionSettings)
             settings.globally_enabled = True
             settings.anonymous_comments = True
+        else:
+            types_tool = getToolByName(portal, 'portal_types')
+            types_tool.Document.allow_discussion = True
+            portal.manage_permission('Reply to item', ('Anonymous', ))
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
