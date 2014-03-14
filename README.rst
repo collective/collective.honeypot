@@ -3,6 +3,11 @@ Introduction
 
 This package gives honeypot protection for forms.
 
+.. warning:: I [Maurits] want to move this to the github collective,
+   but I want to do some more fixes and tell the Plone Security Team
+   about this to get their opinion before making this public.
+   Probably not needed, but let's be careful.
+
 
 Use case
 ========
