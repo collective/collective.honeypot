@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.3 (unreleased)
+0.3 (2014-03-14)
 ----------------
 
 - Remove ``z3c.jbot`` from the default dependencies so the
