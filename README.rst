@@ -89,8 +89,8 @@ to use them, you need to explicitly enable them by loading
 
 What does that do?
 
--  This registers overrides for several templates and scripts (using
-``z3c.jbot``).
+- This registers overrides for several templates and scripts (using
+  ``z3c.jbot``).
 
 - It adds those templates and scripts to the list of extra protected
   actions.  This means that a post request to these actions now needs
