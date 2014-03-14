@@ -80,10 +80,13 @@ exception is also raised if the field is not submitted in the form at
 all.  See the Configuration_ section.
 
 The package has fixes for some standard Plone templates.  If you want
-to use them, you need to explicitly enable them by loading
+to use them, you need to explicitly enable them by loading the extra
+``fixes`` dependencies (``z3c.jbot`` currently) and loading
 ``fixes.zcml``.  In your buildout config::
 
   [instance]
+  eggs =
+      collective.honeypot[fixes]
   zcml =
       collective.honeypot-fixes
 
