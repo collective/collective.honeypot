@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.2 (unreleased)
+0.2 (2014-03-14)
 ----------------
 
 - Make ``z3c.jbot`` an extra dependency of ``collective.honeypot[fixes]``.
