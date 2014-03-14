@@ -5,7 +5,9 @@ Changelog
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Remove ``z3c.jbot`` from the default dependencies so the
+  last change actually works.
+  [maurits]
 
 
 0.2 (2014-03-14)

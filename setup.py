@@ -30,7 +30,6 @@ setup(name='collective.honeypot',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'z3c.jbot',
       ],
       extras_require = {
           'test': [
