@@ -21,6 +21,11 @@ else:
     from plone.app.discussion.interfaces import IConversation
 
 
+if not hasattr(Browser, 'post'):
+    # Plone 3.
+    Browser.post = Browser.open
+
+
 class BasicTestCase(unittest.TestCase):
     # This does NOT have our fixed templates and scripts activated.
     layer = BASIC_FUNCTIONAL_TESTING
