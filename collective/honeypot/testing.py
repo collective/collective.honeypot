@@ -52,6 +52,10 @@ def enable_self_registration(portal):
                              acquire=0)
 
 
+def isDiscussionAllowedFor(obj):
+    return True
+
+
 class BasicFixture(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
@@ -77,6 +81,17 @@ class BasicFixture(PloneSandboxLayer):
         types_tool = getToolByName(portal, 'portal_types')
         types_tool.Document.allow_discussion = True
         portal.manage_permission('Reply to item', ('Anonymous', ))
+
+        # In Plone 4.1 the old validate_talkback script goes wrong
+        # because the discussion tool does not have a
+        # isDiscussionAllowedFor method.  Let's fix that with a dummy
+        # one.  Note that getToolByName(portal, 'portal_discussion')
+        # gets the old commenting tool and portal.portal_discussion
+        # gets the new p.a.discussion tool, which lacks this method.
+        # Go figure.
+        discussion_tool = portal.portal_discussion
+        if not hasattr(discussion_tool, 'isDiscussionAllowedFor'):
+            discussion_tool.isDiscussionAllowedFor = isDiscussionAllowedFor
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
