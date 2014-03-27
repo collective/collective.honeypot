@@ -199,6 +199,4 @@ Plone 3:
 
 - Check which of our Plone 4 fixes work on Plone 3 too.
 
-- Protect discussion_reply.
-
 - Protect join_form.

@@ -71,10 +71,12 @@ class BasicFixture(PloneSandboxLayer):
             settings = registry.forInterface(IDiscussionSettings)
             settings.globally_enabled = True
             settings.anonymous_comments = True
-        else:
-            types_tool = getToolByName(portal, 'portal_types')
-            types_tool.Document.allow_discussion = True
-            portal.manage_permission('Reply to item', ('Anonymous', ))
+        # This is for old-style comments.  That should be only for
+        # Plone 3 and 4.0, but the scripts are still available, so we
+        # still need to protect them and test them
+        types_tool = getToolByName(portal, 'portal_types')
+        types_tool.Document.allow_discussion = True
+        portal.manage_permission('Reply to item', ('Anonymous', ))
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)

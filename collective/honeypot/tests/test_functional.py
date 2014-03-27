@@ -194,46 +194,57 @@ class BasicTestCase(unittest.TestCase):
                               self.portal_url + '/doc', 'protected_1=bad')
             self.assertEqual(len(self.mailhost.messages), 0)
 
-    if not HAS_DISCUSSION:
+    # We could decide to only run the next tests when HAS_DISCUSSION
+    # is False, but even with plone.app.discussion available the old
+    # scripts are still there so they need to be protected and tested.
 
-        def test_comment_empty(self):
-            self._create_commentable_doc()
-            self.browser.open(self.portal_url + '/doc')
-            self.browser.getControl('Add Comment').click()
+    def test_old_comment_empty(self):
+        self._create_commentable_doc()
+        self.browser.open(self.portal_url + '/doc')
+        try:
+            add_comment = self.browser.getControl('Add Comment')
+        except LookupError:
+            # plone.app.discussion is installed, so the old 'Add
+            # Comment' control is not there.  Go to the form directly.
+            self.browser.open(self.portal_url + '/doc/discussion_reply_form')
+        else:
+            # p.a.discussion is not installed.  Clicking should work
+            # and we should end up on the old form.
+            add_comment.click()
             self.assertEqual(self.browser.url,
                              self.portal_url + '/doc/discussion_reply_form')
-            form = self.browser.getForm(name='edit_form')
-            form.submit()
-            self.assertTrue('Please correct the indicated errors.'
-                            in self.browser.contents)
-            self.assertTrue('Comment cannot be blank.'
-                            in self.browser.contents)
-            self.assertEqual(len(self.mailhost.messages), 0)
+        form = self.browser.getForm(name='edit_form')
+        form.submit()
+        self.assertTrue('Please correct the indicated errors.'
+                        in self.browser.contents)
+        self.assertTrue('Comment cannot be blank.'
+                        in self.browser.contents)
+        self.assertEqual(len(self.mailhost.messages), 0)
 
-        def test_comment_normal(self):
-            self._create_commentable_doc()
-            self.browser.open(self.portal_url + '/doc/discussion_reply_form')
-            form = self.browser.getForm(name='edit_form')
-            self.browser.getControl(name='body_text').value = 'Spammerdespam'
-            form.submit()
-            self.assertTrue('Please correct the indicated errors.'
-                            not in self.browser.contents)
-            self.assertTrue('Comment added.' in self.browser.contents)
-            # The comment is added.
-            self.assertEqual(len(self.portal.doc.talkback.getReplies()), 1)
-            # No mails are sent.
-            self.assertEqual(len(self.mailhost.messages), 0)
+    def test_old_comment_normal(self):
+        self._create_commentable_doc()
+        self.browser.open(self.portal_url + '/doc/discussion_reply_form')
+        form = self.browser.getForm(name='edit_form')
+        self.browser.getControl(name='body_text').value = 'Spammerdespam'
+        form.submit()
+        self.assertTrue('Please correct the indicated errors.'
+                        not in self.browser.contents)
+        self.assertTrue('Comment added.' in self.browser.contents)
+        # The comment is added.
+        self.assertEqual(len(self.portal.doc.talkback.getReplies()), 1)
+        # No mails are sent.
+        self.assertEqual(len(self.mailhost.messages), 0)
 
-        def test_comment_post_honey(self):
-            # Try a post with the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/doc/discussion_reply_form',
-                              'protected_1=bad')
-            self.assertEqual(len(self.mailhost.messages), 0)
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/doc/discussion_reply',
-                              'protected_1=bad')
-            self.assertEqual(len(self.mailhost.messages), 0)
+    def test_old_comment_post_honey(self):
+        # Try a post with the honeypot field.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/doc/discussion_reply_form',
+                          'protected_1=bad')
+        self.assertEqual(len(self.mailhost.messages), 0)
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/doc/discussion_reply',
+                          'protected_1=bad')
+        self.assertEqual(len(self.mailhost.messages), 0)
 
 
 class FixesTestCase(BasicTestCase):
@@ -356,44 +367,46 @@ class FixesTestCase(BasicTestCase):
         # posts to the current view, and we cannot explicitly protect all
         # views.
 
-    if not HAS_DISCUSSION:
+    # We could decide to only run the next tests when HAS_DISCUSSION
+    # is False, but even with plone.app.discussion available the old
+    # scripts are still there so they need to be protected and tested.
 
-        def test_comment_spammer(self):
-            self._create_commentable_doc()
-            self.browser.open(self.portal_url + '/doc/discussion_reply_form')
-            form = self.browser.getForm(name='edit_form')
-            self.browser.getControl(name='body_text').value = 'Spammerdespam'
-            # Yummy, a honeypot!
-            self.browser.getControl(name='protected_1', index=0).value = 'Spammity spam'
-            self.assertRaises(Forbidden, form.submit)
-            self.assertEqual(len(self.mailhost.messages), 0)
+    def test_old_comment_spammer(self):
+        self._create_commentable_doc()
+        self.browser.open(self.portal_url + '/doc/discussion_reply_form')
+        form = self.browser.getForm(name='edit_form')
+        self.browser.getControl(name='body_text').value = 'Spammerdespam'
+        # Yummy, a honeypot!
+        self.browser.getControl(name='protected_1', index=0).value = 'Spammity spam'
+        self.assertRaises(Forbidden, form.submit)
+        self.assertEqual(len(self.mailhost.messages), 0)
 
-        def test_comment_post_no_honey(self):
-            # Try a post without the honeypot field.  It is not very
-            # useful in this case, because we cannot easily require
-            # the empty honeypot field for the form.  And we can
-            # require it for the final script, but normally that
-            # script is traversed to after validation of the form, so
-            # our event subscriber does not kick in.
-            self._create_commentable_doc()
-            # This should be allowed, because it simply opens the actual form.
-            self.browser.post(self.portal_url + '/doc/discussion_reply_form', '')
-            self.assertEqual(len(self.mailhost.messages), 0)
-            # The final script is protected.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/doc/discussion_reply', '')
-            self.assertEqual(len(self.mailhost.messages), 0)
+    def test_old_comment_post_no_honey(self):
+        # Try a post without the honeypot field.  It is not very
+        # useful in this case, because we cannot easily require
+        # the empty honeypot field for the form.  And we can
+        # require it for the final script, but normally that
+        # script is traversed to after validation of the form, so
+        # our event subscriber does not kick in.
+        self._create_commentable_doc()
+        # This should be allowed, because it simply opens the actual form.
+        self.browser.post(self.portal_url + '/doc/discussion_reply_form', '')
+        self.assertEqual(len(self.mailhost.messages), 0)
+        # The final script is protected.
+        self.assertRaises(Forbidden, self.browser.post,
+                          self.portal_url + '/doc/discussion_reply', '')
+        self.assertEqual(len(self.mailhost.messages), 0)
 
-        def test_comment_get(self):
-            # Try a GET.  This does not trigger our honeypot checks, but
-            # still it should not result in the sending of an email.
-            self._create_commentable_doc()
-            qs = urllib.urlencode({
-                'body_text': 'Spam, bacon and eggs',
-                'subject': 'Spam'})
-            self.browser.open(self.portal_url + '/doc/discussion_reply_form?' + qs)
-            self.assertEqual(len(self.mailhost.messages), 0)
-            # POST is required for the final script.
-            self.assertRaises(Forbidden, self.browser.open,
-                              self.portal_url + '/doc/discussion_reply?' + qs)
-            self.assertEqual(len(self.mailhost.messages), 0)
+    def test_old_comment_get(self):
+        # Try a GET.  This does not trigger our honeypot checks, but
+        # still it should not result in the sending of an email.
+        self._create_commentable_doc()
+        qs = urllib.urlencode({
+            'body_text': 'Spam, bacon and eggs',
+            'subject': 'Spam'})
+        self.browser.open(self.portal_url + '/doc/discussion_reply_form?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+        # POST is required for the final script.
+        self.assertRaises(Forbidden, self.browser.open,
+                          self.portal_url + '/doc/discussion_reply?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)

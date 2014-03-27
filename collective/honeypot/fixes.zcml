@@ -17,8 +17,11 @@
   <include zcml:condition="installed plone.app.discussion"
            package=".discussion" />
 
-  <include zcml:condition="not-installed plone.app.discussion"
-           package=".oldcomments" />
+  <!-- We could add zcml:condition="not-installed
+       plone.app.discussion" to oldcomments, but we always need to
+       protect these old scripts because on newer Plones they are
+       still available. -->
+  <include package=".oldcomments" />
 
   <include zcml:condition="have plone-4" package=".plone4" />
 
