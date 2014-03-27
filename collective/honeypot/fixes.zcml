@@ -1,15 +1,27 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:zcml="http://namespaces.zope.org/zcml">
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    zcml:condition="installed z3c.jbot">
 
   <!-- Note: this is not loaded automatically.  In your buildout.cfg
        you need something like this:
 
-       [instance]
-       eggs =
-           collective.honeypot
-       zcml =
-           collective.honeypot-fixes
+         [instance]
+         eggs =
+             collective.honeypot[fixes]
+         zcml =
+             collective.honeypot-fixes
+
+       In Plone 3 the above would give an error when running
+       bin/buildout, so we always load this file.  Instead, if you
+       want to disable the fixes on Plone 3, you should make sure
+       z3c.jbot is not available.  This should do the trick, unless
+       z3c.jbot is already added in some other way:
+
+         [instance]
+         eggs =
+             collective.honeypot
+
   -->
 
   <include package="z3c.jbot" />
