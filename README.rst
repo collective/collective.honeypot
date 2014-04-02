@@ -47,18 +47,40 @@ enough to use some of the standard forms in a standard Plone website
 without captchas, or they even know a way around validation.  If we
 add an invisible field they will simply not use it.  So: for selected
 forms we require that the invisible field is in the submitted form,
-although it may be empty.
+although it must be empty.
 
 
 Installation and usage
 ======================
 
 Add ``collective.honeypot`` to the eggs of your zope instance in your
-buildout config.  In Plone 3.2 or lower you need to add it to the zcml
-option as well.  Run buildout and start the zope instance.
+buildout config.  In Plone 3.2 or lower (untested) you need to add it
+to the zcml option as well.  Run buildout and start the zope instance.
 
 At this point it does not do anything yet.  You should take some
-measures to make it protect forms.
+measures to make it protect forms.  Forms that you want to protect
+need a change.  You can do that yourself and/or load the standard
+fixes from ``collective.honeypot``.
+
+``collective.honeypot`` has fixes for a few standard Plone templates.
+If you want to use them, you need to explicitly enable them by loading
+the extra ``fixes`` dependencies (``z3c.jbot`` currently) and loading
+``fixes.zcml``.  In your buildout config::
+
+  [instance]
+  eggs =
+      collective.honeypot[fixes]
+  zcml =
+      collective.honeypot-fixes
+
+What does that do?
+
+- This registers overrides for several templates and scripts (using
+  ``z3c.jbot``).
+
+- It adds those templates and scripts to the list of extra protected
+  actions.  This means that a post request to these actions now needs
+  to have the honeypot field and it needs to be empty.
 
 In a form you want to protect, you must add this::
 
@@ -78,26 +100,6 @@ For extra protection, you can add the page on which the form appears
 to the ``EXTRA_PROTECTED_ACTIONS``.  This means that the ``Forbidden``
 exception is also raised if the field is not submitted in the form at
 all.  See the Configuration_ section.
-
-The package has fixes for some standard Plone templates.  If you want
-to use them, you need to explicitly enable them by loading the extra
-``fixes`` dependencies (``z3c.jbot`` currently) and loading
-``fixes.zcml``.  In your buildout config::
-
-  [instance]
-  eggs =
-      collective.honeypot[fixes]
-  zcml =
-      collective.honeypot-fixes
-
-What does that do?
-
-- This registers overrides for several templates and scripts (using
-  ``z3c.jbot``).
-
-- It adds those templates and scripts to the list of extra protected
-  actions.  This means that a post request to these actions now needs
-  to have the honeypot field and it needs to be empty.
 
 
 Configuration
@@ -189,3 +191,9 @@ Compatibility
 =============
 
 This works on Plone 3 and Plone 4.  It does *not* work on Plone 2.5.
+
+
+TODO
+====
+
+It would be good to check quintagroup.plonecomments.
