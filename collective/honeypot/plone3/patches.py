@@ -8,10 +8,10 @@ allow_class(Forbidden)
 from collective.honeypot import config
 
 protected = [
-#     'sendto_form',
-#     'sendto',
+     'sendto_form',
+     'sendto',
      'contact-info',
-#     'send_feedback_site',
+     'send_feedback_site',
 #     'register',
     ]
 # Explicitly add the actions that we protect.
