@@ -259,6 +259,19 @@ class BasicTestCase(unittest.TestCase):
                           'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    def assertRaises(self, excClass, callableObj, *args, **kwargs):
+        error_log = self.portal.error_log
+        errors = len(error_log.getLogEntries())
+        try:
+            super(BasicTestCase, self).assertRaises(
+                excClass, callableObj, *args, **kwargs)
+        except:
+            # In Plone 3 self.assertRaises does not work for the test browser.
+            self.assertEqual(len(error_log.getLogEntries()), errors + 1)
+            entry = error_log.getLogEntries()[0]
+            klass = str(excClass).split('.')[-1]
+            self.assertEqual(entry['type'], klass)
+
 
 class FixesTestCase(BasicTestCase):
     # This DOES have our fixed templates and scripts activated.
