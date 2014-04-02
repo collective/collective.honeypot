@@ -20,7 +20,7 @@ else:
     HAS_DISCUSSION = True
     from plone.app.discussion.interfaces import IConversation
 try:
-    pkg_resources.get_distribution('plone.app.user')
+    pkg_resources.get_distribution('plone.app.users')
 except pkg_resources.DistributionNotFound:
     HAS_REGISTER_FORM = False
 else:
