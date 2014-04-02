@@ -230,8 +230,9 @@ class BasicTestCase(unittest.TestCase):
         form.submit()
         self.assertTrue('Please correct the indicated errors.'
                         in self.browser.contents)
-        self.assertTrue('Comment cannot be blank.'
-                        in self.browser.contents)
+        # First error message is Plone 4, second is Plone 3.
+        self.assertTrue('Comment cannot be blank.' in self.browser.contents or
+                        'Please submit a body.' in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_old_comment_normal(self):
