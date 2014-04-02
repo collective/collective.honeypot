@@ -35,6 +35,7 @@
        still available. -->
   <include package=".oldcomments" />
 
+  <include zcml:condition="not-have plone-4" package=".plone3" />
   <include zcml:condition="have plone-4" package=".plone4" />
 
 </configure>
