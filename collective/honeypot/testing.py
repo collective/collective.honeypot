@@ -5,6 +5,7 @@ from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
+from persistent.list import PersistentList
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
@@ -21,10 +22,18 @@ else:
     from plone.registry.interfaces import IRegistry
 
 
+class BetterMockMailHost(MockMailHost):
+
+    def reset(self):
+        # Somehow on Plone 3 it is necessary to use a persistent list
+        # instead of a normal list.
+        self.messages = PersistentList()
+
+
 def patch_mailhost(portal):
     portal._updateProperty('email_from_address', 'webmaster@example.org')
     portal._original_MailHost = portal.MailHost
-    portal.MailHost = mailhost = MockMailHost('MailHost')
+    portal.MailHost = mailhost = BetterMockMailHost('MailHost')
     mailhost.smtp_host = 'localhost'
     sm = getSiteManager(context=portal)
     sm.unregisterUtility(provided=IMailHost)
