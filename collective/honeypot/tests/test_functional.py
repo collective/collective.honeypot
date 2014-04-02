@@ -28,8 +28,13 @@ else:
 
 
 if not hasattr(Browser, 'post'):
-    # Plone 3.
+    # Plone 3.  Add a post method.
     Browser.post = Browser.open
+    # We actually run into various problems that we need to work
+    # around in the tests.
+    BUGGY_BROWSER = True
+else:
+    BUGGY_BROWSER = False
 
 
 class BasicTestCase(unittest.TestCase):
@@ -240,7 +245,18 @@ class BasicTestCase(unittest.TestCase):
         self.browser.open(self.portal_url + '/doc/discussion_reply_form')
         form = self.browser.getForm(name='edit_form')
         self.browser.getControl(name='body_text').value = 'Spammerdespam'
-        form.submit()
+        try:
+            form.submit()
+        except:
+            if BUGGY_BROWSER:
+                # http://nohost/plone/doc%231396475026 does not exist.
+                # What is meant, and what a normal browser accesses,
+                # is http://nohost/plone/doc#31396475026.  But the
+                # comment is added, we hope, so we load the page
+                # again.
+                self.browser.open(self.portal_url + '/doc')
+            else:
+                raise
         self.assertTrue('Please correct the indicated errors.'
                         not in self.browser.contents)
         self.assertTrue('Comment added.' in self.browser.contents)
