@@ -189,14 +189,3 @@ Compatibility
 =============
 
 This works on Plone 3 and Plone 4.  It does *not* work on Plone 2.5.
-
-
-TODO
-====
-
-
-Plone 3:
-
-- Check which of our Plone 4 fixes work on Plone 3 too.
-
-- Protect join_form.

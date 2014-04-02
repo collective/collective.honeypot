@@ -175,6 +175,48 @@ class BasicTestCase(unittest.TestCase):
                               self.portal_url + '/register', 'protected_1=bad')
             self.assertEqual(len(self.mailhost.messages), 0)
 
+    ### Tests for the old join form.
+
+    if not HAS_REGISTER_FORM:
+
+        # This is for Plone 3.  Note that the join_form template uses
+        # the register script.
+
+        def test_old_register_empty(self):
+            # When validation of the register script fails (as happens
+            # when you call it directly without any parameters) it
+            # shows the join_form with an error message.
+            self.browser.open(self.portal_url + '/register')
+            self.assertTrue('Please correct the indicated errors.' in self.browser.contents)
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_old_register_post_honey(self):
+            # Try a post with the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/register', 'protected_1=bad')
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_join_form_empty(self):
+            self.browser.open(self.portal_url + '/join_form')
+            self.browser.getControl(name='form.button.Register').click()
+            self.assertTrue('Please correct the indicated errors.' in self.browser.contents)
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_join_form_normal(self):
+            self.browser.open(self.portal_url + '/join_form')
+            self.browser.getControl(name='fullname').value = 'Mr. Spammer'
+            self.browser.getControl(name='username').value = 'spammer'
+            self.browser.getControl(name='email').value = 'spammer@example.org'
+            self.browser.getControl(name='form.button.Register').click()
+            self.assertTrue('There were errors' not in self.browser.contents)
+            self.assertEqual(len(self.mailhost.messages), 1)
+
+        def test_join_form_post_honey(self):
+            # Try a post with the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/join_form', 'protected_1=bad')
+            self.assertEqual(len(self.mailhost.messages), 0)
+
     ### Tests for the comment form.
 
     def _create_commentable_doc(self):
@@ -394,6 +436,36 @@ class FixesTestCase(BasicTestCase):
                               self.portal_url + '/@@register', '')
             self.assertRaises(Forbidden, self.browser.post,
                               self.portal_url + '/register', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+    ### Tests for the old join form.
+
+    if not HAS_REGISTER_FORM:
+
+        # This is for Plone 3.  Note that the join_form template uses
+        # the register script.
+
+        def test_old_register_post_no_honey(self):
+            # Try a post without the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/register', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_join_form_spammer(self):
+            self.browser.open(self.portal_url + '/join_form')
+            self.browser.getControl(name='fullname').value = 'Mr. Spammer'
+            self.browser.getControl(name='username').value = 'spammer'
+            self.browser.getControl(name='email').value = 'spammer@example.org'
+            # Yummy, a honeypot!
+            self.browser.getControl(name='protected_1', index=0).value = 'Spammity spam'
+            register_button = self.browser.getControl(name='form.button.Register')
+            self.assertRaises(Forbidden, register_button.click)
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_join_form_post_no_honey(self):
+            # Try a post without the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/join_form', '')
             self.assertEqual(len(self.mailhost.messages), 0)
 
     ### Tests for the comment form.
