@@ -278,13 +278,17 @@ class BasicTestCase(unittest.TestCase):
 
     def assertRaises(self, excClass, callableObj, *args, **kwargs):
         error_log = self.portal.error_log
-        errors = len(error_log.getLogEntries())
+        # Remove all error_log entries so we do not run into the
+        # standard limit of 20 stored errors.
+        while len(error_log.getLogEntries()) > 0:
+            error_log.forgetEntry(error_log.getLogEntries()[-1]['id'])
+
         try:
             super(BasicTestCase, self).assertRaises(
                 excClass, callableObj, *args, **kwargs)
         except:
             # In Plone 3 self.assertRaises does not work for the test browser.
-            self.assertEqual(len(error_log.getLogEntries()), errors + 1)
+            self.assertEqual(len(error_log.getLogEntries()), 1)
             entry = error_log.getLogEntries()[0]
             klass = str(excClass).split('.')[-1]
             self.assertEqual(entry['type'], klass)
