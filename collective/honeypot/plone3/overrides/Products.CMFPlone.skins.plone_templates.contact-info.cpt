@@ -46,6 +46,8 @@
         <fieldset>
             <legend i18n:translate="legend_feedback_for_contact_info">Feedback details</legend>
 
+            <div tal:replace="structure context/@@honeypot_field|nothing" />
+
         <tal:feedbackForm 
             tal:define="fullname python:request.get('fullname', member.getProperty('fullname', ''));
                         email python:request.get('email', member.getProperty('email',''))">
