@@ -28,9 +28,9 @@ else:
     BUGGY_BROWSER = False
 
 
-class BasicTestCase(unittest.TestCase):
-    # This does NOT have our fixed templates and scripts activated.
-    layer = BASIC_FUNCTIONAL_TESTING
+class BaseTestCase(unittest.TestCase):
+    # Base test case class with a few extra methods and a standard
+    # setup.
 
     def setUp(self):
         app = self.layer['app']
@@ -39,6 +39,35 @@ class BasicTestCase(unittest.TestCase):
         self.portal = self.layer['portal']
         self.portal_url = self.portal.absolute_url()
         self.mailhost = self.portal.MailHost
+
+    def _create_commentable_doc(self):
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal.invokeFactory('Document', 'doc', title=u"Document 1")
+        self.portal.doc.allowDiscussion(True)
+        # Need to commit, otherwise the browser does not see it.
+        transaction.commit()
+
+    def assertRaises(self, excClass, callableObj, *args, **kwargs):
+        error_log = self.portal.error_log
+        # Remove all error_log entries so we do not run into the
+        # standard limit of 20 stored errors.
+        while len(error_log.getLogEntries()) > 0:
+            error_log.forgetEntry(error_log.getLogEntries()[-1]['id'])
+
+        try:
+            super(BaseTestCase, self).assertRaises(
+                excClass, callableObj, *args, **kwargs)
+        except:
+            # In Plone 3 self.assertRaises does not work for the test browser.
+            self.assertEqual(len(error_log.getLogEntries()), 1)
+            entry = error_log.getLogEntries()[0]
+            klass = str(excClass).split('.')[-1]
+            self.assertEqual(entry['type'], klass)
+
+
+class StandardTestCase(BaseTestCase):
+    # This does NOT have our fixed templates and scripts activated.
+    layer = BASIC_FUNCTIONAL_TESTING
 
     def test_subscriber(self):
         # Posting should trigger our event subscriber and do the
@@ -210,23 +239,6 @@ class BasicTestCase(unittest.TestCase):
 
     ### Tests for the comment form.
 
-    def _create_commentable_doc(self):
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.invokeFactory('Document', 'doc', title=u"Document 1")
-        self.portal.doc.allowDiscussion(True)
-        # Need to commit, otherwise the browser does not see it.
-        transaction.commit()
-
-    def _install_quinta_comments(self):
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.portal_quickinstaller.installProduct(
-            'quintagroup.plonecomments')
-        # Disable comment moderation, to keep things simple.
-        self.portal.portal_properties.qPloneComments._updateProperty(
-            'enable_moderation', False)
-        # Need to commit, otherwise the browser does not see it.
-        transaction.commit()
-
     if HAS_DISCUSSION:
 
         def test_discussion_empty(self):
@@ -319,10 +331,26 @@ class BasicTestCase(unittest.TestCase):
                           'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    if HAS_QUINTA:
+
+if HAS_QUINTA:
+
+    class StandardQuintaTestCase(BaseTestCase):
+        # This does NOT have our fixed templates and scripts activated.
+        # It does have quintagroup.plonecomments installed.
+        layer = BASIC_FUNCTIONAL_TESTING
+
+        def setUp(self):
+            super(StandardQuintaTestCase, self).setUp()
+            setRoles(self.portal, TEST_USER_ID, ['Manager'])
+            self.portal.portal_quickinstaller.installProduct(
+                'quintagroup.plonecomments')
+            # Disable comment moderation, to keep things simple.
+            self.portal.portal_properties.qPloneComments._updateProperty(
+                'enable_moderation', False)
+            # Need to commit, otherwise the browser does not see it.
+            transaction.commit()
 
         def test_quinta_empty(self):
-            self._install_quinta_comments()
             self._create_commentable_doc()
             self.browser.open(self.portal_url + '/doc')
             try:
@@ -347,7 +375,6 @@ class BasicTestCase(unittest.TestCase):
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_quinta_normal(self):
-            self._install_quinta_comments()
             self._create_commentable_doc()
             self.browser.open(self.portal_url + '/doc/discussion_reply_form')
             form = self.browser.getForm(name='edit_form')
@@ -377,7 +404,6 @@ class BasicTestCase(unittest.TestCase):
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_quinta_post_honey(self):
-            self._install_quinta_comments()
             # Try a post with the honeypot field.
             self.assertRaises(Forbidden, self.browser.post,
                               self.portal_url + '/doc/discussion_reply_form',
@@ -388,25 +414,8 @@ class BasicTestCase(unittest.TestCase):
                               'protected_1=bad')
             self.assertEqual(len(self.mailhost.messages), 0)
 
-    def assertRaises(self, excClass, callableObj, *args, **kwargs):
-        error_log = self.portal.error_log
-        # Remove all error_log entries so we do not run into the
-        # standard limit of 20 stored errors.
-        while len(error_log.getLogEntries()) > 0:
-            error_log.forgetEntry(error_log.getLogEntries()[-1]['id'])
 
-        try:
-            super(BasicTestCase, self).assertRaises(
-                excClass, callableObj, *args, **kwargs)
-        except:
-            # In Plone 3 self.assertRaises does not work for the test browser.
-            self.assertEqual(len(error_log.getLogEntries()), 1)
-            entry = error_log.getLogEntries()[0]
-            klass = str(excClass).split('.')[-1]
-            self.assertEqual(entry['type'], klass)
-
-
-class FixesTestCase(BasicTestCase):
+class FixesTestCase(StandardTestCase):
     # This DOES have our fixed templates and scripts activated.
     layer = FIXES_FUNCTIONAL_TESTING
     # Note that we inherit the test methods from BasicTestCase, to
@@ -602,10 +611,15 @@ class FixesTestCase(BasicTestCase):
                           self.portal_url + '/doc/discussion_reply?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    if HAS_QUINTA:
+
+if HAS_QUINTA:
+
+    class FixesQuintaTestCase(FixesTestCase):
+        # This does NOT have our fixed templates and scripts activated.
+        # It does have quintagroup.plonecomments installed.
+        layer = FIXES_FUNCTIONAL_TESTING
 
         def test_quinta_spammer(self):
-            self._install_quinta_comments()
             self._create_commentable_doc()
             self.browser.open(self.portal_url + '/doc/discussion_reply_form')
             form = self.browser.getForm(name='edit_form')
@@ -616,7 +630,6 @@ class FixesTestCase(BasicTestCase):
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_quinta_post_no_honey(self):
-            self._install_quinta_comments()
             # Try a post without the honeypot field.  It is not very
             # useful in this case, because we cannot easily require
             # the empty honeypot field for the form.  And we can
@@ -633,7 +646,6 @@ class FixesTestCase(BasicTestCase):
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_quinta_get(self):
-            self._install_quinta_comments()
             # Try a GET.  This does not trigger our honeypot checks, but
             # still it should not result in the sending of an email.
             self._create_commentable_doc()
