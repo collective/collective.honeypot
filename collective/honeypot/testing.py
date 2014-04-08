@@ -22,6 +22,13 @@ else:
     from plone.registry.interfaces import IRegistry
 
 try:
+    pkg_resources.get_distribution('plone.app.users')
+except pkg_resources.DistributionNotFound:
+    HAS_REGISTER_FORM = False
+else:
+    HAS_REGISTER_FORM = True
+
+try:
     pkg_resources.get_distribution('quintagroup.plonecomments')
 except pkg_resources.DistributionNotFound:
     HAS_QUINTA = False

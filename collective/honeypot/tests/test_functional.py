@@ -1,31 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import pkg_resources
 import textwrap
 import transaction
 import unittest
 import urllib
 from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
 from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
+from collective.honeypot.testing import HAS_DISCUSSION
 from collective.honeypot.testing import HAS_QUINTA
+from collective.honeypot.testing import HAS_REGISTER_FORM
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
 from zExceptions import Forbidden
 
-try:
-    pkg_resources.get_distribution('plone.app.discussion')
-except pkg_resources.DistributionNotFound:
-    HAS_DISCUSSION = False
-else:
-    HAS_DISCUSSION = True
+if HAS_DISCUSSION:
     from plone.app.discussion.interfaces import IConversation
-try:
-    pkg_resources.get_distribution('plone.app.users')
-except pkg_resources.DistributionNotFound:
-    HAS_REGISTER_FORM = False
-else:
-    HAS_REGISTER_FORM = True
 
 
 if not hasattr(Browser, 'post'):
