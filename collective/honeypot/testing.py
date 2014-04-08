@@ -21,6 +21,13 @@ else:
     from plone.app.discussion.interfaces import IDiscussionSettings
     from plone.registry.interfaces import IRegistry
 
+try:
+    pkg_resources.get_distribution('quintagroup.plonecomments')
+except pkg_resources.DistributionNotFound:
+    HAS_QUINTA = False
+else:
+    HAS_QUINTA = True
+
 
 class BetterMockMailHost(MockMailHost):
 
@@ -74,6 +81,9 @@ class BasicFixture(PloneSandboxLayer):
         import collective.honeypot
         self.loadZCML(package=collective.honeypot)
         self.loadZCML(package=collective.honeypot, name='overrides.zcml')
+        if HAS_QUINTA:
+            import quintagroup.plonecomments
+            self.loadZCML(package=quintagroup.plonecomments)
 
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)

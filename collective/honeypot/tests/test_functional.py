@@ -7,6 +7,7 @@ import unittest
 import urllib
 from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
 from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
+from collective.honeypot.testing import HAS_QUINTA
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
@@ -226,6 +227,16 @@ class BasicTestCase(unittest.TestCase):
         # Need to commit, otherwise the browser does not see it.
         transaction.commit()
 
+    def _install_quinta_comments(self):
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal.portal_quickinstaller.installProduct(
+            'quintagroup.plonecomments')
+        # Disable comment moderation, to keep things simple.
+        self.portal.portal_properties.qPloneComments._updateProperty(
+            'enable_moderation', False)
+        # Need to commit, otherwise the browser does not see it.
+        transaction.commit()
+
     if HAS_DISCUSSION:
 
         def test_discussion_empty(self):
@@ -317,6 +328,75 @@ class BasicTestCase(unittest.TestCase):
                           self.portal_url + '/doc/discussion_reply',
                           'protected_1=bad')
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    if HAS_QUINTA:
+
+        def test_quinta_empty(self):
+            self._install_quinta_comments()
+            self._create_commentable_doc()
+            self.browser.open(self.portal_url + '/doc')
+            try:
+                add_comment = self.browser.getControl('Add Comment')
+            except LookupError:
+                # plone.app.discussion is installed, so the old 'Add
+                # Comment' control is not there.  Go to the form directly.
+                self.browser.open(self.portal_url + '/doc/discussion_reply_form')
+            else:
+                # p.a.discussion is not installed.  Clicking should work
+                # and we should end up on the old form.
+                add_comment.click()
+                self.assertEqual(self.browser.url,
+                                 self.portal_url + '/doc/discussion_reply_form')
+            form = self.browser.getForm(name='edit_form')
+            form.submit()
+            self.assertTrue('Please correct the indicated errors.'
+                            in self.browser.contents)
+            # First error message is Plone 4, second is Plone 3.
+            self.assertTrue('Comment cannot be blank.' in self.browser.contents or
+                            'Please submit a body.' in self.browser.contents)
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_quinta_normal(self):
+            self._install_quinta_comments()
+            self._create_commentable_doc()
+            self.browser.open(self.portal_url + '/doc/discussion_reply_form')
+            form = self.browser.getForm(name='edit_form')
+            self.browser.getControl(name='body_text').value = 'Spammerdespam'
+            # quintagroup.plonecomments requires these two as well:
+            self.browser.getControl(name='Creator').value = 'Mr. Spammer'
+            self.browser.getControl(name='subject').value = 'Spammmmmm'
+            try:
+                form.submit()
+            except:
+                if BUGGY_BROWSER:
+                    # http://nohost/plone/doc%231396475026 does not exist.
+                    # What is meant, and what a normal browser accesses,
+                    # is http://nohost/plone/doc#31396475026.  But the
+                    # comment is added, we hope, so we load the page
+                    # again.
+                    self.browser.open(self.portal_url + '/doc')
+                else:
+                    raise
+            open('/tmp/test.html', 'w').write(self.browser.contents)
+            self.assertTrue('Please correct the indicated errors.'
+                            not in self.browser.contents)
+            self.assertTrue('Comment added.' in self.browser.contents)
+            # The comment is added.
+            self.assertEqual(len(self.portal.doc.talkback.getReplies()), 1)
+            # No mails are sent.
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_quinta_post_honey(self):
+            self._install_quinta_comments()
+            # Try a post with the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/doc/discussion_reply_form',
+                              'protected_1=bad')
+            self.assertEqual(len(self.mailhost.messages), 0)
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/doc/discussion_reply',
+                              'protected_1=bad')
+            self.assertEqual(len(self.mailhost.messages), 0)
 
     def assertRaises(self, excClass, callableObj, *args, **kwargs):
         error_log = self.portal.error_log
@@ -531,3 +611,48 @@ class FixesTestCase(BasicTestCase):
         self.assertRaises(Forbidden, self.browser.open,
                           self.portal_url + '/doc/discussion_reply?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    if HAS_QUINTA:
+
+        def test_quinta_spammer(self):
+            self._install_quinta_comments()
+            self._create_commentable_doc()
+            self.browser.open(self.portal_url + '/doc/discussion_reply_form')
+            form = self.browser.getForm(name='edit_form')
+            self.browser.getControl(name='body_text').value = 'Spammerdespam'
+            # Yummy, a honeypot!
+            self.browser.getControl(name='protected_1', index=0).value = 'Spammity spam'
+            self.assertRaises(Forbidden, form.submit)
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_quinta_post_no_honey(self):
+            self._install_quinta_comments()
+            # Try a post without the honeypot field.  It is not very
+            # useful in this case, because we cannot easily require
+            # the empty honeypot field for the form.  And we can
+            # require it for the final script, but normally that
+            # script is traversed to after validation of the form, so
+            # our event subscriber does not kick in.
+            self._create_commentable_doc()
+            # This should be allowed, because it simply opens the actual form.
+            self.browser.post(self.portal_url + '/doc/discussion_reply_form', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
+            # The final script is protected.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/doc/discussion_reply', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
+
+        def test_quinta_get(self):
+            self._install_quinta_comments()
+            # Try a GET.  This does not trigger our honeypot checks, but
+            # still it should not result in the sending of an email.
+            self._create_commentable_doc()
+            qs = urllib.urlencode({
+                'body_text': 'Spam, bacon and eggs',
+                'subject': 'Spam'})
+            self.browser.open(self.portal_url + '/doc/discussion_reply_form?' + qs)
+            self.assertEqual(len(self.mailhost.messages), 0)
+            # POST is required for the final script.
+            self.assertRaises(Forbidden, self.browser.open,
+                              self.portal_url + '/doc/discussion_reply?' + qs)
+            self.assertEqual(len(self.mailhost.messages), 0)

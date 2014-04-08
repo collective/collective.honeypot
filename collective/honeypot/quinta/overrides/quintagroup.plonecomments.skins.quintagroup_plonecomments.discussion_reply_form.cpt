@@ -87,6 +87,8 @@
                 formatting.
             </p>
 
+            <div tal:replace="structure context/@@honeypot_field|nothing" />
+
             <input type="hidden" name="Creator" value=""
                    tal:attributes="value member/getUserName"
                    tal:condition="not:isForAnonymous"/>

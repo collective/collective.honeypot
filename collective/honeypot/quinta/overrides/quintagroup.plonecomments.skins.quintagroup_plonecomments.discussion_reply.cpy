@@ -19,6 +19,9 @@ mtool = getToolByName(context, 'portal_membership')
 dtool = getToolByName(context, 'portal_discussion')
 
 req = context.REQUEST
+if req.get('REQUEST_METHOD', '').upper() != 'POST':
+    from zExceptions import Forbidden
+    raise Forbidden('Use POST please.')
 pp = getToolByName(context,'portal_properties')
 # Get properties
 isForAnonymous = pp['qPloneComments'].getProperty('enable_anonymous_commenting', False)
