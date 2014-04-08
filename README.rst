@@ -193,7 +193,16 @@ Compatibility
 This works on Plone 3 and Plone 4.  It does *not* work on Plone 2.5.
 
 
-TODO
-====
+Ideas
+=====
 
-It would be good to check quintagroup.plonecomments.
+- Maybe allow specifying loglevel for the posts, or some other way to
+  log less.
+
+- Can we see if the user is anonymous or are we too early in the
+  process?  May be nice to accept all authenticated posts.
+
+- What gets logged when you post a file?
+
+- Option: disallow all posts.  In case of emergency when you want a
+  readonly database as far as possible.
