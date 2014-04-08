@@ -92,6 +92,22 @@ class BasicFixture(PloneSandboxLayer):
             import quintagroup.plonecomments
             self.loadZCML(package=quintagroup.plonecomments)
 
+    def tearDown(self):
+        # There is some other code that removes profiles from
+        # Products.GenericSetup.zcml._profile_registry but not from
+        # _profile_regs, maybe because it gets called multiple times,
+        # and this results in a KeyError on teardown.  This only
+        # happens in Plone 3.3.  I tried fixing it by removing them,
+        # but this failed, so as a last resort we ignore the standard
+        # tearDown completely in that case.
+        super(BasicFixture, self).tearDown()
+        import Products.GenericSetup.zcml
+        for profile in (u'quintagroup.plonecomments:default',
+                        u'quintagroup.plonecomments:uninstall'):
+            if profile not in Products.GenericSetup.zcml._profile_regs:
+                continue
+            Products.GenericSetup.zcml._profile_regs.remove(profile)
+
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
         enable_self_registration(portal)
