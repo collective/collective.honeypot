@@ -394,7 +394,6 @@ if HAS_QUINTA:
                     self.browser.open(self.portal_url + '/doc')
                 else:
                     raise
-            open('/tmp/test.html', 'w').write(self.browser.contents)
             self.assertTrue('Please correct the indicated errors.'
                             not in self.browser.contents)
             self.assertTrue('Comment added.' in self.browser.contents)
