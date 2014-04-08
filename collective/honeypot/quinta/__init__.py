@@ -1,0 +1,2 @@
+import patches
+patches  # pyflakes

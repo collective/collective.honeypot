@@ -29,6 +29,9 @@
   <include zcml:condition="installed plone.app.discussion"
            package=".discussion" />
 
+  <include zcml:condition="installed quintagroup.plonecomments"
+           package=".quinta" />
+
   <!-- We could add zcml:condition="not-installed
        plone.app.discussion" to oldcomments, but we always need to
        protect these old scripts because on newer Plones they are
