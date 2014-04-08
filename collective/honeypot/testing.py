@@ -102,11 +102,12 @@ class BasicFixture(PloneSandboxLayer):
         # tearDown completely in that case.
         super(BasicFixture, self).tearDown()
         import Products.GenericSetup.zcml
-        for profile in (u'quintagroup.plonecomments:default',
-                        u'quintagroup.plonecomments:uninstall'):
-            if profile not in Products.GenericSetup.zcml._profile_regs:
-                continue
-            Products.GenericSetup.zcml._profile_regs.remove(profile)
+        if hasattr(Products.GenericSetup.zcml, '_profile_regs'):
+            for profile in (u'quintagroup.plonecomments:default',
+                            u'quintagroup.plonecomments:uninstall'):
+                if profile not in Products.GenericSetup.zcml._profile_regs:
+                    continue
+                Products.GenericSetup.zcml._profile_regs.remove(profile)
 
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
