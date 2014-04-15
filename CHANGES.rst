@@ -5,6 +5,9 @@ Changelog
 0.5 (unreleased)
 ----------------
 
+- Support disallowing all posts.
+  [maurits]
+
 - Support checking start strings for white listed actions.
   [maurits]
 

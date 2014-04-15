@@ -187,6 +187,15 @@ SPAMMER_LOG_LEVEL error
     critical.  When an unknown level is used or the setting is empty,
     we fall back to the default: ``ERROR``.
 
+DISALLOW_ALL_POSTS
+    Set this to ``1``, ``on``, ``true``, or ``yes`` to disallow all
+    posts.  This may be handy if you want to effectively make a Plone
+    Site read-only, for example in preparation of a security release
+    or when you are doing a big migration in a new zope instance and
+    want to keep the old instance alive for the time being.  Note
+    that, like the rest of the checks, this only has an effect in a
+    Plone (or CMF) site, not in the Zope root.
+
 
 When are the checks *not* done?
 ===============================

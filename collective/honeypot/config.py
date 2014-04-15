@@ -67,3 +67,12 @@ logger.info('Accepted log level: %r', ACCEPTED_LOG_LEVEL)
 # Log level for caught spammers.
 SPAMMER_LOG_LEVEL = get_log_level('SPAMMER_LOG_LEVEL', logging.ERROR)
 logger.info('Spammer log level: %r', SPAMMER_LOG_LEVEL)
+
+# Disallow all posts, even whitelisted ones.
+DISALLOW_ALL_POSTS = os.environ.get('DISALLOW_ALL_POSTS', '')
+if DISALLOW_ALL_POSTS and DISALLOW_ALL_POSTS.lower() in
+        ['1', 'on', 'true', 'yes']:
+    DISALLOW_ALL_POSTS = True
+    logger.warn('DISALLOW_ALL_POSTS is true. All posts are disallowed!')
+else:
+    DISALLOW_ALL_POSTS = False

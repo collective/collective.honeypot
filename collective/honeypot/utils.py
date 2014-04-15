@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
 from collective.honeypot.config import ACCEPTED_LOG_LEVEL
+from collective.honeypot.config import DISALLOW_ALL_POSTS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
@@ -44,10 +45,12 @@ def found_honeypot(form, required):
     return 'has forbidden field'
 
 
-def deny():
+def deny(msg=None):
     # Deny access.
-    raise Forbidden("Posting denied due to possible spamming. "
-                    "Please contact us if we are wrong.")
+    if msg is None:
+        msg = ("Posting denied due to possible spamming. "
+               "Please contact us if we are wrong.")
+    raise Forbidden(msg)
 
 
 def whitelisted(action):
@@ -108,6 +111,10 @@ def check_post(request):
     """
     if request.get('REQUEST_METHOD', '').upper() != 'POST':
         return
+    if DISALLOW_ALL_POSTS:
+        logger.warn('All posts are disallowed.')
+        # block the request:
+        deny(msg='All posts are disallowed.')
     ip = request.get('HTTP_X_FORWARDED_FOR') or request.get('REMOTE_ADDR',
                                                             'unknown')
     referer = request.get('HTTP_REFERER', '')
