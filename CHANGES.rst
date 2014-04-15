@@ -5,6 +5,9 @@ Changelog
 0.5 (unreleased)
 ----------------
 
+- Support checking start strings for white listed actions.
+  [maurits]
+
 - Allow configuring log levels.
   [maurits]
 

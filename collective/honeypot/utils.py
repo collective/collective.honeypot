@@ -6,6 +6,7 @@ from collective.honeypot.config import IGNORED_FORM_FIELDS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import SPAMMER_LOG_LEVEL
 from collective.honeypot.config import WHITELISTED_ACTIONS
+from collective.honeypot.config import WHITELISTED_START
 from zExceptions import Forbidden
 
 logger = logging.getLogger('collective.honeypot')
@@ -47,6 +48,16 @@ def deny():
     # Deny access.
     raise Forbidden("Posting denied due to possible spamming. "
                     "Please contact us if we are wrong.")
+
+
+def whitelisted(action):
+    if action in WHITELISTED_ACTIONS:
+        return True
+    # Check action start strings.
+    for white in WHITELISTED_START:
+        if action.startswith(white):
+            return True
+    return False
 
 
 def get_form(request):
@@ -105,7 +116,7 @@ def check_post(request):
     action = url.split('/')[-1]  # last part of url
     action = action.lstrip('@')
 
-    if action in WHITELISTED_ACTIONS:
+    if whitelisted(action):
         logger.debug("Action whitelisted: %s.", action)
         return
     form = get_form(request)

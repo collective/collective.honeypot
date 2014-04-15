@@ -125,11 +125,15 @@ this in ``buildout.cfg``::
       HONEYPOT_FIELD pooh
       EXTRA_PROTECTED_ACTIONS discussion_reply join_form sendto_form
       WHITELISTED_ACTIONS jq_reveal_email
+      WHITELISTED_START jq_*
       IGNORED_FORM_FIELDS secret_field
       ACCEPTED_LOG_LEVEL info
       SPAMMER_LOG_LEVEL error
 
-None of the options are required.
+None of the options are required.  Values are split on whitespace or
+comma.  Any ``@`` character gets automatically replaced by a space, to
+make it easier to reference ``@@some_view`` by simply ``some_view``,
+as we always protect them both.
 
 HONEYPOT_FIELD
     Name to use as input name of the honeypot field.  If you give no
@@ -154,6 +158,13 @@ WHITELISTED_ACTIONS
     ``edit`` and ``atct_edit`` to avoid logging the large dexterity
     and Archetypes edit forms.  But you may find this interesting, so
     suit yourself.
+
+WHITELISTED_START
+    Form actions starting with one of these strings are not checked.
+    See ``WHITELISTED_ACTIONS`` for more info.  If you have lots of
+    harmless actions that start with ``jq_`` you can add that string
+    to this list.  Regular expression are too easy to get wrong, so we
+    do not support it.
 
 IGNORED_FORM_FIELDS
     We log information about post requests, to allow a system admin to

@@ -28,9 +28,14 @@ logger.info('Extra protected actions: %r', EXTRA_PROTECTED_ACTIONS)
 # Actions that are not checked:
 WHITELISTED_ACTIONS = get_multi('WHITELISTED_ACTIONS', (
     'jq_reveal_email',  # zest.emailhider
+    'at_validate_field',
     'z3cform_validate_field',
     ))
 logger.info('Whitelisted actions: %r', WHITELISTED_ACTIONS)
+# Actions starting with these strings are not checked.  Note: regular
+# expressions are too easily done wrong, so we do not support them.
+WHITELISTED_START = get_multi('WHITELISTED_START', ())
+logger.info('Whitelisted action start strings: %r', WHITELISTED_START)
 
 # Fields that are not logged:
 IGNORED_FORM_FIELDS = get_multi('IGNORED_FORM_FIELDS', ())

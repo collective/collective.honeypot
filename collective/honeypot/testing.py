@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import collective.honeypot.config
 import pkg_resources
 from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
@@ -34,6 +35,12 @@ except pkg_resources.DistributionNotFound:
     HAS_QUINTA = False
 else:
     HAS_QUINTA = True
+
+# We want WHITELISTED_START to be empty by default currently, but we
+# do want to test it.
+start = list(collective.honeypot.config.WHITELISTED_START)
+start.append('jq_')
+collective.honeypot.config.WHITELISTED_START = set(start)
 
 
 class BetterMockMailHost(MockMailHost):

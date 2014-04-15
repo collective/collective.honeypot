@@ -8,6 +8,7 @@ from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.utils import check_post
 from collective.honeypot.utils import found_honeypot
 from collective.honeypot.utils import get_form
+from collective.honeypot.utils import whitelisted
 from zope.publisher.browser import TestRequest
 from zExceptions import Forbidden
 
@@ -80,3 +81,15 @@ class UtilsTestCase(unittest.TestCase):
         request = self._request(dest='/join_form',
                                 form={HONEYPOT_FIELD: ''})
         self.assertEqual(check_post(self._request()), None)
+
+    def test_whitelisted(self):
+        self.assertEqual(whitelisted(''), False)
+        self.assertEqual(whitelisted('random'), False)
+        self.assertEqual(whitelisted('jq_reveal_email'), True)
+        self.assertEqual(whitelisted('at_validate_field'), True)
+        self.assertEqual(whitelisted('z3cform_validate_field'), True)
+        # various jquery methods may use this
+        self.assertEqual(whitelisted('jq_'), True)
+        self.assertEqual(whitelisted('jq'), False)
+        self.assertEqual(whitelisted('jq_foo_bar'), True)
+        self.assertEqual(whitelisted('foo_jq_'), False)
