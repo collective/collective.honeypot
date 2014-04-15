@@ -207,9 +207,11 @@ Ideas
   log less.
 
 - Can we see if the user is anonymous or are we too early in the
-  process?  May be nice to accept all authenticated posts.
+  process?  May be nice to accept all authenticated posts.  Nope: we
+  are too early in the process.
 
-- What gets logged when you post a file?
+- What gets logged when you post a file?  Too much?  Don't dump form
+  values when they are too large?
 
 - Option: disallow all posts.  In case of emergency when you want a
   readonly database as far as possible.

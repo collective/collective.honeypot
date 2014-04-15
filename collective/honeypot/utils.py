@@ -73,6 +73,19 @@ def get_form(request):
     return form
 
 
+def get_small_form(form):
+    # Avoid printing large textareas or complete file uploads.
+    small_form = {}
+    for key, value in form.items():
+        if not isinstance(value, basestring):
+            small_form[key] = value
+            continue
+        if len(value) > 250:
+            small_form[key] = value[:250] + '...'
+
+    return small_form
+
+
 def check_post(request):
     """Log a POST request.
 
@@ -89,6 +102,7 @@ def check_post(request):
 
     action = url.split('/')[-1]  # last part of url
     action = action.lstrip('@')
+
     if action in WHITELISTED_ACTIONS:
         logger.debug("Action whitelisted: %s.", action)
         return
@@ -100,6 +114,11 @@ def check_post(request):
     logger.debug("Checking honeypot fields for action %s. Result: %s.",
                  action, result)
     if not result:
+        try:
+            form = get_small_form(form)
+        except:
+            # Do not crash just because we want to log something.
+            pass
         logger.info("ACCEPTED POST from ip %s, url %r, referer %r, with form "
                     "%r", ip, url, referer, form)
         return
