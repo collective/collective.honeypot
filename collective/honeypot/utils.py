@@ -1,9 +1,9 @@
 import logging
 from copy import deepcopy
 from collective.honeypot.config import ACCEPTED_LOG_LEVEL
+from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
-from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import SPAMMER_LOG_LEVEL
 from collective.honeypot.config import WHITELISTED_ACTIONS
 from collective.honeypot.config import WHITELISTED_START
