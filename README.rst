@@ -73,6 +73,10 @@ the extra ``fixes`` dependencies (``z3c.jbot`` currently) and loading
   zcml =
       collective.honeypot-fixes
 
+**Important**: in Plone 3 you will get an error when running buildout
+with ``-fixes`` in a zcml line.  So in Plone 3.3 you do not need an
+explicit zcml line, but we always load the fixes.
+
 What does that do?
 
 - This registers overrides for several templates and scripts (using
