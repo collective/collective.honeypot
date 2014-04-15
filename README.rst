@@ -75,7 +75,10 @@ the extra ``fixes`` dependencies (``z3c.jbot`` currently) and loading
 
 **Important**: in Plone 3 you will get an error when running buildout
 with ``-fixes`` in a zcml line.  So in Plone 3.3 you do not need an
-explicit zcml line, but we always load the fixes.
+explicit zcml line, but we always load the fixes.  Also, I have seen
+one Plone 3 site that could not start up due to some incompatibility
+between our ``z3c.jbot`` dependency and either Plone Go Mobile or
+grok.  So do test it out locally before rolling it out on a server.
 
 What does that do?
 
