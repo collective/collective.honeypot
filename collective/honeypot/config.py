@@ -35,3 +35,30 @@ logger.info('Whitelisted actions: %r', WHITELISTED_ACTIONS)
 # Fields that are not logged:
 IGNORED_FORM_FIELDS = get_multi('IGNORED_FORM_FIELDS', ())
 logger.info('Ignored form fields: %r', IGNORED_FORM_FIELDS)
+
+
+def get_log_level(key, default):
+    # Get one of the standard log levels or fall back to the default.
+    value = os.environ.get(key, None)
+    if value is None:
+        return default
+    value = value.upper()
+    if value == 'DEBUG':
+        return logging.DEBUG
+    if value == 'INFO':
+        return logging.INFO
+    if value.startswith('WARN'):
+        return logging.WARN
+    if value == 'ERROR':
+        return logging.ERROR
+    if value == 'CRITICAL':
+        return logging.CRITICAL
+    # Default:
+    return logging.INFO
+
+# Log level for accepted posts.
+ACCEPTED_LOG_LEVEL = get_log_level('ACCEPTED_LOG_LEVEL', logging.INFO)
+logger.info('Accepted log level: %r', ACCEPTED_LOG_LEVEL)
+# Log level for caught spammers.
+SPAMMER_LOG_LEVEL = get_log_level('SPAMMER_LOG_LEVEL', logging.ERROR)
+logger.info('Spammer log level: %r', SPAMMER_LOG_LEVEL)

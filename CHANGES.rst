@@ -5,13 +5,21 @@ Changelog
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Allow configuring log levels.
+  [maurits]
+
+- Print less when logging the form.
+  [maurits]
 
 
 0.4 (2014-04-15)
 ----------------
 
-- Nothing changed yet.
+- Add fixes for ``quintagroup.plonecomments``.
+  [maurits]
+
+- Add fixes for Plone 3.
+  [maurits]
 
 
 0.3 (2014-03-14)

@@ -1,8 +1,10 @@
 import logging
 from copy import deepcopy
+from collective.honeypot.config import ACCEPTED_LOG_LEVEL
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
+from collective.honeypot.config import SPAMMER_LOG_LEVEL
 from collective.honeypot.config import WHITELISTED_ACTIONS
 from zExceptions import Forbidden
 
@@ -119,10 +121,12 @@ def check_post(request):
         except:
             # Do not crash just because we want to log something.
             pass
-        logger.info("ACCEPTED POST from ip %s, url %r, referer %r, with form "
-                    "%r", ip, url, referer, form)
+        logger.log(ACCEPTED_LOG_LEVEL,
+                   "ACCEPTED POST from ip %s, url %r, referer %r, with form "
+                   "%r", ip, url, referer, form)
         return
-    logger.warn("SPAMMER caught in honeypot: %s.  ip %s, url %r",
-                result, ip, url)
+    logger.log(SPAMMER_LOG_LEVEL,
+               "SPAMMER caught in honeypot: %s.  ip %s, url %r",
+               result, ip, url)
     # block the request:
     deny()

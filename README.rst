@@ -108,6 +108,10 @@ to the ``EXTRA_PROTECTED_ACTIONS``.  This means that the ``Forbidden``
 exception is also raised if the field is not submitted in the form at
 all.  See the Configuration_ section.
 
+Note that it would be nice to accept all posts from authenticated
+users, but our code is run too early in the Zope process: we cannot
+know yet if the user is logged in or not.
+
 
 Configuration
 =============
@@ -122,6 +126,8 @@ this in ``buildout.cfg``::
       EXTRA_PROTECTED_ACTIONS discussion_reply join_form sendto_form
       WHITELISTED_ACTIONS jq_reveal_email
       IGNORED_FORM_FIELDS secret_field
+      ACCEPTED_LOG_LEVEL info
+      SPAMMER_LOG_LEVEL error
 
 None of the options are required.
 
@@ -157,6 +163,18 @@ IGNORED_FORM_FIELDS
     contain form fields that should be left secret or that are not
     interesting.  No matter what you fill in here, we always ignore
     fields that contain the term `password`.
+
+ACCEPTED_LOG_LEVEL
+    Log level for accepted posts.  This accepts standard lower or
+    upper case log levels: debug, info, warn, warning, error,
+    critical.  When an unknown level is used or the setting is empty,
+    we fall back to the default: ``INFO``.
+
+SPAMMER_LOG_LEVEL error
+    Log level for caught spammers.  This accepts standard lower or
+    upper case log levels: debug, info, warn, warning, error,
+    critical.  When an unknown level is used or the setting is empty,
+    we fall back to the default: ``ERROR``.
 
 
 When are the checks *not* done?
@@ -202,16 +220,6 @@ This works on Plone 3 and Plone 4.  It does *not* work on Plone 2.5.
 
 Ideas
 =====
-
-- Maybe allow specifying loglevel for the posts, or some other way to
-  log less.
-
-- Can we see if the user is anonymous or are we too early in the
-  process?  May be nice to accept all authenticated posts.  Nope: we
-  are too early in the process.
-
-- What gets logged when you post a file?  Too much?  Don't dump form
-  values when they are too large?
 
 - Option: disallow all posts.  In case of emergency when you want a
   readonly database as far as possible.
