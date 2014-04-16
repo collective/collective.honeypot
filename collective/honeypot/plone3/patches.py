@@ -14,13 +14,13 @@ allow_class(Forbidden)
 logger.info('Allowing script access to zExceptions.Forbidden.')
 
 protected = [
-     'sendto_form',
-     'sendto',
-     'contact-info',
-     'send_feedback_site',
-     'register',
-     'join_form',
-     ]
+    'sendto_form',
+    'sendto',
+    'contact-info',
+    'send_feedback_site',
+    'register',
+    'join_form',
+    ]
 # Explicitly add the actions that we protect.
 config.EXTRA_PROTECTED_ACTIONS.update(protected)
 logger.info('Extra protected actions: %r', config.EXTRA_PROTECTED_ACTIONS)
