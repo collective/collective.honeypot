@@ -217,10 +217,21 @@ WHITELISTED_ACTIONS
     These form actions are not checked.  List here actions that are
     harmless, for example actions that load some data via an AJAX
     call.  Generally, actions that change nothing in the database and
-    do not send emails are safe to add here.  You could add
-    ``edit`` and ``atct_edit`` to avoid logging the large dexterity
-    and Archetypes edit forms.  But you may find this interesting, so
-    suit yourself.
+    do not send emails are safe to add here.  If you add this
+    environment variable but leave it empty, you override the
+    default and do not whitelist anything.  By default we whitelist
+    these actions:
+
+    - ``at_validate_field`` (inline validation)
+
+    - ``atct_edit`` (edit form)
+
+    - ``edit`` (edit form)
+
+    - ``jq_reveal_email`` (``zest.emailhider``)
+
+    - ``z3cform_validate_field``  (inline validation)
+
 
 WHITELISTED_START
     Form actions starting with one of these strings are not checked.

@@ -27,8 +27,10 @@ logger.info('Extra protected actions: %r', EXTRA_PROTECTED_ACTIONS)
 
 # Actions that are not checked:
 WHITELISTED_ACTIONS = get_multi('WHITELISTED_ACTIONS', (
-    'jq_reveal_email',  # zest.emailhider
     'at_validate_field',
+    'atct_edit',
+    'edit',
+    'jq_reveal_email',  # zest.emailhider
     'z3cform_validate_field',
     ))
 logger.info('Whitelisted actions: %r', WHITELISTED_ACTIONS)

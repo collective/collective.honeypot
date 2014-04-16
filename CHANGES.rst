@@ -5,6 +5,9 @@ Changelog
 0.6 (unreleased)
 ----------------
 
+- Whitelist edit forms by default.
+  [maurits]
+
 - Log when we load patches and add extra protected actions.
   [maurits]
 
