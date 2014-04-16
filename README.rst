@@ -8,13 +8,13 @@ Introduction
 This package gives honeypot protection for forms.
 
 .. warning:: I [Maurits] want to move this to the github collective,
-   but I want to do some more fixes and tell the Plone Security Team
-   about this to get their opinion before making this public.
-   Probably not needed, but let's be careful.
+   but I first want to tell the Plone Security Team about this to get
+   their opinion before making this public.  Probably not needed, but
+   let's be careful.
 
 
-Use case
-========
+Use cases
+=========
 
 Spammers have found you and are pounding various forms on your
 website.  Prime victims are the join form, contact form, sendto form
@@ -24,8 +24,14 @@ Maybe you have some captcha protection in place but spammers have
 found a way around it.  Or you want to detect a spammer before doing a
 possibly time consuming validation.
 
-Or you do not want to put up any user unfriendly captchas but do not
+You have noticed that some scripts send e-mails or add a comment even
+when they receive a ``GET`` instead of a ``POST`` request.
+
+You do not want to put up any user unfriendly captchas, but do not
 want to make it easy for spammers either.
+
+Or, rather differently, you wonder if you can temporarily disallow all
+``POST`` requests while you are doing a big migration.
 
 
 Idea
@@ -114,7 +120,7 @@ before rolling it out on a server.  For reference, the error was::
       TypeError: Error when calling the metaclass bases
       Can't mix __of__ and descriptors
 
-Okay, you have added the fixes.  What does that do?
+Okay, you have added the fixes.  What does this do?
 
 - This registers overrides for several templates and scripts (using
   ``z3c.jbot``).
@@ -176,6 +182,8 @@ and it will get picked up.  But the usual way would be to do this in
       SPAMMER_LOG_LEVEL error
       DISALLOW_ALL_POSTS no
 
+General notes:
+
 - None of the options are required.  It will work fine without any
   environment variables.
 
@@ -184,6 +192,8 @@ and it will get picked up.  But the usual way would be to do this in
 - Any ``@`` character gets automatically replaced by a space, to make
   it easier to reference ``@@some_view`` by simply ``some_view``, as
   we always protect them both.
+
+These are the supported variables:
 
 HONEYPOT_FIELD
     Name to use as input name of the honeypot field.  If you give no
@@ -317,6 +327,9 @@ Again, the fixes are only loaded when ``collective.honeypot[fixes]``
 also must add ``collective.honeypot-fixes`` to the ``zcml`` option of
 your buildout.
 
+Well, we always change the ``@@authenticator`` view, even if you do
+not load the fixes, but that should not have any adverse effect.
+
 Some scripts in standard Plone happily add a comment or send an e-mail
 when you use a ``GET`` request.  This package does not agree with that
 policy and has fixes to require a ``POST`` request.
@@ -362,7 +375,7 @@ So, what are the actual fixes that this package contains?
 
   - This is the only add-on that we add a fix for, because we believe
     it is widely used in Plone 3 and 4.0.  The tests have been done
-    with version 4.1.9.
+    with ``quintagroup.plonecomments`` version 4.1.9.
 
   - Note that ``quintagroup.plonecomments`` 4.1.9 does not seem to
     work in Plone versions 4.1 and higher, which of course have
@@ -373,7 +386,7 @@ So, what are the actual fixes that this package contains?
   - For ``quintagroup.plonecomments`` we have the same fixes as for
     the old comments.
 
-- Plone 3:
+- Plone 4:
 
   - Require ``POST`` for the ``send_feedback_site`` and ``sendto``
     scripts.
@@ -381,20 +394,25 @@ So, what are the actual fixes that this package contains?
   - Add the honeypot field to the ``sendto_form`` and ``contact-info``
     forms.
 
-  - The join or register form is automatically protected by our
+  - The register form is automatically protected by our
     ``@@authenticator`` override.
 
   - Require the honeypot field for the above actions and the join
     form, specifically: ``sendto_form``, ``sendto``, ``contact-info``,
     ``send_feedback_site``, ``register``, ``join_form``.
 
-- Plone 4:
+- Plone 3:
 
-  - We have the same fixes as for Plone 3, with one exception: we do
-    not require the honeypot field on the ``join_form`` action,
-    because this action no longer exists.  Both the form and the
-    action are now called ``register``, which gets the
-    ``@@authenticator`` protection.
+  - We have the same fixes as for Plone 4.
+
+  - We also require the honeypot field on the ``join_form`` action.
+    Note that in Plone 4 the ``join_form`` only exists under the name
+    ``register``.
+
+  - We allow skin scripts and templates to use ``from zExceptions
+    import Forbidden``.  In Plone 4 this is already allowed.  We need
+    this to be able to use ``raise Forbidden('Use POST please.')`` in
+    form actions.
 
 
 Compatibility
