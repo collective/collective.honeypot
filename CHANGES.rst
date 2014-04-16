@@ -5,7 +5,8 @@ Changelog
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Log when we load patches and add extra protected actions.
+  [maurits]
 
 
 0.5 (2014-04-16)
