@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.5 (unreleased)
+0.5 (2014-04-16)
 ----------------
 
 - Support disallowing all posts.
