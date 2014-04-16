@@ -280,13 +280,121 @@ script directly.  And he can bypass the honeypot checks by using a
 ``GET`` request.
 
 
-Future
-======
+z3c.form
+========
 
-We can probably make it easier to add this to a form based on
-``z3c.form`` or ``zope.formlib``.  It should be possible to do some
-hack to add the fields automatically to every form.  Having an extra
-field should be okay, although it may trip up a few automated tests.
+You can easily add a honeypot field to a ``z3c.form``.  Just add a
+``TextLine`` field to your form ``Interface`` definition, set the
+``widgetFactory`` to the widget that ``collective.honeypot`` supplies,
+and make it hidden.  Something like this::
+
+  from collective.honeypot.z3cform.widget import HoneypotFieldWidget
+  from z3c.form import form, interfaces
+  from zope import schema
+  from zope.interface import Interface
+
+  class IHoneypot(Interface):
+      # Keep field title empty so visitors do not see it.
+      honeypot = schema.TextLine(title=u"", required=False)
+
+  class MyForm(form.Form):
+      fields = form.field.Fields(IHoneypot)
+
+      def update(self):
+          self.fields['honeypot'].widgetFactory = HoneypotFieldWidget
+          self.fields['honeypot'].mode = interfaces.HIDDEN_MODE
+
+See ``collective/honeypot/discussion/z3cformextender.py`` for an
+example of how to extend an existing form, in this case the comment
+form in ``plone.app.discussion``.
+
+
+Fixes
+=====
+
+Again, the fixes are only loaded when ``collective.honeypot[fixes]``
+(or ``z3c.jbot``) is in the eggs of the zope instance.  On Plone 4 you
+also must add ``collective.honeypot-fixes`` to the ``zcml`` option of
+your buildout.
+
+Some scripts in standard Plone happily add a comment or send an e-mail
+when you use a ``GET`` request.  This package does not agree with that
+policy and has fixes to require a ``POST`` request.
+
+The package detects which fixes are needed.  Plone 3 and 4 need other
+fixes.  Some add-ons may or may not be available, so we only load
+fixes that can be applied, especially for ``plone.app.discussion`` and
+``quintagroup.plonecomments``.
+
+So, what are the actual fixes that this package contains?
+
+- Some forms may get the invisible honeypot field automatically.  This
+  package registers an override for the ``@@authenticator`` view from
+  ``plone.protect`` that is used in several templates for csrf
+  protection (cross site request forgery).  So any template that
+  already uses this, is automatically loading our honeypot field.
+
+- ``plone.app.discussion``:
+
+  - Add the honeypot field to the 'add comment' form.
+
+  - The honeypot field is *not* required, because the 'add comment'
+    form posts to the context, not to a specific action.
+
+- old comments:
+
+  - This is the standard commenting system of Plone 3.3 and 4.0.  It
+    is still available in newer Plone versions, so we always load
+    these fixes.
+
+  - Add the honeypot field to the 'add comment' form
+    (``discussion_reply_form``).
+
+  - Require ``POST`` for the ``discussion_reply`` script.
+
+  - Require the honeypot field in the ``discussion_reply`` action.
+    Note: we cannot require it in ``discussion_reply_form``, because
+    any page that allows adding comments will contain a simple form
+    with this action and a single button 'Add Comment' to open the
+    real form.  That initial form will not have our honeypot field.
+
+- ``quintagroup.plonecomments``:
+
+  - This is the only add-on that we add a fix for, because we believe
+    it is widely used in Plone 3 and 4.0.  The tests have been done
+    with version 4.1.9.
+
+  - Note that ``quintagroup.plonecomments`` 4.1.9 does not seem to
+    work in Plone versions 4.1 and higher, which of course have
+    ``plone.app.discussion``.  This has nothing to do with
+    ``collective.honeypot``.  Maybe it works if you uninstall
+    ``plone.app.discussion``, but this is not recommended.
+
+  - For ``quintagroup.plonecomments`` we have the same fixes as for
+    the old comments.
+
+- Plone 3:
+
+  - Require ``POST`` for the ``send_feedback_site`` and ``sendto``
+    scripts.
+
+  - Add the honeypot field to the ``sendto_form`` and ``contact-info``
+    forms.
+
+  - The join or register form is automatically protected by our
+    ``@@authenticator`` override.
+
+  - Require the honeypot field for the above actions and the join
+    form, specifically: ``sendto_form``, ``sendto``, ``contact-info``,
+    ``send_feedback_site``, ``register``, ``join_form``.
+
+- Plone 4:
+
+  - We have the same fixes as for Plone 3, with one exception: we do
+    not require the honeypot field on the ``join_form`` action,
+    because this action no longer exists.  Both the form and the
+    action are now called ``register``, which gets the
+    ``@@authenticator`` protection.
 
 
 Compatibility
