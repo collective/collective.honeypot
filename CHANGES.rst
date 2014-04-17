@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.6 (unreleased)
+0.6 (2014-04-17)
 ----------------
 
 - Whitelist edit forms by default.
