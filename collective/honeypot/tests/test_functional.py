@@ -176,7 +176,7 @@ class StandardTestCase(BaseTestCase):
             self.browser.open(self.portal_url + '/@@register')
             # We could get the form, but with this general id it seems a
             # bad idea:
-            #form = self.browser.getForm(id='zc.page.browser_form')
+            # form = self.browser.getForm(id='zc.page.browser_form')
             self.browser.getControl(name='form.actions.register').click()
             self.assertTrue('There were errors' in self.browser.contents)
             self.assertEqual(len(self.mailhost.messages), 0)
@@ -193,10 +193,12 @@ class StandardTestCase(BaseTestCase):
 
         def test_register_post_honey(self):
             # Try a post with the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/@@register', 'protected_1=bad')
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/register', 'protected_1=bad')
+            self.assertRaises(
+                Forbidden, self.browser.post,
+                self.portal_url + '/@@register', 'protected_1=bad')
+            self.assertRaises(
+                Forbidden, self.browser.post,
+                self.portal_url + '/register', 'protected_1=bad')
             self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the old join form.
@@ -212,20 +214,23 @@ class StandardTestCase(BaseTestCase):
             # shows the join_form with an error message.
             self.browser.open(self.portal_url + '/register')
             self.assertTrue(
-                'Please correct the indicated errors.' in self.browser.contents)
+                'Please correct the indicated errors.'
+                in self.browser.contents)
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_old_register_post_honey(self):
             # Try a post with the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/register', 'protected_1=bad')
+            self.assertRaises(
+                Forbidden, self.browser.post,
+                self.portal_url + '/register', 'protected_1=bad')
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_join_form_empty(self):
             self.browser.open(self.portal_url + '/join_form')
             self.browser.getControl(name='form.button.Register').click()
             self.assertTrue(
-                'Please correct the indicated errors.' in self.browser.contents)
+                'Please correct the indicated errors.'
+                in self.browser.contents)
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_join_form_normal(self):
@@ -239,8 +244,9 @@ class StandardTestCase(BaseTestCase):
 
         def test_join_form_post_honey(self):
             # Try a post with the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/join_form', 'protected_1=bad')
+            self.assertRaises(
+                Forbidden, self.browser.post,
+                self.portal_url + '/join_form', 'protected_1=bad')
             self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the comment form.
@@ -375,15 +381,17 @@ if HAS_QUINTA:
                 # p.a.discussion is not installed.  Clicking should work
                 # and we should end up on the old form.
                 add_comment.click()
-                self.assertEqual(self.browser.url,
-                                 self.portal_url + '/doc/discussion_reply_form')
+                self.assertEqual(
+                    self.browser.url,
+                    self.portal_url + '/doc/discussion_reply_form')
             form = self.browser.getForm(name='edit_form')
             form.submit()
             self.assertTrue('Please correct the indicated errors.'
                             in self.browser.contents)
             # First error message is Plone 4, second is Plone 3.
-            self.assertTrue('Comment cannot be blank.' in self.browser.contents or
-                            'Please submit a body.' in self.browser.contents)
+            self.assertTrue(
+                'Comment cannot be blank.' in self.browser.contents or
+                'Please submit a body.' in self.browser.contents)
             self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_quinta_normal(self):
