@@ -32,7 +32,7 @@ WHITELISTED_ACTIONS = get_multi('WHITELISTED_ACTIONS', (
     'edit',
     'jq_reveal_email',  # zest.emailhider
     'z3cform_validate_field',
-    ))
+))
 logger.info('Whitelisted actions: %r', WHITELISTED_ACTIONS)
 # Actions starting with these strings are not checked.  Note: regular
 # expressions are too easily done wrong, so we do not support them.

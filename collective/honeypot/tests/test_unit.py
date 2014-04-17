@@ -48,7 +48,7 @@ class UtilsTestCase(unittest.TestCase):
                   '__ac_name': 'admin',
                   })
         self.assertEqual(get_form(secret_request),
-            {'hoppa': 'kikoo', '__ac_name': 'admin'})
+                         {'hoppa': 'kikoo', '__ac_name': 'admin'})
         # The stripped data should still be on the original form.
         self.assertEqual(secret_request.form['password'], 'secret')
         self.assertEqual(secret_request.form['password_confirm'], 'secret2')
