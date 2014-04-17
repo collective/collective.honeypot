@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<object name="portal_skins">
+ <object name="honeypot_oldcomments"
+    meta_type="Filesystem Directory View"
+    directory="collective.honeypot:skins/honeypot_oldcomments" />
+ <object name="honeypot_plone4"
+    meta_type="Filesystem Directory View"
+    directory="collective.honeypot:skins/honeypot_plone4" />
+ <object name="honeypot_quinta"
+    meta_type="Filesystem Directory View"
+    directory="collective.honeypot:skins/honeypot_quinta" />
+ <skin-path name="*">
+  <layer name="honeypot_plone3" remove="True" />
+  <layer name="honeypot_plone4" insert-after="custom" />
+  <layer name="honeypot_oldcomments" insert-after="honeypot_plone4" />
+  <!-- Note: honeypot_quinta should actually be before
+       honeypot_oldcomments if and only if quintagroup.plonecomments
+       is installed.  But we do not know if that is the case.  We
+       would run into problems when we load it before and
+       quintagroup.plonecomments is not installed.  This only really
+       matters for Plone 4.0 normally. -->
+  <layer name="honeypot_quinta" insert-after="honeypot_oldcomments" />
+ </skin-path>
+</object>

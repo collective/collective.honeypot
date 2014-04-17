@@ -1,0 +1,34 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="collective.honeypot">
+
+  <genericsetup:registerProfile
+      zcml:condition="not-have plone-4"
+      name="default"
+      title="collective.honeypot"
+      directory="profiles/plone3"
+      description='Plone 3 fixes from collective.honeypot'
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      zcml:condition="have plone-4"
+      name="default"
+      title="collective.honeypot"
+      directory="profiles/plone4"
+      description='Plone 4 fixes from collective.honeypot'
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="collective.honeypot uninstall"
+      directory="profiles/uninstall"
+      description='Uninstall profile for the Plone Comments product.'
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+</configure>
+                                                                       

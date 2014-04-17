@@ -5,7 +5,12 @@ Changelog
 0.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add GenericSetup profile, which adds skin layers with our fixes.
+  This is recommended on Plone 3.  The reason is that this technique
+  does not need ``z3c.jbot``, which can have a few ugly side effects
+  in Plone 3: ``Products.CacheSetup`` does not like it and in other
+  cases Zope does not even start up.
+  [maurits]
 
 
 0.6 (2014-04-17)
