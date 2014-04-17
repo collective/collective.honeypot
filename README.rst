@@ -350,6 +350,11 @@ fixes.  Some add-ons may or may not be available, so we only load
 fixes that can be applied, especially for ``plone.app.discussion`` and
 ``quintagroup.plonecomments``.
 
+We use ``z3c.jbot`` to fix the scripts and templates.  This means that
+we only fix them at the original location.  If we override a script or
+template in an own skin layer or via some zcml, then our fix has no
+effect, so you need to do a fix yourself.
+
 So, what are the actual fixes that this package contains?
 
 - Some forms may get the invisible honeypot field automatically.  This
