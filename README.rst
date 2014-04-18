@@ -64,8 +64,22 @@ Installation and usage
 ======================
 
 Add ``collective.honeypot`` to the eggs of your zope instance in your
-buildout config.  In Plone 3.2 or lower (untested) you need to add it
-to the zcml option as well.  Run buildout and start the zope instance.
+buildout config::
+
+  [instance]
+  eggs =
+      collective.honeypot
+
+In Plone 3.2 or lower (untested) you need to add it to the zcml option
+as well::
+
+  [instance]
+  eggs =
+      collective.honeypot
+  zcml =
+      collective.honeypot
+
+Run buildout and start the zope instance.
 
 At this point it does not do anything yet, except that it logs some
 info whenever someone does a ``POST``.  You should take some measures to
@@ -74,9 +88,51 @@ needs a change.  You can do that yourself and/or load the standard
 fixes from ``collective.honeypot``.
 
 ``collective.honeypot`` has fixes for a few standard Plone templates.
-If you want to use them, you need to explicitly enable them by loading
-the extra ``fixes`` dependencies (``z3c.jbot`` currently) and loading
-``fixes.zcml``.  In your Plone 4 buildout config::
+If you want to use them, you need to explicitly enable them.  How?
+
+
+Activation on Plone 3
+---------------------
+
+Go to the Add-ons (Extra Products) control panel in your Plone Site
+and activate ``collective.honeypot``.
+
+What does this do?
+
+- This adds a few skin layers that override several templates and
+  scripts.
+
+Two notes:
+
+- We add the skin layers after the ``custom`` skin layer, so if you
+  have customized a skin script or template that we want to override,
+  then you should take over the changes in your customization.
+
+- If you have installed ``quintagroup.plonecomments``, then you need
+  to change the order of the skin layers.  Go to the Zope Management
+  Interface, then to Properties tab of the ``portal_skins`` tool.  In
+  all skin selections put ``honeypot_quinta`` at the first spot behind
+  ``custom``.  Specifically, it should be above
+  ``honeypot_oldcomments`` and ``quintagroup_plonecomments``.
+
+Alternatively you could add ``z3c.jbot`` to the eggs and load our
+``fixes.zcml`` in an own package (on Plone 3 this is not possible in a
+buildout config).  This used to be the only way, but ``z3c.jbot`` on
+Plone 3 gives problems with some packages.  Problems have been noted
+in combination with ``Products.CacheSetup`` and with Plone Go Mobile.
+
+
+Activation on Plone 4
+---------------------
+
+You have two options: do the same as on Plone 3, or load some extra
+``zcml`` to have the fixes available without needing any actions in
+the Plone UI.  The last one is recommended.  It also offers an extra
+fix.
+
+The best option is to load the extra ``fixes`` dependencies
+(``z3c.jbot`` currently) and loading ``fixes.zcml``.  In your Plone 4
+buildout config::
 
   [instance]
   eggs =
@@ -84,43 +140,7 @@ the extra ``fixes`` dependencies (``z3c.jbot`` currently) and loading
   zcml =
       collective.honeypot-fixes
 
-Or in your Plone 3 buildout config::
-
-  [instance]
-  eggs =
-      collective.honeypot[fixes]
-
-**Important**: in Plone 3 you will get an error when running buildout
-if you have ``-fixes`` in a zcml line.  So we have changed the
-behavior of ``collective.honeypot`` in Plone 3.3: you do not need an
-explicit zcml line, but we always load the fixes if you have
-``collective.honeypot[fixes]`` in the eggs, or if ``z3c.jbot`` is in
-the eggs in some other way.
-
-**Important**: I have seen one Plone 3 site that could not start up
-due to some incompatibility between our ``z3c.jbot`` dependency and
-either Plone Go Mobile or Grok in general.  So do test it out locally
-before rolling it out on a server.  For reference, the error was::
-
-  Traceback (most recent call last):
-  ...
-    File ".../Zope-2.10.13-final-py2.4/lib/python/zope/configuration/config.py", line 206, in resolve
-      return __import__(mname+'.'+oname, *_import_chickens)
-    File "/Users/mauritsvanrees/shared-eggs/five.grok-1.0-py2.4.egg/five/grok/__init__.py", line 23, in ?
-      from five.grok.components import Model, Container, Site, LocalUtility
-    File "/Users/mauritsvanrees/shared-eggs/five.grok-1.0-py2.4.egg/five/grok/components.py", line 133, in ?
-  class ViewPageTemplateFile(BaseViewPageTemplateFile):
-  zope.configuration.xmlconfig.ZopeXMLConfigurationError: File ".../parts/instance/etc/site.zcml", line 14.2-14.55
-      ZopeXMLConfigurationError: File
-          ".../parts/instance/etc/package-includes/005-gomobile.convergence-configure.zcml", line 1.0-1.64
-      ZopeXMLConfigurationError: File
-          ".../gomobile.convergence-0.1dev_r369-py2.4.egg/gomobile/convergence/configure.zcml", line 13.4-13.64
-      ZopeXMLConfigurationError: File
-          ".../plone.directives.form-1.0b6-py2.4.egg/plone/directives/form/meta.zcml", line 6.4-6.52
-      TypeError: Error when calling the metaclass bases
-      Can't mix __of__ and descriptors
-
-Okay, you have added the fixes.  What does this do?
+What does this do?
 
 - This registers overrides for several templates and scripts (using
   ``z3c.jbot``).
@@ -128,6 +148,105 @@ Okay, you have added the fixes.  What does this do?
 - It adds those templates and scripts to the list of extra protected
   actions.  This means that a ``POST`` request to these actions now
   **must** have the honeypot field and it **must** be empty.
+
+
+Fixes
+=====
+
+You need to enable the fixes.  See `Installation and usage `_ for how
+to do that.
+
+Well, we always change the ``@@authenticator`` view, even if you do
+not enable the fixes, but that should not have any adverse effect.
+
+Some scripts in standard Plone happily add a comment or send an e-mail
+when you use a ``GET`` request.  This package does not agree with that
+policy and has fixes to require a ``POST`` request.
+
+When using ``z3c.jbot``, the package detects which fixes are needed.
+Plone 3 and 4 need other fixes.  Some add-ons may or may not be
+available, so we only load fixes that can be applied, especially for
+``plone.app.discussion`` and ``quintagroup.plonecomments``.
+
+If you override a script or template in an own skin layer or via some
+zcml, then our fixes may have no effect, so you need to do a fix
+yourself.
+
+So, what are the actual fixes that this package contains?
+
+- Some forms may get the invisible honeypot field automatically.  This
+  package registers an override for the ``@@authenticator`` view from
+  ``plone.protect`` that is used in several templates for csrf
+  protection (cross site request forgery).  So any template that
+  already uses this, is automatically loading our honeypot field.
+
+- ``plone.app.discussion``:
+
+  - Add the honeypot field to the 'add comment' form.  This fix is
+    only done when you load ``fixes.zcml``.
+
+  - The honeypot field is *not* required, because the 'add comment'
+    form posts to the context, not to a specific action.
+
+- old comments:
+
+  - This is the standard commenting system of Plone 3.3 and 4.0.  It
+    is still available in newer Plone versions, so we always load
+    these fixes.
+
+  - Add the honeypot field to the 'add comment' form
+    (``discussion_reply_form``).
+
+  - Require ``POST`` for the ``discussion_reply`` script.
+
+  - Require the honeypot field in the ``discussion_reply`` action.
+    Note: we cannot require it in ``discussion_reply_form``, because
+    any page that allows adding comments will contain a simple form
+    with this action and a single button 'Add Comment' to open the
+    real form.  That initial form will not have our honeypot field.
+
+- ``quintagroup.plonecomments``:
+
+  - This is the only add-on that we add a fix for, because we believe
+    it is widely used in Plone 3 and 4.0.  The tests have been done
+    with ``quintagroup.plonecomments`` version 4.1.9.
+
+  - Note that ``quintagroup.plonecomments`` 4.1.9 does not seem to
+    work in Plone versions 4.1 and higher, which of course have
+    ``plone.app.discussion``.  This has nothing to do with
+    ``collective.honeypot``.  Maybe it works if you uninstall
+    ``plone.app.discussion``, but this is not recommended.
+
+  - For ``quintagroup.plonecomments`` we have the same fixes as for
+    the old comments.
+
+- Plone 4:
+
+  - Require ``POST`` for the ``send_feedback_site`` and ``sendto``
+    scripts.
+
+  - Add the honeypot field to the ``sendto_form`` and ``contact-info``
+    forms.
+
+  - The register form is automatically protected by our
+    ``@@authenticator`` override.
+
+  - Require the honeypot field for the above actions and the join
+    form, specifically: ``sendto_form``, ``sendto``, ``contact-info``,
+    ``send_feedback_site``, ``register``, ``join_form``.
+
+- Plone 3:
+
+  - We have the same fixes as for Plone 4.
+
+  - We also require the honeypot field on the ``join_form`` action.
+    Note that in Plone 4 the ``join_form`` only exists under the name
+    ``register``.
+
+  - We allow skin scripts and templates to use ``from zExceptions
+    import Forbidden``.  In Plone 4 this is already allowed.  We need
+    this to be able to use ``raise Forbidden('Use POST please.')`` in
+    form actions.
 
 
 Protecting your own forms
@@ -328,107 +447,6 @@ and make it hidden.  Something like this::
 See ``collective/honeypot/discussion/z3cformextender.py`` for an
 example of how to extend an existing form, in this case the comment
 form in ``plone.app.discussion``.
-
-
-Fixes
-=====
-
-Again, the fixes are only loaded when ``collective.honeypot[fixes]``
-(or ``z3c.jbot``) is in the eggs of the zope instance.  On Plone 4 you
-also must add ``collective.honeypot-fixes`` to the ``zcml`` option of
-your buildout.
-
-Well, we always change the ``@@authenticator`` view, even if you do
-not load the fixes, but that should not have any adverse effect.
-
-Some scripts in standard Plone happily add a comment or send an e-mail
-when you use a ``GET`` request.  This package does not agree with that
-policy and has fixes to require a ``POST`` request.
-
-The package detects which fixes are needed.  Plone 3 and 4 need other
-fixes.  Some add-ons may or may not be available, so we only load
-fixes that can be applied, especially for ``plone.app.discussion`` and
-``quintagroup.plonecomments``.
-
-We use ``z3c.jbot`` to fix the scripts and templates.  This means that
-we only fix them at the original location.  If we override a script or
-template in an own skin layer or via some zcml, then our fix has no
-effect, so you need to do a fix yourself.
-
-So, what are the actual fixes that this package contains?
-
-- Some forms may get the invisible honeypot field automatically.  This
-  package registers an override for the ``@@authenticator`` view from
-  ``plone.protect`` that is used in several templates for csrf
-  protection (cross site request forgery).  So any template that
-  already uses this, is automatically loading our honeypot field.
-
-- ``plone.app.discussion``:
-
-  - Add the honeypot field to the 'add comment' form.
-
-  - The honeypot field is *not* required, because the 'add comment'
-    form posts to the context, not to a specific action.
-
-- old comments:
-
-  - This is the standard commenting system of Plone 3.3 and 4.0.  It
-    is still available in newer Plone versions, so we always load
-    these fixes.
-
-  - Add the honeypot field to the 'add comment' form
-    (``discussion_reply_form``).
-
-  - Require ``POST`` for the ``discussion_reply`` script.
-
-  - Require the honeypot field in the ``discussion_reply`` action.
-    Note: we cannot require it in ``discussion_reply_form``, because
-    any page that allows adding comments will contain a simple form
-    with this action and a single button 'Add Comment' to open the
-    real form.  That initial form will not have our honeypot field.
-
-- ``quintagroup.plonecomments``:
-
-  - This is the only add-on that we add a fix for, because we believe
-    it is widely used in Plone 3 and 4.0.  The tests have been done
-    with ``quintagroup.plonecomments`` version 4.1.9.
-
-  - Note that ``quintagroup.plonecomments`` 4.1.9 does not seem to
-    work in Plone versions 4.1 and higher, which of course have
-    ``plone.app.discussion``.  This has nothing to do with
-    ``collective.honeypot``.  Maybe it works if you uninstall
-    ``plone.app.discussion``, but this is not recommended.
-
-  - For ``quintagroup.plonecomments`` we have the same fixes as for
-    the old comments.
-
-- Plone 4:
-
-  - Require ``POST`` for the ``send_feedback_site`` and ``sendto``
-    scripts.
-
-  - Add the honeypot field to the ``sendto_form`` and ``contact-info``
-    forms.
-
-  - The register form is automatically protected by our
-    ``@@authenticator`` override.
-
-  - Require the honeypot field for the above actions and the join
-    form, specifically: ``sendto_form``, ``sendto``, ``contact-info``,
-    ``send_feedback_site``, ``register``, ``join_form``.
-
-- Plone 3:
-
-  - We have the same fixes as for Plone 4.
-
-  - We also require the honeypot field on the ``join_form`` action.
-    Note that in Plone 4 the ``join_form`` only exists under the name
-    ``register``.
-
-  - We allow skin scripts and templates to use ``from zExceptions
-    import Forbidden``.  In Plone 4 this is already allowed.  We need
-    this to be able to use ``raise Forbidden('Use POST please.')`` in
-    form actions.
 
 
 Compatibility
