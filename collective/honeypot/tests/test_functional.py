@@ -4,6 +4,7 @@ import textwrap
 import transaction
 import unittest
 import urllib
+import sys
 from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
 from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
 from collective.honeypot.testing import HAS_DISCUSSION
@@ -13,6 +14,11 @@ from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
 from zExceptions import Forbidden
+
+if sys.version_info < (2, 5):
+    HAS_PLONE4 = False
+else:
+    HAS_PLONE4 = True
 
 if HAS_DISCUSSION:
     from plone.app.discussion.interfaces import IConversation
@@ -302,7 +308,10 @@ class StandardTestCase(BaseTestCase):
             add_comment.click()
             self.assertEqual(self.browser.url,
                              self.portal_url + '/doc/discussion_reply_form')
-        form = self.browser.getForm(name='edit_form')
+        try:
+            form = self.browser.getForm(name='edit_form')
+        except LookupError:
+            form = self.browser.getForm(id='edit_form')
         form.submit()
         self.assertTrue('Please correct the indicated errors.'
                         in self.browser.contents)
@@ -314,7 +323,15 @@ class StandardTestCase(BaseTestCase):
     def test_old_comment_normal(self):
         self._create_commentable_doc()
         self.browser.open(self.portal_url + '/doc/discussion_reply_form')
-        form = self.browser.getForm(name='edit_form')
+        try:
+            form = self.browser.getForm(name='edit_form')
+        except LookupError:
+            form = self.browser.getForm(id='edit_form')
+        try:
+            self.browser.getControl(name='subject').value = 'Spammmmmm'
+        except LookupError:
+            # The subject field is not always there.
+            pass
         self.browser.getControl(name='body_text').value = 'Spammerdespam'
         try:
             form.submit()
@@ -384,7 +401,10 @@ if HAS_QUINTA:
                 self.assertEqual(
                     self.browser.url,
                     self.portal_url + '/doc/discussion_reply_form')
-            form = self.browser.getForm(name='edit_form')
+            try:
+                form = self.browser.getForm(name='edit_form')
+            except LookupError:
+                form = self.browser.getForm(id='edit_form')
             form.submit()
             self.assertTrue('Please correct the indicated errors.'
                             in self.browser.contents)
@@ -397,7 +417,10 @@ if HAS_QUINTA:
         def test_quinta_normal(self):
             self._create_commentable_doc()
             self.browser.open(self.portal_url + '/doc/discussion_reply_form')
-            form = self.browser.getForm(name='edit_form')
+            try:
+                form = self.browser.getForm(name='edit_form')
+            except LookupError:
+                form = self.browser.getForm(id='edit_form')
             self.browser.getControl(name='body_text').value = 'Spammerdespam'
             # quintagroup.plonecomments requires these two as well:
             self.browser.getControl(name='Creator').value = 'Mr. Spammer'
@@ -456,13 +479,15 @@ class FixesTestCase(StandardTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    def test_sendto_post_no_honey(self):
-        # Try a post without the honeypot field.
-        self.assertRaises(Forbidden, self.browser.post,
-                          self.portal_url + '/sendto_form', '')
-        self.assertRaises(Forbidden, self.browser.post,
-                          self.portal_url + '/sendto', '')
-        self.assertEqual(len(self.mailhost.messages), 0)
+    if HAS_PLONE4:
+
+        def test_sendto_post_no_honey(self):
+            # Try a post without the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/sendto_form', '')
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/sendto', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_sendto_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
@@ -493,13 +518,15 @@ class FixesTestCase(StandardTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    def test_contact_info_post_no_honey(self):
-        # Try a post without the honeypot field.
-        self.assertRaises(Forbidden, self.browser.post,
-                          self.portal_url + '/contact-info', '')
-        self.assertRaises(Forbidden, self.browser.post,
-                          self.portal_url + '/send_feedback_site', '')
-        self.assertEqual(len(self.mailhost.messages), 0)
+    if HAS_PLONE4:
+
+        def test_contact_info_post_no_honey(self):
+            # Try a post without the honeypot field.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/contact-info', '')
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/send_feedback_site', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
@@ -535,13 +562,15 @@ class FixesTestCase(StandardTestCase):
             self.assertRaises(Forbidden, register_button.click)
             self.assertEqual(len(self.mailhost.messages), 0)
 
-        def test_register_post_no_honey(self):
-            # Try a post without the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/@@register', '')
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/register', '')
-            self.assertEqual(len(self.mailhost.messages), 0)
+        if HAS_PLONE4:
+
+            def test_register_post_no_honey(self):
+                # Try a post without the honeypot field.
+                self.assertRaises(Forbidden, self.browser.post,
+                                  self.portal_url + '/@@register', '')
+                self.assertRaises(Forbidden, self.browser.post,
+                                  self.portal_url + '/register', '')
+                self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the old join form.
 
@@ -549,12 +578,6 @@ class FixesTestCase(StandardTestCase):
 
         # This is for Plone 3.  Note that the join_form template uses
         # the register script.
-
-        def test_old_register_post_no_honey(self):
-            # Try a post without the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/register', '')
-            self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_join_form_spammer(self):
             self.browser.open(self.portal_url + '/join_form')
@@ -568,12 +591,6 @@ class FixesTestCase(StandardTestCase):
             register_button = self.browser.getControl(
                 name='form.button.Register')
             self.assertRaises(Forbidden, register_button.click)
-            self.assertEqual(len(self.mailhost.messages), 0)
-
-        def test_join_form_post_no_honey(self):
-            # Try a post without the honeypot field.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/join_form', '')
             self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the comment form.
@@ -607,7 +624,10 @@ class FixesTestCase(StandardTestCase):
     def test_old_comment_spammer(self):
         self._create_commentable_doc()
         self.browser.open(self.portal_url + '/doc/discussion_reply_form')
-        form = self.browser.getForm(name='edit_form')
+        try:
+            form = self.browser.getForm(name='edit_form')
+        except LookupError:
+            form = self.browser.getForm(id='edit_form')
         self.browser.getControl(name='body_text').value = 'Spammerdespam'
         # Yummy, a honeypot!
         self.browser.getControl(
@@ -616,21 +636,23 @@ class FixesTestCase(StandardTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    def test_old_comment_post_no_honey(self):
-        # Try a post without the honeypot field.  It is not very
-        # useful in this case, because we cannot easily require
-        # the empty honeypot field for the form.  And we can
-        # require it for the final script, but normally that
-        # script is traversed to after validation of the form, so
-        # our event subscriber does not kick in.
-        self._create_commentable_doc()
-        # This should be allowed, because it simply opens the actual form.
-        self.browser.post(self.portal_url + '/doc/discussion_reply_form', '')
-        self.assertEqual(len(self.mailhost.messages), 0)
-        # The final script is protected.
-        self.assertRaises(Forbidden, self.browser.post,
-                          self.portal_url + '/doc/discussion_reply', '')
-        self.assertEqual(len(self.mailhost.messages), 0)
+    if HAS_PLONE4:
+
+        def test_old_comment_post_no_honey(self):
+            # Try a post without the honeypot field.  It is not very
+            # useful in this case, because we cannot easily require
+            # the empty honeypot field for the form.  And we can
+            # require it for the final script, but normally that
+            # script is traversed to after validation of the form, so
+            # our event subscriber does not kick in.
+            self._create_commentable_doc()
+            # This should be allowed, because it simply opens the actual form.
+            self.browser.post(self.portal_url + '/doc/discussion_reply_form', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
+            # The final script is protected.
+            self.assertRaises(Forbidden, self.browser.post,
+                              self.portal_url + '/doc/discussion_reply', '')
+            self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_old_comment_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
@@ -654,10 +676,28 @@ if HAS_QUINTA:
         # It does have quintagroup.plonecomments installed.
         layer = FIXES_FUNCTIONAL_TESTING
 
+        def setUp(self):
+            super(FixesQuintaTestCase, self).setUp()
+            # May need to put our skin layer higher.
+            skins = self.portal.portal_skins
+            for path_id, path in skins.getSkinPaths():
+                path = [
+                    name.strip() for name in path.split(',') if name.strip()]
+                if 'honeypot_quinta' in path:
+                    path.remove('honeypot_quinta')
+                    path.insert(0, 'honeypot_quinta')
+                    path = ','.join(path)
+                    skins.addSkinSelection(path_id, path)
+            # Need to commit, otherwise the browser does not see it.
+            transaction.commit()
+
         def test_quinta_spammer(self):
             self._create_commentable_doc()
             self.browser.open(self.portal_url + '/doc/discussion_reply_form')
-            form = self.browser.getForm(name='edit_form')
+            try:
+                form = self.browser.getForm(name='edit_form')
+            except LookupError:
+                form = self.browser.getForm(id='edit_form')
             self.browser.getControl(name='body_text').value = 'Spammerdespam'
             # Yummy, a honeypot!
             self.browser.getControl(
@@ -666,24 +706,26 @@ if HAS_QUINTA:
             self.assertRaises(Forbidden, form.submit)
             self.assertEqual(len(self.mailhost.messages), 0)
 
-        def test_quinta_post_no_honey(self):
-            # Try a post without the honeypot field.  It is not very
-            # useful in this case, because we cannot easily require
-            # the empty honeypot field for the form.  And we can
-            # require it for the final script, but normally that
-            # script is traversed to after validation of the form, so
-            # our event subscriber does not kick in.
-            self._create_commentable_doc()
-            # This should be allowed, because it simply opens the actual form.
-            self.browser.post(
-                self.portal_url +
-                '/doc/discussion_reply_form',
-                '')
-            self.assertEqual(len(self.mailhost.messages), 0)
-            # The final script is protected.
-            self.assertRaises(Forbidden, self.browser.post,
-                              self.portal_url + '/doc/discussion_reply', '')
-            self.assertEqual(len(self.mailhost.messages), 0)
+        if HAS_PLONE4:
+
+            def test_quinta_post_no_honey(self):
+                # Try a post without the honeypot field.  It is not very
+                # useful in this case, because we cannot easily require
+                # the empty honeypot field for the form.  And we can
+                # require it for the final script, but normally that
+                # script is traversed to after validation of the form, so
+                # our event subscriber does not kick in.
+                self._create_commentable_doc()
+                # This should be allowed, because it simply opens the actual form.
+                self.browser.post(
+                    self.portal_url +
+                    '/doc/discussion_reply_form',
+                    '')
+                self.assertEqual(len(self.mailhost.messages), 0)
+                # The final script is protected.
+                self.assertRaises(Forbidden, self.browser.post,
+                                  self.portal_url + '/doc/discussion_reply', '')
+                self.assertEqual(len(self.mailhost.messages), 0)
 
         def test_quinta_get(self):
             # Try a GET.  This does not trigger our honeypot checks, but

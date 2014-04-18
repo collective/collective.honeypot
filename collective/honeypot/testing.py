@@ -10,6 +10,7 @@ from persistent.list import PersistentList
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import applyProfile
 from zope.component import getSiteManager
 from zope.component import queryUtility
 
@@ -152,11 +153,9 @@ class FixesFixture(BasicFixture):
     # templates and scripts.
     defaultBases = (PLONE_FIXTURE,)
 
-    def setUpZope(self, app, configurationContext):
-        super(FixesFixture, self).setUpZope(app, configurationContext)
-        # Load extra ZCML
-        import collective.honeypot
-        self.loadZCML(package=collective.honeypot, name='fixes.zcml')
+    def setUpPloneSite(self, portal):
+        super(FixesFixture, self).setUpPloneSite(portal)
+        applyProfile(portal, 'collective.honeypot:default')
 
 
 BASIC_FIXTURE = BasicFixture()

@@ -43,10 +43,4 @@
   <include zcml:condition="installed plone.app.z3cform"
            package=".z3cform" />
 
-  <!-- On Plone 3 always include fixes.zcml, because there is no
-       proper way to explicitly load it in a buildout config.  Also,
-       it is pretty safe to load, as it only has an effect when
-       z3c.jbot is available.  -->
-  <include zcml:condition="not-have plone-4" file="fixes.zcml" />
-
 </configure>
