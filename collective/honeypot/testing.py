@@ -133,6 +133,11 @@ class BasicFixture(PloneSandboxLayer):
         types_tool.Document.allow_discussion = True
         portal.manage_permission('Reply to item', ('Anonymous', ))
 
+        # Allow anonymous to the sendto form.  This is disallowed in
+        # Plone 4.3.3.
+        from Products.CMFPlone.PloneTool import AllowSendto
+        portal.manage_permission(AllowSendto, ('Anonymous', ))
+
         # In Plone 4.1 the old validate_talkback script goes wrong
         # because the discussion tool does not have a
         # isDiscussionAllowedFor method.  Let's fix that with a dummy
