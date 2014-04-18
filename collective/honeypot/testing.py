@@ -11,6 +11,7 @@ from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import applyProfile
+from plone.testing import z2
 from zope.component import getSiteManager
 from zope.component import queryUtility
 
@@ -96,9 +97,15 @@ class BasicFixture(PloneSandboxLayer):
         import collective.honeypot
         self.loadZCML(package=collective.honeypot)
         self.loadZCML(package=collective.honeypot, name='overrides.zcml')
+        # Install product and call its initialize() function
+        z2.installProduct(app, 'collective.honeypot')
         if HAS_QUINTA:
             import quintagroup.plonecomments
             self.loadZCML(package=quintagroup.plonecomments)
+
+    def tearDownZope(self, app):
+        # Uninstall product
+        z2.uninstallProduct(app, 'collective.honeypot')
 
     def tearDown(self):
         # There is some other code that removes profiles from

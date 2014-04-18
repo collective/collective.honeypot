@@ -459,6 +459,37 @@ class ProfileTestCase(StandardTestCase):
     # check that the standard forms still work, and override a few to
     # show that the honeypot field is present.
 
+    def test_qi_uninstall(self):
+        qi = self.portal.portal_quickinstaller
+        if not qi.isProductInstalled('collective.honeypot'):
+            # child test case that does not have us installed.
+            return
+        qi.uninstallProducts(['collective.honeypot'])
+        self.assertFalse(qi.isProductInstalled('collective.honeypot'))
+        skins = self.portal.portal_skins
+        for layer in skins.objectIds():
+            self.assertTrue('honeypot' not in layer)
+        for path_id, path in skins.getSkinPaths():
+            path = [
+                name.strip() for name in path.split(',') if name.strip()]
+            for layer in path:
+                self.assertTrue('honeypot' not in layer)
+
+    def test_profile_uninstall(self):
+        qi = self.portal.portal_quickinstaller
+        if not qi.isProductInstalled('collective.honeypot'):
+            # child test case that does not have us installed.
+            return
+        self.portal.portal_setup.runAllImportStepsFromProfile('profile-collective.honeypot:uninstall')
+        skins = self.portal.portal_skins
+        for layer in skins.objectIds():
+            self.assertTrue('honeypot' not in layer)
+        for path_id, path in skins.getSkinPaths():
+            path = [
+                name.strip() for name in path.split(',') if name.strip()]
+            for layer in path:
+                self.assertTrue('honeypot' not in layer)
+
     # Tests for the sendto form.
 
     def test_sendto_spammer(self):
