@@ -4,21 +4,16 @@ import textwrap
 import transaction
 import unittest
 import urllib
-import sys
 from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
 from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
 from collective.honeypot.testing import HAS_DISCUSSION
 from collective.honeypot.testing import HAS_QUINTA
+from collective.honeypot.testing import LOAD_FIXES
 from collective.honeypot.testing import HAS_REGISTER_FORM
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
 from zExceptions import Forbidden
-
-if sys.version_info < (2, 5):
-    HAS_PLONE4 = False
-else:
-    HAS_PLONE4 = True
 
 if HAS_DISCUSSION:
     from plone.app.discussion.interfaces import IConversation
@@ -479,7 +474,7 @@ class FixesTestCase(StandardTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    if HAS_PLONE4:
+    if LOAD_FIXES:
 
         def test_sendto_post_no_honey(self):
             # Try a post without the honeypot field.
@@ -518,7 +513,7 @@ class FixesTestCase(StandardTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    if HAS_PLONE4:
+    if LOAD_FIXES:
 
         def test_contact_info_post_no_honey(self):
             # Try a post without the honeypot field.
@@ -562,7 +557,7 @@ class FixesTestCase(StandardTestCase):
             self.assertRaises(Forbidden, register_button.click)
             self.assertEqual(len(self.mailhost.messages), 0)
 
-        if HAS_PLONE4:
+        if LOAD_FIXES:
 
             def test_register_post_no_honey(self):
                 # Try a post without the honeypot field.
@@ -595,7 +590,7 @@ class FixesTestCase(StandardTestCase):
 
     # Tests for the comment form.
 
-    if HAS_DISCUSSION:
+    if HAS_DISCUSSION and LOAD_FIXES:
 
         def test_discussion_spammer(self):
             self._create_commentable_doc()
@@ -636,7 +631,7 @@ class FixesTestCase(StandardTestCase):
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    if HAS_PLONE4:
+    if LOAD_FIXES:
 
         def test_old_comment_post_no_honey(self):
             # Try a post without the honeypot field.  It is not very
@@ -706,7 +701,7 @@ if HAS_QUINTA:
             self.assertRaises(Forbidden, form.submit)
             self.assertEqual(len(self.mailhost.messages), 0)
 
-        if HAS_PLONE4:
+        if LOAD_FIXES:
 
             def test_quinta_post_no_honey(self):
                 # Try a post without the honeypot field.  It is not very
