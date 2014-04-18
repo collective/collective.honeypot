@@ -153,7 +153,7 @@ What does this do?
 Fixes
 =====
 
-You need to enable the fixes.  See `Installation and usage `_ for how
+You need to enable the fixes.  See `Installation and usage`_ for how
 to do that.
 
 Well, we always change the ``@@authenticator`` view, even if you do
