@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.7 (unreleased)
+0.7 (2014-04-18)
 ----------------
 
 - Add GenericSetup profile, which adds skin layers with our fixes.
