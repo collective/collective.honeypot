@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='collective.honeypot',
-      version='0.7',
+      version='0.8.dev0',
       description="Themes and categories behavior",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
