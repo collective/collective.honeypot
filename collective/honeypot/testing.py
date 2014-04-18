@@ -2,7 +2,6 @@
 
 import collective.honeypot.config
 import pkg_resources
-import sys
 from Acquisition import aq_base
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.tests.utils import MockMailHost
@@ -14,14 +13,6 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import applyProfile
 from zope.component import getSiteManager
 from zope.component import queryUtility
-
-if sys.version_info < (2, 5):
-    LOAD_FIXES = False
-else:
-    LOAD_FIXES = True
-# To test in Plone 4 without loading fixes.zcml and instead applying
-# our GenericSetup profile, you can manually set this:
-# LOAD_FIXES = False
 
 try:
     pkg_resources.get_distribution('plone.app.discussion')
@@ -162,27 +153,35 @@ class BasicFixture(PloneSandboxLayer):
         unpatch_mailhost(portal)
 
 
+class ProfileFixture(BasicFixture):
+    # Fixture that applies our GenericSetup profile.  This activates
+    # the improved templates and scripts.  This is the recommended way
+    # on Plone 3, but is expected to work on Plone 4 as well.
+    defaultBases = (PLONE_FIXTURE,)
+    load_fixes = False
+
+    def setUpPloneSite(self, portal):
+        super(ProfileFixture, self).setUpPloneSite(portal)
+        applyProfile(portal, 'collective.honeypot:default')
+
+
 class FixesFixture(BasicFixture):
     # Fixture that loads fixes.zcml.  This activates the improved
-    # templates and scripts.
+    # templates and scripts.  This is the recommended way
+    # on Plone 4, but is expected to work on Plone 3 as well.
     defaultBases = (PLONE_FIXTURE,)
+    load_fixes = True
 
     def setUpZope(self, app, configurationContext):
         super(FixesFixture, self).setUpZope(app, configurationContext)
-        if LOAD_FIXES:
-            # Load extra ZCML.  This is the recommended way on Plone 4.
-            import collective.honeypot
-            self.loadZCML(package=collective.honeypot, name='fixes.zcml')
-
-    def setUpPloneSite(self, portal):
-        super(FixesFixture, self).setUpPloneSite(portal)
-        if not LOAD_FIXES:
-            # Install our package.  This is the recommended way on Plone 3.
-            applyProfile(portal, 'collective.honeypot:default')
+        # Load extra ZCML.
+        import collective.honeypot
+        self.loadZCML(package=collective.honeypot, name='fixes.zcml')
 
 
 BASIC_FIXTURE = BasicFixture()
 FIXES_FIXTURE = FixesFixture()
+PROFILE_FIXTURE = ProfileFixture()
 BASIC_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(BASIC_FIXTURE,),
     name='collective.honeypot:BasicFunctional',
@@ -190,4 +189,8 @@ BASIC_FUNCTIONAL_TESTING = FunctionalTesting(
 FIXES_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(FIXES_FIXTURE,),
     name='collective.honeypot:FixesFunctional',
+)
+PROFILE_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(PROFILE_FIXTURE,),
+    name='collective.honeypot:ProfileFunctional',
 )
