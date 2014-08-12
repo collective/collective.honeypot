@@ -5,7 +5,9 @@ Changelog
 0.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add kssValidateField to the default WHITELIST_ACTIONS to suppress kss inline
+  validation being logged on Plone <= 4.2 .
+  [fredvd]
 
 
 0.7 (2014-04-18)

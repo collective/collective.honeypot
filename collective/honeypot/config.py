@@ -30,6 +30,7 @@ WHITELISTED_ACTIONS = get_multi('WHITELISTED_ACTIONS', (
     'at_validate_field',
     'atct_edit',
     'edit',
+    'kssValidateField',
     'jq_reveal_email',  # zest.emailhider
     'z3cform_validate_field',
 ))

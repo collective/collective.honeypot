@@ -347,9 +347,12 @@ WHITELISTED_ACTIONS
 
     - ``edit`` (edit form)
 
+    - ``kssValidateField`` (inline validation)
+
     - ``jq_reveal_email`` (``zest.emailhider``)
 
     - ``z3cform_validate_field``  (inline validation)
+
 
 
 WHITELISTED_START
