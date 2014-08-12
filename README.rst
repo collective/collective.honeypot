@@ -396,7 +396,9 @@ DISALLOW_ALL_POSTS
 When are the checks *not* done?
 ===============================
 
-This package ignores ``GET`` requests.  It only works on POST requests.
+This package does not check fields on any ``GET`` requests, it actually blocks
+the ``GET`` requests on selected forms and requires a ``POST`` there. Hence the
+field checks only work on ``POST`` requests.
 
 If you have made the ``HONEYPOT_FIELD`` configuration option empty, no
 honeypot checks are done, so you only get some logging.
