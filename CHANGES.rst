@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0 (unreleased)
+1.0 (2015-08-24)
 ----------------
 
 - First official public release.
