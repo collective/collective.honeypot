@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='collective.honeypot',
-      version='0.8.dev0',
+      version='1.0.dev0',
       description="Themes and categories behavior",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
@@ -22,7 +22,7 @@ setup(name='collective.honeypot',
       keywords='honeypot antispam form protection plone',
       author='Maurits van Rees',
       author_email='maurits@vanrees.org',
-      url='http://maurits.vanrees.org/',
+      url='https://github.com/collective/collective.honeypot',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['collective'],
