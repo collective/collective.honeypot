@@ -1,7 +1,23 @@
+sudo: false
+cache:
+  directories:
+  - buildout-cache
 language: python
+# Note: Python 2.4 / Plone 3.3 is not supported.
 python:
   - "2.6"
   - "2.7"
+env:
+  - BUILDOUT_CONFIG=plone40.cfg
+  - BUILDOUT_CONFIG=plone41.cfg
+  - BUILDOUT_CONFIG=plone42.cfg
+  - BUILDOUT_CONFIG=plone43.cfg
+matrix:
+  exclude:
+    - python: "2.7"
+        env: BUILDOUT_CONFIG=plone40
+    - python: "2.7"
+        env: BUILDOUT_CONFIG=plone41
 notifications:
   email:
     recipients:
