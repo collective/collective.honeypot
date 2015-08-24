@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(name='collective.honeypot',
       version='1.0.1.dev0',
-      description="Themes and categories behavior",
+      description="Anti-spam honeypot for Plone",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
       # Get more strings from
