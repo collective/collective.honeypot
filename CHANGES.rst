@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0.1 (unreleased)
+1.0.1 (2015-08-25)
 ------------------
 
 - Require POST for ``send_feedback`` script.  This script can only be
