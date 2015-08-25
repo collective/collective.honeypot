@@ -156,6 +156,12 @@ class BasicFixture(PloneSandboxLayer):
         if not hasattr(discussion_tool, 'isDiscussionAllowedFor'):
             discussion_tool.isDiscussionAllowedFor = isDiscussionAllowedFor
 
+        if not hasattr(portal, 'portal_feedback'):
+            # send_feedback does not work without a portal_feedback.
+            # Probably fine.  We add an object without caring what it
+            # really is.
+            portal.portal_feedback = portal.portal_discussion
+
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
 

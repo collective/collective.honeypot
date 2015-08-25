@@ -5,7 +5,10 @@ Changelog
 1.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Require POST for ``send_feedback`` script.  This script can only be
+  used by authenticated users, so there is little danger, but POST is
+  still better.
+  [maurits]
 
 
 1.0 (2015-08-24)

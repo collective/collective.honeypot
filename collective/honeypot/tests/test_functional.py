@@ -10,7 +10,10 @@ from collective.honeypot.testing import PROFILE_FUNCTIONAL_TESTING
 from collective.honeypot.testing import HAS_DISCUSSION
 from collective.honeypot.testing import HAS_QUINTA
 from collective.honeypot.testing import HAS_REGISTER_FORM
+from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import TEST_USER_PASSWORD
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
 from zExceptions import Forbidden
@@ -547,6 +550,27 @@ class ProfileTestCase(StandardTestCase):
         # POST is required for the final script.
         self.assertRaises(Forbidden, self.browser.open,
                           self.portal_url + '/send_feedback_site?' + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    # Tests for send_feedback.
+
+    def test_send_feedback_get(self):
+        # For login, because this is needed for the send_feedback script.
+        self.browser.open(self.portal_url + '/login_form')
+        self.browser.getControl(name='__ac_name').value = TEST_USER_NAME
+        self.browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
+        self.browser.getControl('Log in').click()
+
+        # Try a GET.  This does not trigger our honeypot checks, but
+        # still it should not result in the sending of an email.
+        qs = urllib.urlencode({
+            'author': SITE_OWNER_NAME,
+            'referer': 'http://plone.org',
+            'subject': 'Spammmmmm',
+            'message': 'Spam, bacon and eggs'})
+        # POST is required.
+        self.assertRaises(Forbidden, self.browser.open,
+                          self.portal_url + '/send_feedback?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the register form.
