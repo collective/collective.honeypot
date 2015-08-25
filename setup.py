@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='collective.honeypot',
-      version='1.0.1',
+      version='1.0.2.dev0',
       description="Anti-spam honeypot for Plone",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
