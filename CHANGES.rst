@@ -5,7 +5,8 @@ Changelog
 1.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added Travis badge to readme.
+  [maurits]
 
 
 1.0.1 (2015-08-25)
