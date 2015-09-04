@@ -7,7 +7,8 @@ language: python
 # Note: Python 2.4 / Plone 3.3 is not supported.
 env:
   matrix:
-    - PYTHON=2.7 BUILDOUT_CONFIG=plone43.cfg
+    - PYTHON=python2.6 BUILDOUT_CONFIG=plone40.cfg
+    - PYTHON=python2.7 BUILDOUT_CONFIG=plone43.cfg
 notifications:
   email:
     recipients:
