@@ -8,7 +8,6 @@
       class=".browser.HoneypotAuthenticatorView"
       permission="zope.Public"
       allowed_interface="plone.protect.interfaces.IAuthenticatorView"
-      template="honeypot.pt"
       />
 
 </configure>

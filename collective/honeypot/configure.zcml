@@ -23,7 +23,7 @@
   <browser:page
       for="*"
       name="honeypot_field"
-      class=".browser.HoneypotAuthenticatorView"
+      class=".browser.HoneypotFieldView"
       permission="zope2.View"
       template="honeypot.pt"
       />

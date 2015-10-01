@@ -5,6 +5,12 @@ Changelog
 1.0.2 (unreleased)
 ------------------
 
+- Split honeypot_field and authenticator view.  When
+  `@@authenticator`` is called, return the view without rendering it.
+  Fixes AttributeError: 'unicode' object has no attribute 'token', for
+  example on PloneFormGen quickedit form.
+  [maurits]
+
 - Added Travis badge to readme.
   [maurits]
 
