@@ -16,11 +16,17 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.app.testing import setRoles
 from plone.testing.z2 import Browser
+from Products.CMFPlone.utils import getFSVersionTuple
 from zExceptions import Forbidden
+from zope.component import getMultiAdapter
 
 if HAS_DISCUSSION:
     from plone.app.discussion.interfaces import IConversation
 
+if getFSVersionTuple()[0] == 5:
+    PLONE5 = True
+else:
+    PLONE5 = False
 
 if not hasattr(Browser, 'post'):
     # Plone 3.  Add a post method.
@@ -47,7 +53,11 @@ class BaseTestCase(unittest.TestCase):
     def _create_commentable_doc(self):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Document', 'doc', title=u"Document 1")
-        self.portal.doc.allowDiscussion(True)
+        if hasattr(self.portal.doc, 'allowDiscussion'):
+            self.portal.doc.allowDiscussion(True)
+        else:
+            # Plone 5
+            self.portal.doc.allow_discussion = True
         # Need to commit, otherwise the browser does not see it.
         transaction.commit()
 
@@ -93,21 +103,26 @@ class StandardTestCase(BaseTestCase):
                           'protected_1=bad')
 
     def test_authenticator(self):
-        authenticator = self.layer['portal'].restrictedTraverse(
-            '@@authenticator').authenticator()
+        portal = self.layer['portal']
+        authenticator = getMultiAdapter(
+            (portal, portal.REQUEST), name='authenticator').authenticator()
         self.assertTrue(authenticator.startswith(
             '<input type="hidden" name="_authenticator" value='))
         self.assertTrue('protected' in authenticator)
         self.browser.open(self.portal_url + '/@@honeypot_field')
-        self.assertTrue(self.browser.contents.strip() in authenticator)
+        honeypot = getMultiAdapter(
+            (portal, portal.REQUEST), name='honeypot_field')()
+        self.assertTrue(honeypot.strip() in authenticator)
 
     def test_honeypot_field_view(self):
-        self.browser.open(self.portal_url + '/@@honeypot_field')
+        portal = self.layer['portal']
+        honeypot = getMultiAdapter(
+            (portal, portal.REQUEST), name='honeypot_field')()
         text = textwrap.dedent("""
             <div style="display: none">
               <input type="text" value="" name="protected_1" />
             </div>""")
-        self.assertEqual(self.browser.contents.strip(), text.strip())
+        self.assertEqual(honeypot.strip(), text.strip())
 
     # Tests for the sendto form.
 
@@ -144,23 +159,44 @@ class StandardTestCase(BaseTestCase):
 
     def test_contact_info_empty(self):
         self.browser.open(self.portal_url + '/contact-info')
-        form = self.browser.getForm(name='feedback_form')
-        form.submit()
-        self.assertTrue('Please correct the indicated errors.'
-                        in self.browser.contents)
+        if 'feedback_form' in self.browser.contents:
+            form = self.browser.getForm(name='feedback_form')
+            form.submit()
+            self.assertTrue('Please correct the indicated errors.'
+                            in self.browser.contents)
+        else:
+            # Plone 5
+            form = self.browser.getForm(action='contact-info')
+            form.submit(name='form.buttons.send')
+            self.assertTrue('There were some errors.' in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_normal(self):
         self.browser.open(self.portal_url + '/contact-info')
-        form = self.browser.getForm(name='feedback_form')
-        self.browser.getControl(name='sender_fullname').value = 'Mr. Spammer'
-        self.browser.getControl(
-            name='sender_from_address').value = 'spammer@example.org'
-        self.browser.getControl(name='subject').value = 'Spammmmmm'
-        self.browser.getControl(name='message').value = 'Spam, bacon and eggs'
-        form.submit()
-        self.assertTrue('Please correct the indicated errors.'
-                        not in self.browser.contents)
+        if 'feedback_form' in self.browser.contents:
+            self.browser.getControl(name='sender_fullname').value = 'Mr. Spammer'
+            self.browser.getControl(
+                name='sender_from_address').value = 'spammer@example.org'
+            self.browser.getControl(name='subject').value = 'Spammmmmm'
+            self.browser.getControl(name='message').value = 'Spam, bacon and eggs'
+            form = self.browser.getForm(name='feedback_form')
+            form.submit()
+            self.assertTrue('Please correct the indicated errors.'
+                            not in self.browser.contents)
+        else:
+            # Plone 5
+            self.browser.getControl(
+                name='form.widgets.sender_fullname').value = 'Mr. Spammer'
+            self.browser.getControl(
+                name='form.widgets.sender_from_address').value = 'spammer@example.org'
+            self.browser.getControl(
+                name='form.widgets.subject').value = 'Spammmmmm'
+            self.browser.getControl(
+                name='form.widgets.message').value = 'Spam, bacon and eggs'
+            form = self.browser.getForm(action='contact-info')
+            form.submit(name='form.buttons.send')
+            self.assertTrue('There were some errors.'
+                            not in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 1)
 
     def test_contact_info_post_honey(self):
@@ -495,7 +531,7 @@ class ProfileTestCase(StandardTestCase):
 
     # Tests for the sendto form.
 
-    def test_sendto_spammer(self):
+    def test_sendto_spammer(self):  # UNIQUE
         self.browser.open(self.portal_url + '/sendto_form')
         form = self.browser.getForm(name='sendto_form')
         self.browser.getControl(
@@ -526,15 +562,30 @@ class ProfileTestCase(StandardTestCase):
 
     def test_contact_info_spammer(self):
         self.browser.open(self.portal_url + '/contact-info')
-        form = self.browser.getForm(name='feedback_form')
-        self.browser.getControl(name='sender_fullname').value = 'Mr. Spammer'
-        self.browser.getControl(
-            name='sender_from_address').value = 'spammer@example.org'
-        self.browser.getControl(name='subject').value = 'Spammmmmm'
-        self.browser.getControl(name='message').value = 'Spam, bacon and eggs'
-        # Yummy, a honeypot!
-        self.browser.getControl(name='protected_1').value = 'Spammity spam'
-        self.assertRaises(Forbidden, form.submit)
+        if 'feedback_form' in self.browser.contents:
+            self.browser.getControl(name='sender_fullname').value = 'Mr. Spammer'
+            self.browser.getControl(
+                name='sender_from_address').value = 'spammer@example.org'
+            self.browser.getControl(name='subject').value = 'Spammmmmm'
+            self.browser.getControl(name='message').value = 'Spam, bacon and eggs'
+            # Yummy, a honeypot!
+            self.browser.getControl(name='protected_1').value = 'Spammity spam'
+            form = self.browser.getForm(name='feedback_form')
+            self.assertRaises(Forbidden, form.submit)
+        else:
+            # Plone 5
+            self.browser.getControl(
+                name='form.widgets.sender_fullname').value = 'Mr. Spammer'
+            self.browser.getControl(
+                name='form.widgets.sender_from_address').value = 'spammer@example.org'
+            self.browser.getControl(
+                name='form.widgets.subject').value = 'Spammmmmm'
+            self.browser.getControl(
+                name='form.widgets.message').value = 'Spam, bacon and eggs'
+            # Yummy, a honeypot!
+            self.browser.getControl(name='protected_1').value = 'Spammity spam'
+            form = self.browser.getForm(action='contact-info')
+            self.assertRaises(Forbidden, form.submit, name='form.buttons.send')
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_get(self):
@@ -547,10 +598,12 @@ class ProfileTestCase(StandardTestCase):
             'message': 'Spam, bacon and eggs'})
         self.browser.open(self.portal_url + '/contact-info?' + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
-        # POST is required for the final script.
-        self.assertRaises(Forbidden, self.browser.open,
-                          self.portal_url + '/send_feedback_site?' + qs)
-        self.assertEqual(len(self.mailhost.messages), 0)
+        # Plone 5 does not have the send_feedback_site script.
+        if self.portal.unrestrictedTraverse('send_feedback_site', None):
+            # POST is required for the final script.
+            self.assertRaises(Forbidden, self.browser.open,
+                              self.portal_url + '/send_feedback_site?' + qs)
+            self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for send_feedback.
 

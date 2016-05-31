@@ -1,5 +1,6 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:browser="http://namespaces.zope.org/browser">
 
   <browser:page
@@ -9,5 +10,11 @@
       permission="zope.Public"
       allowed_interface="plone.protect.interfaces.IAuthenticatorView"
       />
+
+  <!-- <adapter -->
+  <!--     zcml:condition="installed plone.protect.auto" -->
+  <!--     name="plone.protect.autocsrf" -->
+  <!--     factory=".auto.ProtectHoneyTransform" -->
+  <!--     /> -->
 
 </configure>
