@@ -88,7 +88,9 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEqual(whitelisted('jq_reveal_email'), True)
         self.assertEqual(whitelisted('at_validate_field'), True)
         self.assertEqual(whitelisted('z3cform_validate_field'), True)
-        # various jquery methods may use this
+        # Various jquery methods may use this.  Note: the next test fails when
+        # run on its own, because testing.py is not loaded.  But 'bin/test -u'
+        # should work fine.
         self.assertEqual(whitelisted('jq_'), True)
         self.assertEqual(whitelisted('jq'), False)
         self.assertEqual(whitelisted('jq_foo_bar'), True)
