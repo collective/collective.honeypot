@@ -13,6 +13,7 @@ env:
   - BUILDOUT_CONFIG=plone41.cfg
   - BUILDOUT_CONFIG=plone42.cfg
   - BUILDOUT_CONFIG=plone43.cfg
+  - BUILDOUT_CONFIG=plone50.cfg
 # Plone 4.0 and 4.1 do not support python 2.7, so exclude those combinations.
 # Plone 4.2 and 4.3 support both 2.6 and 2.7, but let's only do 2.7 there.
 matrix:
