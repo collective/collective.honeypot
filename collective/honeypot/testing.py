@@ -22,7 +22,13 @@ except pkg_resources.DistributionNotFound:
 else:
     HAS_DISCUSSION = True
     from plone.app.discussion.interfaces import IDiscussionSettings
+try:
+    pkg_resources.get_distribution('plone.registry')
+except pkg_resources.DistributionNotFound:
+    HAS_REGISTY = False
+else:
     from plone.registry.interfaces import IRegistry
+    HAS_REGISTRY = True
 
 try:
     pkg_resources.get_distribution('plone.app.users')
@@ -54,7 +60,12 @@ class BetterMockMailHost(MockMailHost):
 
 
 def patch_mailhost(portal):
-    portal._updateProperty('email_from_address', 'webmaster@example.org')
+    if portal.hasProperty('email_from_address'):
+        portal._updateProperty('email_from_address', 'webmaster@example.org')
+    else:
+        # Plone 5
+        registry = queryUtility(IRegistry)
+        registry['plone.email_from_address'] = 'webmaster@example.org'
     portal._original_MailHost = portal.MailHost
     portal.MailHost = mailhost = BetterMockMailHost('MailHost')
     mailhost.smtp_host = 'localhost'
@@ -137,13 +148,41 @@ class BasicFixture(PloneSandboxLayer):
         # Plone 3 and 4.0, but the scripts are still available, so we
         # still need to protect them and test them
         types_tool = getToolByName(portal, 'portal_types')
-        types_tool.Document.allow_discussion = True
+        if 'Document' in types_tool:
+            types_tool.Document.allow_discussion = True
+        else:
+            # Plone 5 test setup has no Document type.
+            from plone.dexterity.fti import DexterityFTI
+            fti = DexterityFTI('Document')
+            portal.portal_types._setObject('Document', fti)
+            fti.klass = 'plone.dexterity.content.Item'
+            fti.filter_content_types = False
+            fti.behaviors = (
+                'plone.app.dexterity.behaviors.metadata.IBasic',
+                'plone.app.dexterity.behaviors.discussion.IAllowDiscussion',
+            )
+        if 'Folder' not in types_tool:
+            # Plone 5 test setup has no Folder type.
+            fti = DexterityFTI('Folder')
+            portal.portal_types._setObject('Folder', fti)
+            fti.klass = 'plone.dexterity.content.Container'
+            fti.filter_content_types = False
+            fti.behaviors = (
+                'Products.CMFPlone.interfaces.constrains.'
+                'ISelectableConstrainTypes',
+                'plone.app.dexterity.behaviors.metadata.IBasic',
+                'plone.app.dexterity.behaviors.discussion.IAllowDiscussion',
+            )
         portal.manage_permission('Reply to item', ('Anonymous', ))
 
         # Allow anonymous to the sendto form.  This is disallowed in
         # Plone 4.3.3.
-        from Products.CMFPlone.PloneTool import AllowSendto
-        portal.manage_permission(AllowSendto, ('Anonymous', ))
+        try:
+            from Products.CMFPlone.PloneTool import AllowSendto
+        except ImportError:
+            print('WARNING: AllowSendto not given to Anonymous.')
+        else:
+            portal.manage_permission(AllowSendto, ('Anonymous', ))
 
         # In Plone 4.1 the old validate_talkback script goes wrong
         # because the discussion tool does not have a
@@ -152,15 +191,20 @@ class BasicFixture(PloneSandboxLayer):
         # gets the old commenting tool and portal.portal_discussion
         # gets the new p.a.discussion tool, which lacks this method.
         # Go figure.
-        discussion_tool = portal.portal_discussion
-        if not hasattr(discussion_tool, 'isDiscussionAllowedFor'):
-            discussion_tool.isDiscussionAllowedFor = isDiscussionAllowedFor
+        discussion_tool = getattr(portal, 'portal_discussion', None)
+        if discussion_tool is not None:
+            if not hasattr(discussion_tool, 'isDiscussionAllowedFor'):
+                discussion_tool.isDiscussionAllowedFor = isDiscussionAllowedFor
 
         if not hasattr(portal, 'portal_feedback'):
             # send_feedback does not work without a portal_feedback.
             # Probably fine.  We add an object without caring what it
             # really is.
-            portal.portal_feedback = portal.portal_discussion
+            if discussion_tool:
+                portal.portal_feedback = portal.portal_discussion
+            else:
+                # Looks not needed on Plone 5.
+                print('WARNING: portal_feedback not set.')
 
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
@@ -175,7 +219,14 @@ class ProfileFixture(BasicFixture):
 
     def setUpPloneSite(self, portal):
         super(ProfileFixture, self).setUpPloneSite(portal)
-        applyProfile(portal, 'collective.honeypot:default')
+        try:
+            portal.portal_setup.getProfileInfo('collective.honeypot:default')
+        except KeyError:
+            # This will not work on Plone 5, as we have no profile.
+            # XXX We may want to skip these tests completely.
+            pass
+        else:
+            applyProfile(portal, 'collective.honeypot:default')
 
 
 class FixesFixture(BasicFixture):
