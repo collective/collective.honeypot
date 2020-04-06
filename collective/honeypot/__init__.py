@@ -8,6 +8,7 @@ if sys.version_info < (2, 5):
     import logging
     from AccessControl import allow_class
     from zExceptions import Forbidden
-    logger = logging.getLogger('collective.honeypot')
+
+    logger = logging.getLogger("collective.honeypot")
     allow_class(Forbidden)
-    logger.info('Allowing script access to zExceptions.Forbidden.')
+    logger.info("Allowing script access to zExceptions.Forbidden.")
