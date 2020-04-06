@@ -1,14 +1,13 @@
+import logging
+from urlparse import urlparse
+
 from collective.honeypot import config
 from lxml import etree
 from plone.protect.authenticator import createToken
 from plone.protect.auto import ProtectTransform
-from urlparse import urlparse
 from zope.component import ComponentLookupError
 
-import logging
-
-
-LOGGER = logging.getLogger('collective.honeypot')
+LOGGER = logging.getLogger("collective.honeypot")
 
 
 class ProtectHoneyTransform(ProtectTransform):

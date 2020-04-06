@@ -3,14 +3,12 @@
 import unittest
 
 from Acquisition import Implicit
-from Testing import makerequest
 from collective.honeypot.config import HONEYPOT_FIELD
-from collective.honeypot.utils import check_post
-from collective.honeypot.utils import found_honeypot
-from collective.honeypot.utils import get_form
-from collective.honeypot.utils import whitelisted
-from zope.publisher.browser import TestRequest
+from collective.honeypot.utils import (check_post, found_honeypot, get_form,
+                                       whitelisted)
+from Testing import makerequest
 from zExceptions import Forbidden
+from zope.publisher.browser import TestRequest
 
 
 class UtilsTestCase(unittest.TestCase):

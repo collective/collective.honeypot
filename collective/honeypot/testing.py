@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import collective.honeypot.config
 import pkg_resources
+
+import collective.honeypot.config
 from Acquisition import aq_base
+from persistent.list import PersistentList
+from plone.app.testing import (PLONE_FIXTURE, FunctionalTesting,
+                               PloneSandboxLayer, applyProfile)
+from plone.testing import z2
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
-from persistent.list import PersistentList
-from plone.app.testing import FunctionalTesting
-from plone.app.testing import PLONE_FIXTURE
-from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import applyProfile
-from plone.testing import z2
-from zope.component import getSiteManager
-from zope.component import queryUtility
+from zope.component import getSiteManager, queryUtility
 
 try:
     pkg_resources.get_distribution('plone.app.discussion')

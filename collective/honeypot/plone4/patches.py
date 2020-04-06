@@ -1,4 +1,5 @@
 import logging
+
 from collective.honeypot import config
 
 logger = logging.getLogger('collective.honeypot')

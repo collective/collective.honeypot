@@ -1,13 +1,12 @@
 import logging
 from copy import deepcopy
-from collective.honeypot.config import ACCEPTED_LOG_LEVEL
-from collective.honeypot.config import DISALLOW_ALL_POSTS
-from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
-from collective.honeypot.config import HONEYPOT_FIELD
-from collective.honeypot.config import IGNORED_FORM_FIELDS
-from collective.honeypot.config import SPAMMER_LOG_LEVEL
-from collective.honeypot.config import WHITELISTED_ACTIONS
-from collective.honeypot.config import WHITELISTED_START
+
+import six
+from collective.honeypot.config import (ACCEPTED_LOG_LEVEL, DISALLOW_ALL_POSTS,
+                                        EXTRA_PROTECTED_ACTIONS,
+                                        HONEYPOT_FIELD, IGNORED_FORM_FIELDS,
+                                        SPAMMER_LOG_LEVEL, WHITELISTED_ACTIONS,
+                                        WHITELISTED_START)
 from zExceptions import Forbidden
 
 logger = logging.getLogger('collective.honeypot')
@@ -93,7 +92,7 @@ def get_small_form(form):
     # Avoid printing large textareas or complete file uploads.
     small_form = {}
     for key, value in form.items():
-        if not isinstance(value, basestring):
+        if not isinstance(value, six.string_types):
             small_form[key] = value
             continue
         if len(value) > 250:

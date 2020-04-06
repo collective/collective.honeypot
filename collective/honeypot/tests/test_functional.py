@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import textwrap
-import transaction
 import unittest
-import urllib
-from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
-from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
-from collective.honeypot.testing import PROFILE_FUNCTIONAL_TESTING
-from collective.honeypot.testing import HAS_DISCUSSION
-from collective.honeypot.testing import HAS_QUINTA
-from collective.honeypot.testing import HAS_REGISTER_FORM
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import TEST_USER_ID
-from plone.app.testing import TEST_USER_NAME
-from plone.app.testing import TEST_USER_PASSWORD
-from plone.app.testing import setRoles
+
+import six.moves.urllib.parse
+import transaction
+from collective.honeypot.testing import (BASIC_FUNCTIONAL_TESTING,
+                                         FIXES_FUNCTIONAL_TESTING,
+                                         HAS_DISCUSSION, HAS_QUINTA,
+                                         HAS_REGISTER_FORM,
+                                         PROFILE_FUNCTIONAL_TESTING)
+from plone.app.testing import (SITE_OWNER_NAME, TEST_USER_ID, TEST_USER_NAME,
+                               TEST_USER_PASSWORD, setRoles)
 from plone.testing.z2 import Browser
 from Products.CMFPlone.utils import getFSVersionTuple
 from zExceptions import Forbidden
@@ -547,7 +544,7 @@ class ProfileTestCase(StandardTestCase):
     def test_sendto_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = urllib.urlencode({
+        qs = six.moves.urllib.parse.urlencode({
             'send_to_address': 'joe@example.org',
             'send_from_address': 'spammer@example.org',
             'comment': 'Spam, bacon and eggs'})
@@ -591,7 +588,7 @@ class ProfileTestCase(StandardTestCase):
     def test_contact_info_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = urllib.urlencode({
+        qs = six.moves.urllib.parse.urlencode({
             'sender_fullname': 'Mr. Spammer',
             'sender_from_address': 'spammer@example.org',
             'subject': 'Spammmmmm',
@@ -616,7 +613,7 @@ class ProfileTestCase(StandardTestCase):
 
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = urllib.urlencode({
+        qs = six.moves.urllib.parse.urlencode({
             'author': SITE_OWNER_NAME,
             'referer': 'http://plone.org',
             'subject': 'Spammmmmm',
@@ -689,7 +686,7 @@ class ProfileTestCase(StandardTestCase):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
         self._create_commentable_doc()
-        qs = urllib.urlencode({
+        qs = six.moves.urllib.parse.urlencode({
             'body_text': 'Spam, bacon and eggs',
             'subject': 'Spam'})
         self.browser.open(self.portal_url + '/doc/discussion_reply_form?' + qs)
@@ -741,7 +738,7 @@ if HAS_QUINTA:
             # Try a GET.  This does not trigger our honeypot checks, but
             # still it should not result in the sending of an email.
             self._create_commentable_doc()
-            qs = urllib.urlencode({
+            qs = six.moves.urllib.parse.urlencode({
                 'body_text': 'Spam, bacon and eggs',
                 'subject': 'Spam'})
             self.browser.open(
