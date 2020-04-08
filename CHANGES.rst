@@ -5,7 +5,8 @@ Changelog
 1.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix adapter registration conflict.
+  [rodfersou]
 
 
 1.0.2 (2015-10-01)
