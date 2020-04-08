@@ -5,15 +5,16 @@ setup(name='collective.honeypot',
       description="Anti-spam honeypot for Plone",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
-      # Get more strings from
-      # http://pypi.python.org/pypi?:action=list_classifiers
+      # Get more strings from https://pypi.org/classifiers
       classifiers=[
+          "Development Status :: 5 - Production/Stable",
           "Framework :: Plone",
           "Framework :: Plone :: 3.3",
           "Framework :: Plone :: 4.0",
           "Framework :: Plone :: 4.1",
           "Framework :: Plone :: 4.2",
           "Framework :: Plone :: 4.3",
+          "License :: OSI Approved :: GNU General Public License (GPL)",
           "Programming Language :: Python",
           "Programming Language :: Python :: 2.4",
           "Programming Language :: Python :: 2.6",
