@@ -2,7 +2,6 @@
 
 from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
 from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
-from collective.honeypot.testing import PROFILE_FUNCTIONAL_TESTING
 from plone.app.discussion.interfaces import IConversation
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
@@ -37,11 +36,7 @@ class BaseTestCase(unittest.TestCase):
     def _create_commentable_doc(self):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         self.portal.invokeFactory("Document", "doc", title=u"Document 1")
-        if hasattr(self.portal.doc, "allowDiscussion"):
-            self.portal.doc.allowDiscussion(True)
-        else:
-            # Plone 5
-            self.portal.doc.allow_discussion = True
+        self.portal.doc.allow_discussion = True
         # Need to commit, otherwise the browser does not see it.
         transaction.commit()
 
@@ -52,16 +47,7 @@ class BaseTestCase(unittest.TestCase):
         while len(error_log.getLogEntries()) > 0:
             error_log.forgetEntry(error_log.getLogEntries()[-1]["id"])
 
-        try:
-            super(BaseTestCase, self).assertRaises(
-                excClass, callableObj, *args, **kwargs
-            )
-        except:
-            # In Plone 3 self.assertRaises does not work for the test browser.
-            self.assertEqual(len(error_log.getLogEntries()), 1)
-            entry = error_log.getLogEntries()[0]
-            klass = str(excClass).split(".")[-1]
-            self.assertEqual(entry["type"], klass)
+        super(BaseTestCase, self).assertRaises(excClass, callableObj, *args, **kwargs)
 
 
 class StandardTestCase(BaseTestCase):
@@ -151,52 +137,59 @@ class StandardTestCase(BaseTestCase):
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    def test_sendto_spammer(self):  # UNIQUE
+        self.browser.open(self.portal_url + "/sendto_form")
+        form = self.browser.getForm(name="sendto_form")
+        self.browser.getControl(name="send_to_address").value = "joe@example.org"
+        self.browser.getControl(name="send_from_address").value = "spammer@example.org"
+        self.browser.getControl(name="comment").value = "Spam, bacon and eggs"
+        # Yummy, a honeypot!
+        self.browser.getControl(name="protected_1").value = "Spammity spam"
+        self.assertRaises(Forbidden, form.submit)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_sendto_get(self):
+        # Try a GET.  This does not trigger our honeypot checks, but
+        # still it should not result in the sending of an email.
+        qs = six.moves.urllib.parse.urlencode(
+            {
+                "send_to_address": "joe@example.org",
+                "send_from_address": "spammer@example.org",
+                "comment": "Spam, bacon and eggs",
+            }
+        )
+        self.browser.open(self.portal_url + "/sendto_form?" + qs)
+        self.assertEqual(len(self.mailhost.messages), 0)
+        # POST is required for the final script.
+        self.assertRaises(
+            Forbidden, self.browser.open, self.portal_url + "/sendto?" + qs
+        )
+        self.assertEqual(len(self.mailhost.messages), 0)
+
     # Tests for the contact-info form.
 
     def test_contact_info_empty(self):
         self.browser.open(self.portal_url + "/contact-info")
-        if "feedback_form" in self.browser.contents:
-            form = self.browser.getForm(name="feedback_form")
-            form.submit()
-            self.assertTrue(
-                "Please correct the indicated errors." in self.browser.contents
-            )
-        else:
-            # Plone 5
-            form = self.browser.getForm(action="contact-info")
-            form.submit(name="form.buttons.send")
-            self.assertTrue("There were some errors." in self.browser.contents)
+        form = self.browser.getForm(action="contact-info")
+        form.submit(name="form.buttons.send")
+        self.assertTrue("There were some errors." in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_normal(self):
         self.browser.open(self.portal_url + "/contact-info")
-        if "feedback_form" in self.browser.contents:
-            self.browser.getControl(name="sender_fullname").value = "Mr. Spammer"
-            self.browser.getControl(
-                name="sender_from_address"
-            ).value = "spammer@example.org"
-            self.browser.getControl(name="subject").value = "Spammmmmm"
-            self.browser.getControl(name="message").value = "Spam, bacon and eggs"
-            form = self.browser.getForm(name="feedback_form")
-            form.submit()
-            self.assertTrue(
-                "Please correct the indicated errors." not in self.browser.contents
-            )
-        else:
-            # Plone 5
-            self.browser.getControl(
-                name="form.widgets.sender_fullname"
-            ).value = "Mr. Spammer"
-            self.browser.getControl(
-                name="form.widgets.sender_from_address"
-            ).value = "spammer@example.org"
-            self.browser.getControl(name="form.widgets.subject").value = "Spammmmmm"
-            self.browser.getControl(
-                name="form.widgets.message"
-            ).value = "Spam, bacon and eggs"
-            form = self.browser.getForm(action="contact-info")
-            form.submit(name="form.buttons.send")
-            self.assertTrue("There were some errors." not in self.browser.contents)
+        self.browser.getControl(
+            name="form.widgets.sender_fullname"
+        ).value = "Mr. Spammer"
+        self.browser.getControl(
+            name="form.widgets.sender_from_address"
+        ).value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.subject").value = "Spammmmmm"
+        self.browser.getControl(
+            name="form.widgets.message"
+        ).value = "Spam, bacon and eggs"
+        form = self.browser.getForm(action="contact-info")
+        form.submit(name="form.buttons.send")
+        self.assertTrue("There were some errors." not in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 1)
 
     def test_contact_info_post_honey(self):
@@ -213,6 +206,38 @@ class StandardTestCase(BaseTestCase):
             self.portal_url + "/send_feedback_site",
             "protected_1=bad",
         )
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_contact_info_spammer(self):
+        self.browser.open(self.portal_url + "/contact-info")
+        self.browser.getControl(
+            name="form.widgets.sender_fullname"
+        ).value = "Mr. Spammer"
+        self.browser.getControl(
+            name="form.widgets.sender_from_address"
+        ).value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.subject").value = "Spammmmmm"
+        self.browser.getControl(
+            name="form.widgets.message"
+        ).value = "Spam, bacon and eggs"
+        # Yummy, a honeypot!
+        self.browser.getControl(name="protected_1").value = "Spammity spam"
+        form = self.browser.getForm(action="contact-info")
+        self.assertRaises(Forbidden, form.submit, name="form.buttons.send")
+        self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_contact_info_get(self):
+        # Try a GET.  This does not trigger our honeypot checks, but
+        # still it should not result in the sending of an email.
+        qs = six.moves.urllib.parse.urlencode(
+            {
+                "sender_fullname": "Mr. Spammer",
+                "sender_from_address": "spammer@example.org",
+                "subject": "Spammmmmm",
+                "message": "Spam, bacon and eggs",
+            }
+        )
+        self.browser.open(self.portal_url + "/contact-info?" + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the register form.
@@ -251,6 +276,17 @@ class StandardTestCase(BaseTestCase):
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    def test_register_spammer(self):
+        self.browser.open(self.portal_url + "/@@register")
+        self.browser.getControl(name="form.fullname").value = "Mr. Spammer"
+        self.browser.getControl(name="form.username").value = "spammer"
+        self.browser.getControl(name="form.email").value = "spammer@example.org"
+        # Yummy, a honeypot!
+        self.browser.getControl(name="protected_1", index=0).value = "Spammity spam"
+        register_button = self.browser.getControl(name="form.actions.register")
+        self.assertRaises(Forbidden, register_button.click)
+        self.assertEqual(len(self.mailhost.messages), 0)
+
     # Tests for the comment form.
 
     def test_discussion_empty(self):
@@ -280,132 +316,6 @@ class StandardTestCase(BaseTestCase):
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
-
-class ProfileTestCase(StandardTestCase):
-    # This has our profile installed.
-    layer = PROFILE_FUNCTIONAL_TESTING
-    # Note that we inherit the test methods from BasicTestCase, to
-    # check that the standard forms still work, and override a few to
-    # show that the honeypot field is present.
-
-    def test_qi_uninstall(self):
-        qi = self.portal.portal_quickinstaller
-        if not qi.isProductInstalled("collective.honeypot"):
-            # child test case that does not have us installed.
-            return
-        qi.uninstallProducts(["collective.honeypot"])
-        self.assertFalse(qi.isProductInstalled("collective.honeypot"))
-        skins = self.portal.portal_skins
-        for layer in skins.objectIds():
-            self.assertTrue("honeypot" not in layer)
-        for path_id, path in skins.getSkinPaths():
-            path = [name.strip() for name in path.split(",") if name.strip()]
-            for layer in path:
-                self.assertTrue("honeypot" not in layer)
-
-    def test_profile_uninstall(self):
-        qi = self.portal.portal_quickinstaller
-        if not qi.isProductInstalled("collective.honeypot"):
-            # child test case that does not have us installed.
-            return
-        self.portal.portal_setup.runAllImportStepsFromProfile(
-            "profile-collective.honeypot:uninstall"
-        )
-        skins = self.portal.portal_skins
-        for layer in skins.objectIds():
-            self.assertTrue("honeypot" not in layer)
-        for path_id, path in skins.getSkinPaths():
-            path = [name.strip() for name in path.split(",") if name.strip()]
-            for layer in path:
-                self.assertTrue("honeypot" not in layer)
-
-    # Tests for the sendto form.
-
-    def test_sendto_spammer(self):  # UNIQUE
-        self.browser.open(self.portal_url + "/sendto_form")
-        form = self.browser.getForm(name="sendto_form")
-        self.browser.getControl(name="send_to_address").value = "joe@example.org"
-        self.browser.getControl(name="send_from_address").value = "spammer@example.org"
-        self.browser.getControl(name="comment").value = "Spam, bacon and eggs"
-        # Yummy, a honeypot!
-        self.browser.getControl(name="protected_1").value = "Spammity spam"
-        self.assertRaises(Forbidden, form.submit)
-        self.assertEqual(len(self.mailhost.messages), 0)
-
-    def test_sendto_get(self):
-        # Try a GET.  This does not trigger our honeypot checks, but
-        # still it should not result in the sending of an email.
-        qs = six.moves.urllib.parse.urlencode(
-            {
-                "send_to_address": "joe@example.org",
-                "send_from_address": "spammer@example.org",
-                "comment": "Spam, bacon and eggs",
-            }
-        )
-        self.browser.open(self.portal_url + "/sendto_form?" + qs)
-        self.assertEqual(len(self.mailhost.messages), 0)
-        # POST is required for the final script.
-        self.assertRaises(
-            Forbidden, self.browser.open, self.portal_url + "/sendto?" + qs
-        )
-        self.assertEqual(len(self.mailhost.messages), 0)
-
-    # Tests for the contact-info form.
-
-    def test_contact_info_spammer(self):
-        self.browser.open(self.portal_url + "/contact-info")
-        if "feedback_form" in self.browser.contents:
-            self.browser.getControl(name="sender_fullname").value = "Mr. Spammer"
-            self.browser.getControl(
-                name="sender_from_address"
-            ).value = "spammer@example.org"
-            self.browser.getControl(name="subject").value = "Spammmmmm"
-            self.browser.getControl(name="message").value = "Spam, bacon and eggs"
-            # Yummy, a honeypot!
-            self.browser.getControl(name="protected_1").value = "Spammity spam"
-            form = self.browser.getForm(name="feedback_form")
-            self.assertRaises(Forbidden, form.submit)
-        else:
-            # Plone 5
-            self.browser.getControl(
-                name="form.widgets.sender_fullname"
-            ).value = "Mr. Spammer"
-            self.browser.getControl(
-                name="form.widgets.sender_from_address"
-            ).value = "spammer@example.org"
-            self.browser.getControl(name="form.widgets.subject").value = "Spammmmmm"
-            self.browser.getControl(
-                name="form.widgets.message"
-            ).value = "Spam, bacon and eggs"
-            # Yummy, a honeypot!
-            self.browser.getControl(name="protected_1").value = "Spammity spam"
-            form = self.browser.getForm(action="contact-info")
-            self.assertRaises(Forbidden, form.submit, name="form.buttons.send")
-        self.assertEqual(len(self.mailhost.messages), 0)
-
-    def test_contact_info_get(self):
-        # Try a GET.  This does not trigger our honeypot checks, but
-        # still it should not result in the sending of an email.
-        qs = six.moves.urllib.parse.urlencode(
-            {
-                "sender_fullname": "Mr. Spammer",
-                "sender_from_address": "spammer@example.org",
-                "subject": "Spammmmmm",
-                "message": "Spam, bacon and eggs",
-            }
-        )
-        self.browser.open(self.portal_url + "/contact-info?" + qs)
-        self.assertEqual(len(self.mailhost.messages), 0)
-        # Plone 5 does not have the send_feedback_site script.
-        if self.portal.unrestrictedTraverse("send_feedback_site", None):
-            # POST is required for the final script.
-            self.assertRaises(
-                Forbidden,
-                self.browser.open,
-                self.portal_url + "/send_feedback_site?" + qs,
-            )
-            self.assertEqual(len(self.mailhost.messages), 0)
-
     # Tests for send_feedback.
 
     def test_send_feedback_get(self):
@@ -431,21 +341,8 @@ class ProfileTestCase(StandardTestCase):
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    # Tests for the register form.
 
-    def test_register_spammer(self):
-        self.browser.open(self.portal_url + "/@@register")
-        self.browser.getControl(name="form.fullname").value = "Mr. Spammer"
-        self.browser.getControl(name="form.username").value = "spammer"
-        self.browser.getControl(name="form.email").value = "spammer@example.org"
-        # Yummy, a honeypot!
-        self.browser.getControl(name="protected_1", index=0).value = "Spammity spam"
-        register_button = self.browser.getControl(name="form.actions.register")
-        self.assertRaises(Forbidden, register_button.click)
-        self.assertEqual(len(self.mailhost.messages), 0)
-
-
-class FixesTestCase(ProfileTestCase):
+class FixesTestCase(BaseTestCase):
     # This has our fixes.zcml applied.  We run the same tests as our
     # base class.
     layer = FIXES_FUNCTIONAL_TESTING
