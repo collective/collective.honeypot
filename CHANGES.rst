@@ -4,7 +4,10 @@ Changelog
 
 2.0 (unreleased)
 ------------------
-  
+
+- Secure collective.easyform with honeypot if available.
+  [thet]
+
 - Add a generic z3c.form honeypot extender module which can be configured via ZCML only and configure plone.app.discussion to use it.
   [thet]
 
