@@ -14,7 +14,15 @@
   -->
 
   <include package="z3c.jbot" />
-  <include package=".discussion" />
   <include package=".plone5" />
+
+  <adapter
+      zcml:condition="installed plone.app.discussion"
+      name="honeypot"
+      factory=".z3cform.honeypotextender.HoneypotExtender"
+      for="zope.interface.Interface
+           zope.publisher.interfaces.browser.IDefaultBrowserLayer
+           plone.app.discussion.browser.comments.CommentForm"
+      provides="plone.z3cform.fieldsets.interfaces.IFormExtender" />
 
 </configure>
