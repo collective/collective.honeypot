@@ -1,23 +1,9 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
-    xmlns:cmf="http://namespaces.zope.org/cmf"
-    xmlns:five="http://namespaces.zope.org/five"
-    xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.honeypot">
-
-  <!-- Register package so we can use the Extensions directory. -->
-  <five:registerPackage package="." />
-
-  <!-- File System Directory Views registration -->
-  <cmf:registerDirectory name="honeypot_oldcomments" />
-  <cmf:registerDirectory name="honeypot_plone3" />
-  <cmf:registerDirectory name="honeypot_plone4" />
-  <cmf:registerDirectory name="honeypot_quinta" />
-
-  <!-- Optional GenericSetup profiles. -->
-  <include file="profiles.zcml" />
 
   <!-- Browser view rendering our honeypot field. -->
   <browser:page
@@ -30,12 +16,6 @@
 
   <!-- Subscribe to before traverse event. -->
   <subscriber
-      zcml:condition="not-have plone-41"
-      for="Products.CMFCore.interfaces.ISiteRoot
-           zope.app.publication.interfaces.IBeforeTraverseEvent"
-      handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
-  <subscriber
-      zcml:condition="have plone-41"
       for="Products.CMFCore.interfaces.ISiteRoot
            zope.traversing.interfaces.IBeforeTraverseEvent"
       handler="collective.honeypot.eventsubscribers.pre_traverse_check" />
