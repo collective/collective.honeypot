@@ -1,4 +1,1 @@
-import patches
-
-
-patches  # pyflakes
+from . import patches  # noqa
