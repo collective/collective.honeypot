@@ -7,6 +7,7 @@ from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.registry.interfaces import IRegistry
 from plone.testing import z2
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.tests.utils import MockMailHost
@@ -26,12 +27,8 @@ collective.honeypot.config.WHITELISTED_START = set(start)
 
 
 def patch_mailhost(portal):
-    if portal.hasProperty("email_from_address"):
-        portal._updateProperty("email_from_address", "webmaster@example.org")
-    else:
-        # Plone 5
-        registry = queryUtility(IRegistry)
-        registry["plone.email_from_address"] = "webmaster@example.org"
+    registry = queryUtility(IRegistry)
+    registry["plone.email_from_address"] = "webmaster@example.org"
     portal._original_MailHost = portal.MailHost
     portal.MailHost = mailhost = MockMailHost("MailHost")
     mailhost.smtp_host = "localhost"
@@ -57,10 +54,6 @@ def enable_self_registration(portal):
     if "Anonymous" not in reg_roles:
         reg_roles.append("Anonymous")
     portal.manage_permission("Add portal member", roles=reg_roles, acquire=0)
-
-
-def isDiscussionAllowedFor(obj):
-    return True
 
 
 class BasicFixture(PloneSandboxLayer):
@@ -99,31 +92,6 @@ class BasicFixture(PloneSandboxLayer):
         settings = registry.forInterface(IDiscussionSettings)
         settings.globally_enabled = True
         settings.anonymous_comments = True
-        # This is for old-style comments.  That should be only for
-        # Plone 3 and 4.0, but the scripts are still available, so we
-        # still need to protect them and test them
-        types_tool = getToolByName(portal, "portal_types")
-        from plone.dexterity.fti import DexterityFTI
-
-        # Plone 5 test setup has no Document type.
-        fti = DexterityFTI("Document")
-        types_tool._setObject("Document", fti)
-        fti.klass = "plone.dexterity.content.Item"
-        fti.filter_content_types = False
-        fti.behaviors = (
-            "plone.app.dexterity.behaviors.metadata.IBasic",
-            "plone.app.dexterity.behaviors.discussion.IAllowDiscussion",
-        )
-        # Plone 5 test setup has no Folder type.
-        fti = DexterityFTI("Folder")
-        portal.portal_types._setObject("Folder", fti)
-        fti.klass = "plone.dexterity.content.Container"
-        fti.filter_content_types = False
-        fti.behaviors = (
-            "Products.CMFPlone.interfaces.constrains." "ISelectableConstrainTypes",
-            "plone.app.dexterity.behaviors.metadata.IBasic",
-            "plone.app.dexterity.behaviors.discussion.IAllowDiscussion",
-        )
         portal.manage_permission("Reply to item", ("Anonymous",))
 
         # Allow anonymous to the sendto form.  This is disallowed in
@@ -135,49 +103,8 @@ class BasicFixture(PloneSandboxLayer):
         else:
             portal.manage_permission(AllowSendto, ("Anonymous",))
 
-        # In Plone 4.1 the old validate_talkback script goes wrong
-        # because the discussion tool does not have a
-        # isDiscussionAllowedFor method.  Let's fix that with a dummy
-        # one.  Note that getToolByName(portal, 'portal_discussion')
-        # gets the old commenting tool and portal.portal_discussion
-        # gets the new p.a.discussion tool, which lacks this method.
-        # Go figure.
-        discussion_tool = getattr(portal, "portal_discussion", None)
-        if discussion_tool is not None:
-            if not hasattr(discussion_tool, "isDiscussionAllowedFor"):
-                discussion_tool.isDiscussionAllowedFor = isDiscussionAllowedFor
-
-        if not hasattr(portal, "portal_feedback"):
-            # send_feedback does not work without a portal_feedback.
-            # Probably fine.  We add an object without caring what it
-            # really is.
-            if discussion_tool:
-                portal.portal_feedback = portal.portal_discussion
-            else:
-                # Looks not needed on Plone 5.
-                print("WARNING: portal_feedback not set.")
-
     def teardownPloneSite(self, portal):
         unpatch_mailhost(portal)
-
-
-class ProfileFixture(BasicFixture):
-    # Fixture that applies our GenericSetup profile.  This activates
-    # the improved templates and scripts.  This is the recommended way
-    # on Plone 3, but is expected to work on Plone 4 as well.
-    defaultBases = (PLONE_FIXTURE,)
-    load_fixes = False
-
-    def setUpPloneSite(self, portal):
-        super(ProfileFixture, self).setUpPloneSite(portal)
-        try:
-            portal.portal_setup.getProfileInfo("collective.honeypot:default")
-        except KeyError:
-            # This will not work on Plone 5, as we have no profile.
-            # XXX We may want to skip these tests completely.
-            pass
-        else:
-            applyProfile(portal, "collective.honeypot:default")
 
 
 class FixesFixture(BasicFixture):
@@ -197,13 +124,9 @@ class FixesFixture(BasicFixture):
 
 BASIC_FIXTURE = BasicFixture()
 FIXES_FIXTURE = FixesFixture()
-PROFILE_FIXTURE = ProfileFixture()
 BASIC_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(BASIC_FIXTURE,), name="collective.honeypot:BasicFunctional",
 )
 FIXES_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(FIXES_FIXTURE,), name="collective.honeypot:FixesFunctional",
-)
-PROFILE_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(PROFILE_FIXTURE,), name="collective.honeypot:ProfileFunctional",
 )
