@@ -13,4 +13,11 @@
       template="../honeypot.pt"
       />
 
+  <z3c:widgetTemplate
+      mode="display"
+      widget=".widget.IHoneypotWidget"
+      template="widget_display.pt"
+      layer="z3c.form.interfaces.IFormLayer"
+      />
+
 </configure>
