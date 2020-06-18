@@ -14,6 +14,7 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 class HoneypotExtender(extensible.FormExtender):
     """Extends the comment form with a honeypot field.
     """
+
     # context, request, form
     adapts(Interface, IDefaultBrowserLayer, CommentForm)
 
@@ -26,5 +27,5 @@ class HoneypotExtender(extensible.FormExtender):
 
     def update(self):
         self.add(IHoneypot, prefix="")
-        self.form.fields['honeypot'].widgetFactory = HoneypotFieldWidget
-        self.form.fields['honeypot'].mode = interfaces.HIDDEN_MODE
+        self.form.fields["honeypot"].widgetFactory = HoneypotFieldWidget
+        self.form.fields["honeypot"].mode = interfaces.HIDDEN_MODE

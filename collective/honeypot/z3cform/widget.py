@@ -1,8 +1,9 @@
-import zope.interface
 from collective.honeypot import config
 from z3c.form.browser import text
 from z3c.form.interfaces import IWidget
 from z3c.form.widget import FieldWidget
+
+import zope.interface
 
 
 class IHoneypotWidget(IWidget):
