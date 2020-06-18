@@ -8,10 +8,10 @@ class HoneypotFieldView(AuthenticatorView):
 
 
 class HoneypotAuthenticatorView(AuthenticatorView):
-
-    def authenticator(self, extra='', name='_authenticator'):
+    def authenticator(self, extra="", name="_authenticator"):
         csrf = super(HoneypotAuthenticatorView, self).authenticator()
         honeypot_view = getMultiAdapter(
-            (self.context, self.request), name='honeypot_field')
+            (self.context, self.request), name="honeypot_field"
+        )
         honeypot = honeypot_view()
         return csrf + honeypot
