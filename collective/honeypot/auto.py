@@ -2,7 +2,7 @@ from collective.honeypot import config
 from lxml import etree
 from plone.protect.authenticator import createToken
 from plone.protect.auto import ProtectTransform
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 from zope.component import ComponentLookupError
 
 import logging
