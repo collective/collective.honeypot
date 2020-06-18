@@ -5,6 +5,8 @@
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.honeypot">
 
+  <include file="fixes.zcml" />
+
   <!-- Browser view rendering our honeypot field. -->
   <browser:page
       for="*"

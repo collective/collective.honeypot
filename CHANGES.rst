@@ -5,6 +5,9 @@ Changelog
 2.0 (unreleased)
 ------------------
 
+- Automatically load the fixes if package is loaded. No need to explicitly include the ``fixes.zcml`` anymore.
+  [thet]
+
 - Secure collective.easyform with honeypot if available.
   [thet]
 
