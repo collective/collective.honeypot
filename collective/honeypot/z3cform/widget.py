@@ -2,8 +2,7 @@ from collective.honeypot import config
 from z3c.form.browser import text
 from z3c.form.interfaces import IWidget
 from z3c.form.widget import FieldWidget
-
-import zope.interface
+from zope.interface import implementer_only
 
 
 class IHoneypotWidget(IWidget):
@@ -11,8 +10,8 @@ class IHoneypotWidget(IWidget):
     """
 
 
+@implementer_only(IHoneypotWidget)
 class HoneypotWidget(text.TextWidget):
-    zope.interface.implementsOnly(IHoneypotWidget)
     honeypot_field_name = config.HONEYPOT_FIELD
 
     def update(self):
