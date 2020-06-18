@@ -25,4 +25,13 @@
            plone.app.discussion.browser.comments.CommentForm"
       provides="plone.z3cform.fieldsets.interfaces.IFormExtender" />
 
+  <adapter
+      zcml:condition="installed collective.easyform"
+      name="honeypot"
+      factory=".z3cform.honeypotextender.HoneypotExtender"
+      for="zope.interface.Interface
+           zope.publisher.interfaces.browser.IDefaultBrowserLayer
+           collective.easyform.browser.view.EasyFormForm"
+      provides="plone.z3cform.fieldsets.interfaces.IFormExtender" />
+
 </configure>
