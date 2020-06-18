@@ -4,6 +4,9 @@ Changelog
 
 2.0 (unreleased)
 ------------------
+  
+- Add data converter for z3c.form validation to not fail when multiple HoneyPot fields were injected.
+  [thet]
 
 - Update for support of Plone 5.2 and Python 3. Remove support for Plone 3 and 4.
   [thet, reinhardt]
