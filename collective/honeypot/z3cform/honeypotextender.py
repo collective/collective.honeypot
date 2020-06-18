@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
-
 from collective.honeypot.interfaces import IHoneypot
 from collective.honeypot.z3cform.widget import HoneypotFieldWidget
-from plone.app.discussion.browser.comments import CommentForm
 from plone.z3cform.fieldsets import extensible
 from z3c.form import interfaces
 from z3c.form.field import Fields
-from zope.component import adapter
-from zope.interface import Interface
-from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
-@adapter(Interface, IDefaultBrowserLayer, CommentForm)
 class HoneypotExtender(extensible.FormExtender):
     """Extends the comment form with a honeypot field.
     """
@@ -27,3 +20,4 @@ class HoneypotExtender(extensible.FormExtender):
         self.add(IHoneypot, prefix="")
         self.form.fields["honeypot"].widgetFactory = HoneypotFieldWidget
         self.form.fields["honeypot"].mode = interfaces.HIDDEN_MODE
+

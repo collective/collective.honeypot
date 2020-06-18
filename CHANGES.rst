@@ -5,6 +5,9 @@ Changelog
 2.0 (unreleased)
 ------------------
   
+- Add a generic z3c.form honeypot extender module which can be configured via ZCML only and configure plone.app.discussion to use it.
+  [thet]
+
 - Add a dummy widget display view which renders empty - form renderings may expect it.
   [thet]
   
