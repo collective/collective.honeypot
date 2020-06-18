@@ -3,7 +3,6 @@
     xmlns:browser="http://namespaces.zope.org/browser">
 
   <include package="z3c.jbot" file="meta.zcml" />
-
   <browser:jbot directory="overrides" />
 
 </configure>
