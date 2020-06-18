@@ -16,10 +16,12 @@ from Products.CMFPlone.utils import getFSVersionTuple
 from zExceptions import Forbidden
 from zope.component import getMultiAdapter
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 import textwrap
 import transaction
 import unittest
-import urllib
 
 
 if HAS_DISCUSSION:
@@ -601,7 +603,7 @@ class ProfileTestCase(StandardTestCase):
     def test_sendto_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = urllib.urlencode(
+        qs = six.moves.urllib.parse.urlencode(
             {
                 "send_to_address": "joe@example.org",
                 "send_from_address": "spammer@example.org",
@@ -652,7 +654,7 @@ class ProfileTestCase(StandardTestCase):
     def test_contact_info_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = urllib.urlencode(
+        qs = six.moves.urllib.parse.urlencode(
             {
                 "sender_fullname": "Mr. Spammer",
                 "sender_from_address": "spammer@example.org",
@@ -683,7 +685,7 @@ class ProfileTestCase(StandardTestCase):
 
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = urllib.urlencode(
+        qs = six.moves.urllib.parse.urlencode(
             {
                 "author": SITE_OWNER_NAME,
                 "referer": "http://plone.org",
@@ -751,7 +753,9 @@ class ProfileTestCase(StandardTestCase):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
         self._create_commentable_doc()
-        qs = urllib.urlencode({"body_text": "Spam, bacon and eggs", "subject": "Spam"})
+        qs = six.moves.urllib.parse.urlencode(
+            {"body_text": "Spam, bacon and eggs", "subject": "Spam"}
+        )
         self.browser.open(self.portal_url + "/doc/discussion_reply_form?" + qs)
         self.assertEqual(len(self.mailhost.messages), 0)
         # POST is required for the final script.
@@ -801,7 +805,7 @@ if HAS_QUINTA:
             # Try a GET.  This does not trigger our honeypot checks, but
             # still it should not result in the sending of an email.
             self._create_commentable_doc()
-            qs = urllib.urlencode(
+            qs = six.moves.urllib.parse.urlencode(
                 {"body_text": "Spam, bacon and eggs", "subject": "Spam"}
             )
             self.browser.open(self.portal_url + "/doc/discussion_reply_form?" + qs)

@@ -10,6 +10,7 @@ from copy import deepcopy
 from zExceptions import Forbidden
 
 import logging
+import six
 
 
 logger = logging.getLogger("collective.honeypot")
@@ -97,7 +98,7 @@ def get_small_form(form):
     # Avoid printing large textareas or complete file uploads.
     small_form = {}
     for key, value in form.items():
-        if not isinstance(value, basestring):
+        if not isinstance(value, six.string_types):
             small_form[key] = value
             continue
         if len(value) > 250:
