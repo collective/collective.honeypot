@@ -2,6 +2,7 @@
 
 from Acquisition import aq_base
 from persistent.list import PersistentList
+from plone.app.discussion.interfaces import IDiscussionSettings
 from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
@@ -17,48 +18,11 @@ import collective.honeypot.config
 import pkg_resources
 
 
-try:
-    pkg_resources.get_distribution("plone.app.discussion")
-except pkg_resources.DistributionNotFound:
-    HAS_DISCUSSION = False
-else:
-    HAS_DISCUSSION = True
-    from plone.app.discussion.interfaces import IDiscussionSettings
-try:
-    pkg_resources.get_distribution("plone.registry")
-except pkg_resources.DistributionNotFound:
-    HAS_REGISTY = False
-else:
-    from plone.registry.interfaces import IRegistry
-
-    HAS_REGISTRY = True
-
-try:
-    pkg_resources.get_distribution("plone.app.users")
-except pkg_resources.DistributionNotFound:
-    HAS_REGISTER_FORM = False
-else:
-    HAS_REGISTER_FORM = True
-
-try:
-    pkg_resources.get_distribution("quintagroup.plonecomments")
-except pkg_resources.DistributionNotFound:
-    HAS_QUINTA = False
-else:
-    HAS_QUINTA = True
-
 # We want WHITELISTED_START to be empty by default currently, but we
 # do want to test it.
 start = list(collective.honeypot.config.WHITELISTED_START)
 start.append("jq_")
 collective.honeypot.config.WHITELISTED_START = set(start)
-
-
-class BetterMockMailHost(MockMailHost):
-    def reset(self):
-        # Somehow on Plone 3 it is necessary to use a persistent list
-        # instead of a normal list.
-        self.messages = PersistentList()
 
 
 def patch_mailhost(portal):
@@ -69,7 +33,7 @@ def patch_mailhost(portal):
         registry = queryUtility(IRegistry)
         registry["plone.email_from_address"] = "webmaster@example.org"
     portal._original_MailHost = portal.MailHost
-    portal.MailHost = mailhost = BetterMockMailHost("MailHost")
+    portal.MailHost = mailhost = MockMailHost("MailHost")
     mailhost.smtp_host = "localhost"
     sm = getSiteManager(context=portal)
     sm.unregisterUtility(provided=IMailHost)
@@ -111,10 +75,6 @@ class BasicFixture(PloneSandboxLayer):
         self.loadZCML(package=collective.honeypot, name="overrides.zcml")
         # Install product and call its initialize() function
         z2.installProduct(app, "collective.honeypot")
-        if HAS_QUINTA:
-            import quintagroup.plonecomments
-
-            self.loadZCML(package=quintagroup.plonecomments)
 
     def tearDownZope(self, app):
         # Uninstall product
@@ -131,53 +91,39 @@ class BasicFixture(PloneSandboxLayer):
         super(BasicFixture, self).tearDown()
         import Products.GenericSetup.zcml
 
-        if hasattr(Products.GenericSetup.zcml, "_profile_regs"):
-            for profile in (
-                u"quintagroup.plonecomments:default",
-                u"quintagroup.plonecomments:uninstall",
-            ):
-                if profile not in Products.GenericSetup.zcml._profile_regs:
-                    continue
-                Products.GenericSetup.zcml._profile_regs.remove(profile)
-
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
         enable_self_registration(portal)
-        if HAS_DISCUSSION:
-            # Enable commenting.
-            registry = queryUtility(IRegistry)
-            settings = registry.forInterface(IDiscussionSettings)
-            settings.globally_enabled = True
-            settings.anonymous_comments = True
+        # Enable commenting.
+        registry = queryUtility(IRegistry)
+        settings = registry.forInterface(IDiscussionSettings)
+        settings.globally_enabled = True
+        settings.anonymous_comments = True
         # This is for old-style comments.  That should be only for
         # Plone 3 and 4.0, but the scripts are still available, so we
         # still need to protect them and test them
         types_tool = getToolByName(portal, "portal_types")
-        if "Document" in types_tool:
-            types_tool.Document.allow_discussion = True
-        else:
-            # Plone 5 test setup has no Document type.
-            from plone.dexterity.fti import DexterityFTI
+        from plone.dexterity.fti import DexterityFTI
 
-            fti = DexterityFTI("Document")
-            portal.portal_types._setObject("Document", fti)
-            fti.klass = "plone.dexterity.content.Item"
-            fti.filter_content_types = False
-            fti.behaviors = (
-                "plone.app.dexterity.behaviors.metadata.IBasic",
-                "plone.app.dexterity.behaviors.discussion.IAllowDiscussion",
-            )
-        if "Folder" not in types_tool:
-            # Plone 5 test setup has no Folder type.
-            fti = DexterityFTI("Folder")
-            portal.portal_types._setObject("Folder", fti)
-            fti.klass = "plone.dexterity.content.Container"
-            fti.filter_content_types = False
-            fti.behaviors = (
-                "Products.CMFPlone.interfaces.constrains." "ISelectableConstrainTypes",
-                "plone.app.dexterity.behaviors.metadata.IBasic",
-                "plone.app.dexterity.behaviors.discussion.IAllowDiscussion",
-            )
+        # Plone 5 test setup has no Document type.
+        fti = DexterityFTI("Document")
+        types_tool._setObject("Document", fti)
+        fti.klass = "plone.dexterity.content.Item"
+        fti.filter_content_types = False
+        fti.behaviors = (
+            "plone.app.dexterity.behaviors.metadata.IBasic",
+            "plone.app.dexterity.behaviors.discussion.IAllowDiscussion",
+        )
+        # Plone 5 test setup has no Folder type.
+        fti = DexterityFTI("Folder")
+        portal.portal_types._setObject("Folder", fti)
+        fti.klass = "plone.dexterity.content.Container"
+        fti.filter_content_types = False
+        fti.behaviors = (
+            "Products.CMFPlone.interfaces.constrains." "ISelectableConstrainTypes",
+            "plone.app.dexterity.behaviors.metadata.IBasic",
+            "plone.app.dexterity.behaviors.discussion.IAllowDiscussion",
+        )
         portal.manage_permission("Reply to item", ("Anonymous",))
 
         # Allow anonymous to the sendto form.  This is disallowed in

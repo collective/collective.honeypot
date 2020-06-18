@@ -2,10 +2,11 @@ Changelog
 =========
 
 
-1.0.4 (unreleased)
+2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Update for support of Plone 5.2 and Python 3. Remove support for Plone 3 and 4.
+  [thet, reinhardt]
 
 
 1.0.3 (2020-04-08)
