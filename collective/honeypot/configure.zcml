@@ -6,6 +6,7 @@
     i18n_domain="collective.honeypot">
 
   <include file="fixes.zcml" />
+  <include package="plone.transformchain" />
 
   <!-- Browser view rendering our honeypot field. -->
   <browser:page
@@ -24,5 +25,10 @@
 
   <include zcml:condition="installed plone.app.z3cform"
            package=".z3cform" />
+
+  <adapter
+      name="collective.honeypot.autohoneypot"
+      factory=".auto.ProtectHoneyTransform"
+      />
 
 </configure>

@@ -77,21 +77,6 @@ class StandardTestCase(BaseTestCase):
             "protected_1=bad",
         )
 
-    def test_authenticator(self):
-        portal = self.layer["portal"]
-        authenticator = getMultiAdapter(
-            (portal, portal.REQUEST), name="authenticator"
-        ).authenticator()
-        self.assertTrue(
-            authenticator.startswith(
-                '<input type="hidden" name="_authenticator" value='
-            )
-        )
-        self.assertTrue("protected" in authenticator)
-        self.browser.open(self.portal_url + "/@@honeypot_field")
-        honeypot = getMultiAdapter((portal, portal.REQUEST), name="honeypot_field")()
-        self.assertTrue(honeypot.strip() in authenticator)
-
     def test_honeypot_field_view(self):
         portal = self.layer["portal"]
         honeypot = getMultiAdapter((portal, portal.REQUEST), name="honeypot_field")()
@@ -247,16 +232,16 @@ class StandardTestCase(BaseTestCase):
         # We could get the form, but with this general id it seems a
         # bad idea:
         # form = self.browser.getForm(id='zc.page.browser_form')
-        self.browser.getControl(name="form.actions.register").click()
+        self.browser.getControl(name="form.buttons.register").click()
         self.assertTrue("There were errors" in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_register_normal(self):
         self.browser.open(self.portal_url + "/@@register")
-        self.browser.getControl(name="form.fullname").value = "Mr. Spammer"
-        self.browser.getControl(name="form.username").value = "spammer"
-        self.browser.getControl(name="form.email").value = "spammer@example.org"
-        self.browser.getControl(name="form.actions.register").click()
+        self.browser.getControl(name="form.widgets.fullname").value = "Mr. Spammer"
+        self.browser.getControl(name="form.widgets.username").value = "spammer"
+        self.browser.getControl(name="form.widgets.email").value = "spammer@example.org"
+        self.browser.getControl(name="form.buttons.register").click()
         self.assertTrue("There were errors" not in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 1)
 
@@ -278,12 +263,12 @@ class StandardTestCase(BaseTestCase):
 
     def test_register_spammer(self):
         self.browser.open(self.portal_url + "/@@register")
-        self.browser.getControl(name="form.fullname").value = "Mr. Spammer"
-        self.browser.getControl(name="form.username").value = "spammer"
-        self.browser.getControl(name="form.email").value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.fullname").value = "Mr. Spammer"
+        self.browser.getControl(name="form.widgets.username").value = "spammer"
+        self.browser.getControl(name="form.widgets.email").value = "spammer@example.org"
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1", index=0).value = "Spammity spam"
-        register_button = self.browser.getControl(name="form.actions.register")
+        register_button = self.browser.getControl(name="form.buttons.register")
         self.assertRaises(Forbidden, register_button.click)
         self.assertEqual(len(self.mailhost.messages), 0)
 
