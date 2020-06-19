@@ -49,6 +49,12 @@ class BaseTestCase(unittest.TestCase):
 
         super(BaseTestCase, self).assertRaises(excClass, callableObj, *args, **kwargs)
 
+    def login(self):
+        self.browser.open(self.portal_url + "/login_form")
+        self.browser.getControl(name="__ac_name").value = TEST_USER_NAME
+        self.browser.getControl(name="__ac_password").value = TEST_USER_PASSWORD
+        self.browser.getControl("Log in").click()
+
 
 class StandardTestCase(BaseTestCase):
     # This does NOT have our fixed templates and scripts activated.
@@ -91,18 +97,20 @@ class StandardTestCase(BaseTestCase):
     # Tests for the sendto form.
 
     def test_sendto_empty(self):
+        self.login()
         self.browser.open(self.portal_url + "/sendto_form")
-        form = self.browser.getForm(name="sendto_form")
+        form = self.browser.getForm(id="form")
         form.submit()
         self.assertTrue("Please correct the indicated errors." in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_sendto_normal(self):
+        self.login()
         self.browser.open(self.portal_url + "/sendto_form")
-        form = self.browser.getForm(name="sendto_form")
-        self.browser.getControl(name="send_to_address").value = "joe@example.org"
-        self.browser.getControl(name="send_from_address").value = "spammer@example.org"
-        self.browser.getControl(name="comment").value = "Spam, bacon and eggs"
+        form = self.browser.getForm(id="form")
+        self.browser.getControl(name="form.widgets.send_to_address").value = "joe@example.org"
+        self.browser.getControl(name="form.widgets.send_from_address").value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.comment").value = "Spam, bacon and eggs"
         form.submit()
         self.assertTrue(
             "Please correct the indicated errors." not in self.browser.contents
@@ -110,6 +118,7 @@ class StandardTestCase(BaseTestCase):
         self.assertEqual(len(self.mailhost.messages), 1)
 
     def test_sendto_post_honey(self):
+        self.login()
         # Try a post with the honeypot field.
         self.assertRaises(
             Forbidden,
@@ -123,17 +132,19 @@ class StandardTestCase(BaseTestCase):
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_sendto_spammer(self):  # UNIQUE
+        self.login()
         self.browser.open(self.portal_url + "/sendto_form")
-        form = self.browser.getForm(name="sendto_form")
-        self.browser.getControl(name="send_to_address").value = "joe@example.org"
-        self.browser.getControl(name="send_from_address").value = "spammer@example.org"
-        self.browser.getControl(name="comment").value = "Spam, bacon and eggs"
+        form = self.browser.getForm(id="form")
+        self.browser.getControl(name="form.widgets.send_to_address").value = "joe@example.org"
+        self.browser.getControl(name="form.widgets.send_from_address").value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.comment").value = "Spam, bacon and eggs"
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1").value = "Spammity spam"
         self.assertRaises(Forbidden, form.submit)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_sendto_get(self):
+        self.login()
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
         qs = six.moves.urllib.parse.urlencode(
@@ -144,11 +155,6 @@ class StandardTestCase(BaseTestCase):
             }
         )
         self.browser.open(self.portal_url + "/sendto_form?" + qs)
-        self.assertEqual(len(self.mailhost.messages), 0)
-        # POST is required for the final script.
-        self.assertRaises(
-            Forbidden, self.browser.open, self.portal_url + "/sendto?" + qs
-        )
         self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the contact-info form.
@@ -305,11 +311,7 @@ class StandardTestCase(BaseTestCase):
 
     def test_send_feedback_get(self):
         # For login, because this is needed for the send_feedback script.
-        self.browser.open(self.portal_url + "/login_form")
-        self.browser.getControl(name="__ac_name").value = TEST_USER_NAME
-        self.browser.getControl(name="__ac_password").value = TEST_USER_PASSWORD
-        self.browser.getControl("Log in").click()
-
+        self.login()
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
         qs = six.moves.urllib.parse.urlencode(
@@ -333,6 +335,7 @@ class FixesTestCase(BaseTestCase):
     layer = FIXES_FUNCTIONAL_TESTING
 
     def test_sendto_post_no_honey(self):
+        self.login()
         # Try a post without the honeypot field.
         self.assertRaises(
             Forbidden, self.browser.post, self.portal_url + "/sendto_form", ""
