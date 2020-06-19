@@ -65,7 +65,6 @@ class BasicFixture(PloneSandboxLayer):
         import collective.honeypot
 
         self.loadZCML(package=collective.honeypot)
-        self.loadZCML(package=collective.honeypot, name="overrides.zcml")
         # Install product and call its initialize() function
         z2.installProduct(app, "collective.honeypot")
 
