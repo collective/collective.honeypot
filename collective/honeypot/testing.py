@@ -108,8 +108,7 @@ class BasicFixture(PloneSandboxLayer):
 
 class FixesFixture(BasicFixture):
     # Fixture that loads fixes.zcml.  This activates the improved
-    # templates and scripts.  This is the recommended way
-    # on Plone 4, but is expected to work on Plone 3 as well.
+    # templates and scripts.
     defaultBases = (PLONE_FIXTURE,)
     load_fixes = True
 

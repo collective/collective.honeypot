@@ -4,31 +4,24 @@ cache:
   - eggs
   - downloads
 language: python
-# Note: Python 2.4 / Plone 3.3 is not supported.
+# Note: Python < 2.7 / Plone < 5.2 is not supported.
 python:
-  - 2.6
   - 2.7
+  - 3.7
+  - 3.8
 env:
-  - BUILDOUT_CONFIG=plone40.cfg
-  - BUILDOUT_CONFIG=plone41.cfg
-  - BUILDOUT_CONFIG=plone42.cfg
-  - BUILDOUT_CONFIG=plone43.cfg
-  - BUILDOUT_CONFIG=plone50.cfg
-# Plone 4.0 and 4.1 do not support python 2.7, so exclude those combinations.
-# Plone 4.2 and 4.3 support both 2.6 and 2.7, but let's only do 2.7 there.
+  - BUILDOUT_CONFIG=plone52.cfg
 matrix:
   exclude:
     - python: 2.7
-      env: BUILDOUT_CONFIG=plone40.cfg
-    - python: 2.7
-      env: BUILDOUT_CONFIG=plone41.cfg
-    - python: 2.6
-      env: BUILDOUT_CONFIG=plone42.cfg
-    - python: 2.6
-      env: BUILDOUT_CONFIG=plone43.cfg
+      env: BUILDOUT_CONFIG=plone52.cfg
+    - python: 3.7
+      env: BUILDOUT_CONFIG=plone52.cfg
+    - python: 3.8
+      env: BUILDOUT_CONFIG=plone52.cfg
 install:
   - mkdir -p eggs
   - mkdir -p downloads
-  - python bootstrap.py -c $BUILDOUT_CONFIG
+  - pip install -r requirements.txt
   - bin/buildout -N -t 3 -c $BUILDOUT_CONFIG
 script: bin/test

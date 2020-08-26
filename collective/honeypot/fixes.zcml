@@ -1,37 +1,30 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    zcml:condition="installed z3c.jbot">
-
-  <!-- Note: this is not loaded automatically.  In your buildout.cfg
-       you need something like this:
-
-         [instance]
-         eggs =
-             collective.honeypot[fixes]
-         zcml =
-             collective.honeypot-fixes
-  -->
+    zcml:condition="installed z3c.jbot"
+    >
 
   <include package="z3c.jbot" />
   <include package=".plone5" />
 
   <adapter
-      zcml:condition="installed plone.app.discussion"
       name="honeypot"
-      factory=".z3cform.honeypotextender.HoneypotExtender"
+      provides="plone.z3cform.fieldsets.interfaces.IFormExtender"
       for="zope.interface.Interface
            zope.publisher.interfaces.browser.IDefaultBrowserLayer
            plone.app.discussion.browser.comments.CommentForm"
-      provides="plone.z3cform.fieldsets.interfaces.IFormExtender" />
+      factory=".z3cform.honeypotextender.HoneypotExtender"
+      zcml:condition="installed plone.app.discussion"
+      />
 
   <adapter
-      zcml:condition="installed collective.easyform"
       name="honeypot"
-      factory=".z3cform.honeypotextender.HoneypotExtender"
+      provides="plone.z3cform.fieldsets.interfaces.IFormExtender"
       for="zope.interface.Interface
            zope.publisher.interfaces.browser.IDefaultBrowserLayer
            collective.easyform.browser.view.EasyFormForm"
-      provides="plone.z3cform.fieldsets.interfaces.IFormExtender" />
+      factory=".z3cform.honeypotextender.HoneypotExtender"
+      zcml:condition="installed collective.easyform"
+      />
 
 </configure>
