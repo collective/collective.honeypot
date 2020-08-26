@@ -70,29 +70,6 @@ buildout config::
 
 Run buildout and start the zope instance.
 
-At this point it does not do anything yet, except that it logs some
-info whenever someone does a ``POST``.  You should take some measures to
-make it actually protect forms.  Every form that you want to protect,
-needs a change.  You can do that yourself and/or load the standard
-fixes from ``collective.honeypot``.
-
-``collective.honeypot`` has fixes for a few standard Plone templates.
-If you want to use them, you need to explicitly enable them.  How?
-
-
-Activation
-----------
-
-The best option is to load the extra ``fixes`` dependencies
-(``z3c.jbot`` currently) and loading ``fixes.zcml``.  In your
-buildout config::
-
-  [instance]
-  eggs =
-      collective.honeypot[fixes]
-  zcml =
-      collective.honeypot-fixes
-
 What does this do?
 
 - This registers overrides for several templates and scripts (using
@@ -105,12 +82,6 @@ What does this do?
 
 Fixes
 =====
-
-You need to enable the fixes.  See `Installation and usage`_ for how
-to do that.
-
-Well, we always change the ``@@authenticator`` view, even if you do
-not enable the fixes, but that should not have any adverse effect.
 
 Some scripts in standard Plone happily add a comment or send an e-mail
 when you use a ``GET`` request.  This package does not agree with that
