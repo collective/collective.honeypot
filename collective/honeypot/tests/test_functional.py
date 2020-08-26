@@ -99,21 +99,25 @@ class StandardTestCase(BaseTestCase):
     def test_sendto_empty(self):
         self.login()
         self.browser.open(self.portal_url + "/sendto_form")
-        form = self.browser.getForm(id="form")
-        form.submit()
-        self.assertTrue("Please correct the indicated errors." in self.browser.contents)
+        self.browser.getControl(name="form.buttons.send").click()
+        self.assertTrue("There were some errors." in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_sendto_normal(self):
         self.login()
         self.browser.open(self.portal_url + "/sendto_form")
-        form = self.browser.getForm(id="form")
-        self.browser.getControl(name="form.widgets.send_to_address").value = "joe@example.org"
-        self.browser.getControl(name="form.widgets.send_from_address").value = "spammer@example.org"
-        self.browser.getControl(name="form.widgets.comment").value = "Spam, bacon and eggs"
-        form.submit()
+        self.browser.getControl(
+            name="form.widgets.send_to_address"
+        ).value = "joe@example.org"
+        self.browser.getControl(
+            name="form.widgets.send_from_address"
+        ).value = "spammer@example.org"
+        self.browser.getControl(
+            name="form.widgets.comment"
+        ).value = "Spam, bacon and eggs"
+        self.browser.getControl(name="form.buttons.send").click()
         self.assertTrue(
-            "Please correct the indicated errors." not in self.browser.contents
+            "There were some errors." not in self.browser.contents
         )
         self.assertEqual(len(self.mailhost.messages), 1)
 
@@ -135,9 +139,15 @@ class StandardTestCase(BaseTestCase):
         self.login()
         self.browser.open(self.portal_url + "/sendto_form")
         form = self.browser.getForm(id="form")
-        self.browser.getControl(name="form.widgets.send_to_address").value = "joe@example.org"
-        self.browser.getControl(name="form.widgets.send_from_address").value = "spammer@example.org"
-        self.browser.getControl(name="form.widgets.comment").value = "Spam, bacon and eggs"
+        self.browser.getControl(
+            name="form.widgets.send_to_address"
+        ).value = "joe@example.org"
+        self.browser.getControl(
+            name="form.widgets.send_from_address"
+        ).value = "spammer@example.org"
+        self.browser.getControl(
+            name="form.widgets.comment"
+        ).value = "Spam, bacon and eggs"
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1").value = "Spammity spam"
         self.assertRaises(Forbidden, form.submit)
@@ -189,12 +199,6 @@ class StandardTestCase(BaseTestCase):
             Forbidden,
             self.browser.post,
             self.portal_url + "/contact-info",
-            "protected_1=bad",
-        )
-        self.assertRaises(
-            Forbidden,
-            self.browser.post,
-            self.portal_url + "/send_feedback_site",
             "protected_1=bad",
         )
         self.assertEqual(len(self.mailhost.messages), 0)
@@ -307,27 +311,6 @@ class StandardTestCase(BaseTestCase):
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    # Tests for send_feedback.
-
-    def test_send_feedback_get(self):
-        # For login, because this is needed for the send_feedback script.
-        self.login()
-        # Try a GET.  This does not trigger our honeypot checks, but
-        # still it should not result in the sending of an email.
-        qs = six.moves.urllib.parse.urlencode(
-            {
-                "author": SITE_OWNER_NAME,
-                "referer": "http://plone.org",
-                "subject": "Spammmmmm",
-                "message": "Spam, bacon and eggs",
-            }
-        )
-        # POST is required.
-        self.assertRaises(
-            Forbidden, self.browser.open, self.portal_url + "/send_feedback?" + qs
-        )
-        self.assertEqual(len(self.mailhost.messages), 0)
-
 
 class FixesTestCase(BaseTestCase):
     # This has our fixes.zcml applied.  We run the same tests as our
@@ -347,9 +330,6 @@ class FixesTestCase(BaseTestCase):
         # Try a post without the honeypot field.
         self.assertRaises(
             Forbidden, self.browser.post, self.portal_url + "/contact-info", ""
-        )
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/send_feedback_site", ""
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
