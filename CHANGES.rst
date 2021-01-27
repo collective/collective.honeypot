@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-2.0 (unreleased)
-------------------
+2.0 (2021-01-27)
+----------------
 
 - Automatically load the fixes if package is loaded. No need to explicitly include the ``fixes.zcml`` anymore.
   [thet]
