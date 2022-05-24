@@ -1,4 +1,4 @@
 <div>
   <input type="text" value=""
-         tal:attributes="name view/honeypot_field_name" />
+         tal:attributes="name view/honeypot_field_name" tabindex="-1" />
 </div>

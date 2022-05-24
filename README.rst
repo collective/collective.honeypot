@@ -273,6 +273,19 @@ DISALLOW_ALL_POSTS
     effect in a Plone (or CMF) site, not in the Zope root.
 
 
+Hiding the field with CSS
+=========================
+
+With the given value of HONEYPOT_FIELD being `secrete_honey_field`, you have to put some CSS rules oin place to hide the field for normal users.
+
+.. code-block:: CSS
+
+    [name="secrete_honey_field"]{
+      margin-left: -3000px;
+      pointer-events: none;
+    }
+
+
 When are the checks *not* done?
 ===============================
 
