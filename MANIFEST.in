@@ -1,4 +1,4 @@
 graft collective
 graft docs
-include *rst *cfg bootstrap.py .travis.yml
+include *.rst
 global-exclude *.pyc
