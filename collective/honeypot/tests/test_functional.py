@@ -36,17 +36,6 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
         # Need to commit, otherwise the browser does not see it.
         transaction.commit()
 
-    def assertRaises(self, excClass, callableObj, *args, **kwargs):
-        error_log = self.portal.error_log
-        # Remove all error_log entries so we do not run into the
-        # standard limit of 20 stored errors.
-        while len(error_log.getLogEntries()) > 0:
-            error_log.forgetEntry(error_log.getLogEntries()[-1]["id"])
-
-        super(HoneypotFunctionalTestCase, self).assertRaises(
-            excClass, callableObj, *args, **kwargs
-        )
-
     def login(self):
         self.browser.open(self.portal_url + "/login_form")
         self.browser.getControl(name="__ac_name").value = TEST_USER_NAME
