@@ -28,6 +28,13 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
         self.portal = self.layer["portal"]
         self.portal_url = self.portal.absolute_url()
         self.mailhost = self.portal.MailHost
+        transaction.commit()
+        # We first open a page with GET in the browser, otherwise on Plone 6
+        # you get strange errors if you directly do a failing POST:
+        # ZODB.POSException.ConnectionStateError:
+        # Shouldn't load state for persistent.list.PersistentList
+        # when the connection is closed
+        self.browser.open(self.portal_url)
 
     def _create_commentable_doc(self):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
