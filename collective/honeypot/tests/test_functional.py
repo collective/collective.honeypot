@@ -4,12 +4,10 @@ from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
 from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
 from plone.app.discussion.interfaces import IConversation
 from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
-from plone.testing.z2 import Browser
-from Products.CMFPlone.utils import getFSVersionTuple
+from plone.testing.zope import Browser
 from zExceptions import Forbidden
 from zope.component import getMultiAdapter
 

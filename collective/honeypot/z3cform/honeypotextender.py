@@ -20,4 +20,3 @@ class HoneypotExtender(extensible.FormExtender):
         self.add(IHoneypot, prefix="")
         self.form.fields["honeypot"].widgetFactory = HoneypotFieldWidget
         self.form.fields["honeypot"].mode = interfaces.HIDDEN_MODE
-

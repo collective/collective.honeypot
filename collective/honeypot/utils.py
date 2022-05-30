@@ -139,7 +139,7 @@ def check_post(request):
     if not result:
         try:
             form = get_small_form(form)
-        except:
+        except Exception:
             # Do not crash just because we want to log something.
             pass
         logger.log(
