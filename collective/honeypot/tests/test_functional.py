@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
-from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
+from collective.honeypot.testing import HONEYPOT_FUNCTIONAL_TESTING
 from plone.app.discussion.interfaces import IConversation
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -19,9 +18,8 @@ import transaction
 import unittest
 
 
-class BaseTestCase(unittest.TestCase):
-    # Base test case class with a few extra methods and a standard
-    # setup.
+class HoneypotFunctionalTestCase(unittest.TestCase):
+    layer = HONEYPOT_FUNCTIONAL_TESTING
 
     def setUp(self):
         app = self.layer["app"]
@@ -45,18 +43,15 @@ class BaseTestCase(unittest.TestCase):
         while len(error_log.getLogEntries()) > 0:
             error_log.forgetEntry(error_log.getLogEntries()[-1]["id"])
 
-        super(BaseTestCase, self).assertRaises(excClass, callableObj, *args, **kwargs)
+        super(HoneypotFunctionalTestCase, self).assertRaises(
+            excClass, callableObj, *args, **kwargs
+        )
 
     def login(self):
         self.browser.open(self.portal_url + "/login_form")
         self.browser.getControl(name="__ac_name").value = TEST_USER_NAME
         self.browser.getControl(name="__ac_password").value = TEST_USER_PASSWORD
         self.browser.getControl("Log in").click()
-
-
-class StandardTestCase(BaseTestCase):
-    # This does NOT have our fixed templates and scripts activated.
-    layer = BASIC_FUNCTIONAL_TESTING
 
     def test_subscriber(self):
         # Posting should trigger our event subscriber and do the
@@ -308,12 +303,6 @@ class StandardTestCase(BaseTestCase):
             Forbidden, self.browser.post, self.portal_url + "/doc", "protected_1=bad",
         )
         self.assertEqual(len(self.mailhost.messages), 0)
-
-
-class FixesTestCase(BaseTestCase):
-    # This has our fixes.zcml applied.  We run the same tests as our
-    # base class.
-    layer = FIXES_FUNCTIONAL_TESTING
 
     def test_sendto_post_no_honey(self):
         self.login()

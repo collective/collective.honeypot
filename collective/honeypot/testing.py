@@ -40,7 +40,7 @@ def unpatch_mailhost(portal):
     sm.registerUtility(aq_base(portal._original_MailHost), provided=IMailHost)
 
 
-class BasicFixture(PloneSandboxLayer):
+class HoneypotFixture(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
 
@@ -71,25 +71,7 @@ class BasicFixture(PloneSandboxLayer):
         unpatch_mailhost(portal)
 
 
-class FixesFixture(BasicFixture):
-    # Fixture that loads fixes.zcml.  This activates the improved
-    # templates and scripts.
-    defaultBases = (PLONE_FIXTURE,)
-    load_fixes = True
-
-    def setUpZope(self, app, configurationContext):
-        super(FixesFixture, self).setUpZope(app, configurationContext)
-        # Load extra ZCML.
-        import collective.honeypot
-
-        self.loadZCML(package=collective.honeypot, name="fixes.zcml")
-
-
-BASIC_FIXTURE = BasicFixture()
-FIXES_FIXTURE = FixesFixture()
-BASIC_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(BASIC_FIXTURE,), name="collective.honeypot:BasicFunctional",
-)
-FIXES_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(FIXES_FIXTURE,), name="collective.honeypot:FixesFunctional",
+HONEYPOT_FIXTURE = HoneypotFixture()
+HONEYPOT_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(HONEYPOT_FIXTURE,), name="collective.honeypot:Functional",
 )
