@@ -5,7 +5,7 @@ Changelog
 2.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Test on GitHub Actions instead of Travis.  [maurits]
 
 
 2.0 (2021-01-27)
@@ -22,7 +22,7 @@ Changelog
 
 - Add a dummy widget display view which renders empty - form renderings may expect it.
   [thet]
-  
+
 - Add data converter for z3c.form validation to not fail when multiple HoneyPot fields were injected.
   [thet]
 

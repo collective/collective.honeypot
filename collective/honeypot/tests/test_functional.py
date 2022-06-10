@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from collective.honeypot.testing import BASIC_FUNCTIONAL_TESTING
-from collective.honeypot.testing import FIXES_FUNCTIONAL_TESTING
+from collective.honeypot.testing import HONEYPOT_FUNCTIONAL_TESTING
 from plone.app.discussion.interfaces import IConversation
 from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
-from plone.testing.z2 import Browser
-from Products.CMFPlone.utils import getFSVersionTuple
+from plone.testing.zope import Browser
 from zExceptions import Forbidden
 from zope.component import getMultiAdapter
 
@@ -21,9 +18,8 @@ import transaction
 import unittest
 
 
-class BaseTestCase(unittest.TestCase):
-    # Base test case class with a few extra methods and a standard
-    # setup.
+class HoneypotFunctionalTestCase(unittest.TestCase):
+    layer = HONEYPOT_FUNCTIONAL_TESTING
 
     def setUp(self):
         app = self.layer["app"]
@@ -32,6 +28,13 @@ class BaseTestCase(unittest.TestCase):
         self.portal = self.layer["portal"]
         self.portal_url = self.portal.absolute_url()
         self.mailhost = self.portal.MailHost
+        transaction.commit()
+        # We first open a page with GET in the browser, otherwise on Plone 6
+        # you get strange errors if you directly do a failing POST:
+        # ZODB.POSException.ConnectionStateError:
+        # Shouldn't load state for persistent.list.PersistentList
+        # when the connection is closed
+        self.browser.open(self.portal_url)
 
     def _create_commentable_doc(self):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
@@ -40,48 +43,31 @@ class BaseTestCase(unittest.TestCase):
         # Need to commit, otherwise the browser does not see it.
         transaction.commit()
 
-    def assertRaises(self, excClass, callableObj, *args, **kwargs):
-        error_log = self.portal.error_log
-        # Remove all error_log entries so we do not run into the
-        # standard limit of 20 stored errors.
-        while len(error_log.getLogEntries()) > 0:
-            error_log.forgetEntry(error_log.getLogEntries()[-1]["id"])
-
-        super(BaseTestCase, self).assertRaises(excClass, callableObj, *args, **kwargs)
-
     def login(self):
         self.browser.open(self.portal_url + "/login_form")
         self.browser.getControl(name="__ac_name").value = TEST_USER_NAME
         self.browser.getControl(name="__ac_password").value = TEST_USER_PASSWORD
         self.browser.getControl("Log in").click()
 
-
-class StandardTestCase(BaseTestCase):
-    # This does NOT have our fixed templates and scripts activated.
-    layer = BASIC_FUNCTIONAL_TESTING
-
     def test_subscriber(self):
         # Posting should trigger our event subscriber and do the
         # honeypot checks.
         self.browser.post(self.portal_url, "innocent=true")
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url, "protected_1=bad"
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url, "protected_1=bad")
         # The subscriber is registered for the site root, but this
         # does not mean it only works for posts to the site root.
         # First create a folder.
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         self.portal.invokeFactory("Folder", "f1", title=u"Folder 1")
         folder = self.portal.f1
-        self.assertRaises(
-            Forbidden, self.browser.post, folder.absolute_url(), "protected_1=bad"
-        )
-        self.assertRaises(
-            Forbidden,
-            self.browser.post,
-            self.portal_url + "/non-existing-page",
-            "protected_1=bad",
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(folder.absolute_url(), "protected_1=bad")
+        with self.assertRaises(Forbidden):
+            self.browser.post(
+                self.portal_url + "/non-existing-page",
+                "protected_1=bad",
+            )
 
     def test_honeypot_field_view(self):
         portal = self.layer["portal"]
@@ -124,18 +110,16 @@ class StandardTestCase(BaseTestCase):
     def test_sendto_post_honey(self):
         self.login()
         # Try a post with the honeypot field.
-        self.assertRaises(
-            Forbidden,
-            self.browser.post,
-            self.portal_url + "/sendto_form",
-            "protected_1=bad",
-        )
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/sendto", "protected_1=bad"
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(
+                self.portal_url + "/sendto_form",
+                "protected_1=bad",
+            )
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/sendto", "protected_1=bad")
         self.assertEqual(len(self.mailhost.messages), 0)
 
-    def test_sendto_spammer(self):  # UNIQUE
+    def test_sendto_spammer(self):
         self.login()
         self.browser.open(self.portal_url + "/sendto_form")
         form = self.browser.getForm(id="form")
@@ -150,7 +134,8 @@ class StandardTestCase(BaseTestCase):
         ).value = "Spam, bacon and eggs"
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1").value = "Spammity spam"
-        self.assertRaises(Forbidden, form.submit)
+        with self.assertRaises(Forbidden):
+            form.submit()
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_sendto_get(self):
@@ -195,12 +180,11 @@ class StandardTestCase(BaseTestCase):
 
     def test_contact_info_post_honey(self):
         # Try a post with the honeypot field.
-        self.assertRaises(
-            Forbidden,
-            self.browser.post,
-            self.portal_url + "/contact-info",
-            "protected_1=bad",
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(
+                self.portal_url + "/contact-info",
+                "protected_1=bad",
+            )
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_spammer(self):
@@ -218,7 +202,8 @@ class StandardTestCase(BaseTestCase):
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1").value = "Spammity spam"
         form = self.browser.getForm(action="contact-info")
-        self.assertRaises(Forbidden, form.submit, name="form.buttons.send")
+        with self.assertRaises(Forbidden):
+            form.submit(name="form.buttons.send")
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_get(self):
@@ -257,18 +242,16 @@ class StandardTestCase(BaseTestCase):
 
     def test_register_post_honey(self):
         # Try a post with the honeypot field.
-        self.assertRaises(
-            Forbidden,
-            self.browser.post,
-            self.portal_url + "/@@register",
-            "protected_1=bad",
-        )
-        self.assertRaises(
-            Forbidden,
-            self.browser.post,
-            self.portal_url + "/register",
-            "protected_1=bad",
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(
+                self.portal_url + "/@@register",
+                "protected_1=bad",
+            )
+        with self.assertRaises(Forbidden):
+            self.browser.post(
+                self.portal_url + "/register",
+                "protected_1=bad",
+            )
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_register_spammer(self):
@@ -279,7 +262,8 @@ class StandardTestCase(BaseTestCase):
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1", index=0).value = "Spammity spam"
         register_button = self.browser.getControl(name="form.buttons.register")
-        self.assertRaises(Forbidden, register_button.click)
+        with self.assertRaises(Forbidden):
+            register_button.click()
         self.assertEqual(len(self.mailhost.messages), 0)
 
     # Tests for the comment form.
@@ -306,41 +290,31 @@ class StandardTestCase(BaseTestCase):
 
     def test_discussion_post_honey(self):
         # Try a post with the honeypot field.
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/doc", "protected_1=bad",
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/doc", "protected_1=bad")
         self.assertEqual(len(self.mailhost.messages), 0)
-
-
-class FixesTestCase(BaseTestCase):
-    # This has our fixes.zcml applied.  We run the same tests as our
-    # base class.
-    layer = FIXES_FUNCTIONAL_TESTING
 
     def test_sendto_post_no_honey(self):
         self.login()
         # Try a post without the honeypot field.
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/sendto_form", ""
-        )
-        self.assertRaises(Forbidden, self.browser.post, self.portal_url + "/sendto", "")
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/sendto_form", "")
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/sendto", "")
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_contact_info_post_no_honey(self):
         # Try a post without the honeypot field.
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/contact-info", ""
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/contact-info", "")
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_register_post_no_honey(self):
         # Try a post without the honeypot field.
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/@@register", ""
-        )
-        self.assertRaises(
-            Forbidden, self.browser.post, self.portal_url + "/register", ""
-        )
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/@@register", "")
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url + "/register", "")
         self.assertEqual(len(self.mailhost.messages), 0)
 
     def test_discussion_spammer(self):
@@ -351,5 +325,6 @@ class FixesTestCase(BaseTestCase):
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1", index=0).value = "Spammity spam"
         button = self.browser.getControl(name="form.buttons.comment")
-        self.assertRaises(Forbidden, button.click)
+        with self.assertRaises(Forbidden):
+            button.click()
         self.assertEqual(len(self.mailhost.messages), 0)
