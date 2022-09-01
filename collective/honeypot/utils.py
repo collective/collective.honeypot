@@ -7,6 +7,7 @@ from collective.honeypot.config import SPAMMER_LOG_LEVEL
 from collective.honeypot.config import WHITELISTED_ACTIONS
 from collective.honeypot.config import WHITELISTED_START
 from copy import deepcopy
+from plone.restapi.deserializer import json_body
 from zExceptions import Forbidden
 
 import logging
@@ -73,6 +74,9 @@ def get_form(request):
         form = request.form
     else:
         form = request
+    if not form and getattr(request, "CONTENT_TYPE", "") == "application/json":
+        # restapi post
+        form = json_body(request)
     # We may need to make a copy of the form.  This may be expensive
     # in memory, so we make sure to do this only once when needed.
     copied = False
