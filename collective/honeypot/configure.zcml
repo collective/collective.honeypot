@@ -4,7 +4,8 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.honeypot">
-
+  
+  <i18n:registerTranslations directory="locales" />
   <include file="fixes.zcml" />
   <include package="plone.transformchain" />
 

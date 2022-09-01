@@ -1,3 +1,4 @@
+from collective.honeypot import _
 from collective.honeypot.config import ACCEPTED_LOG_LEVEL
 from collective.honeypot.config import DISALLOW_ALL_POSTS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
@@ -9,6 +10,8 @@ from collective.honeypot.config import WHITELISTED_START
 from copy import deepcopy
 from plone.restapi.deserializer import json_body
 from zExceptions import Forbidden
+from zope.globalrequest import getRequest
+from zope.i18n import translate
 
 import logging
 import six
@@ -52,9 +55,13 @@ def found_honeypot(form, required):
 def deny(msg=None):
     # Deny access.
     if msg is None:
-        msg = (
-            "Posting denied due to possible spamming. "
-            "Please contact us if we are wrong."
+        msg = translate(
+            _(
+                "port_denied_label",
+                default="Posting denied due to possible spamming. "
+                "Please contact us if we are wrong.",
+            ),
+            context=getRequest(),
         )
     raise Forbidden(msg)
 

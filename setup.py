@@ -28,12 +28,20 @@ setup(
     namespace_packages=["collective"],
     include_package_data=True,
     zip_safe=False,
-    install_requires=["setuptools", "z3c.jbot",],
-    extras_require={"test": ["plone.app.testing",],},
+    install_requires=[
+        "setuptools",
+        "z3c.jbot",
+    ],
+    extras_require={
+        "test": [
+            "plone.app.testing",
+        ],
+    },
     entry_points="""
       # -*- Entry points: -*-
-
       [z3c.autoinclude.plugin]
       target = plone
+      [console_scripts]
+      update_locale = collective.honeypot.locales.update:update_locale
       """,
 )
