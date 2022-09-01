@@ -57,7 +57,7 @@ def deny(msg=None):
     if msg is None:
         msg = translate(
             _(
-                "port_denied_label",
+                "post_denied_label",
                 default="Posting denied due to possible spamming. "
                 "Please contact us if we are wrong.",
             ),

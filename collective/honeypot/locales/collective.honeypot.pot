@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-09-01 15:20+0000\n"
+"POT-Creation-Date: 2022-09-01 15:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,5 +19,5 @@ msgstr ""
 
 #. Default: "Posting denied due to possible spamming. Please contact us if we are wrong."
 #: collective/honeypot/utils.py:59
-msgid "port_denied_label"
+msgid "post_denied_label"
 msgstr ""
