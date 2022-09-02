@@ -77,13 +77,13 @@ def whitelisted(action):
 
 
 def get_form(request):
-    if hasattr(request, "form"):
-        form = request.form
-    else:
-        form = request
+    form = getattr(request, "form", {})
     if not form and getattr(request, "CONTENT_TYPE", "") == "application/json":
         # restapi post
         form = json_body(request)
+    if not form:
+        form = request
+
     # We may need to make a copy of the form.  This may be expensive
     # in memory, so we make sure to do this only once when needed.
     copied = False
