@@ -1,10 +1,10 @@
-<div tal:attributes="id string:formfield-form-widgets-${view/honeypot_field_name}">
+<div tal:attributes="id string:${view/honeypot_field_name}">
   <input type="text" value=""
-         tal:attributes="name string:form.widgets.${view/honeypot_field_name}" tabindex="-1" />
+         tal:attributes="name string:${view/honeypot_field_name}" />
 </div>
 
 <style>
-#formfield-form-widgets-${view/honeypot_field_name}{
+#${view/honeypot_field_name}{
   display: none;
 }
 </style>
