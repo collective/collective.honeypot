@@ -81,7 +81,7 @@ def get_form(request):
     if not form and getattr(request, "CONTENT_TYPE", "") == "application/json":
         # restapi post
         form = json_body(request)
-    if not form:
+    if not form and isinstance(request, dict):
         form = request
 
     # We may need to make a copy of the form.  This may be expensive
