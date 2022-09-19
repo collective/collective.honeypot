@@ -1,0 +1,2 @@
+-r requirements.txt
+zc.buildout==3.0.0rc1
