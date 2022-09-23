@@ -84,7 +84,7 @@ class HoneypotRestApiFixture(HoneypotFixture):
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        super().setUpZope(app, configurationContext)
+        super(HoneypotRestApiFixture, self).setUpZope(app, configurationContext)
         self.loadZCML(package=plone.restapi)
 
 
