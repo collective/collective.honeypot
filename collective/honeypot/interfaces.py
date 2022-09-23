@@ -11,5 +11,5 @@ class IHoneypot(Interface):
 
 class IHoneypotDisabledForm(Interface):
     """
-    Marker interface to disable authomatic field insertion in some views
+    Marker interface to disable automatic field insertion in some views
     """
