@@ -1,4 +1,5 @@
 from collective.honeypot import config
+from collective.honeypot.interfaces import IHoneypotDisabledForm
 from lxml import etree
 from lxml import html
 from plone.transformchain.interfaces import ITransform
@@ -41,7 +42,11 @@ class ProtectHoneyTransform(object):
             return None
 
         contentEncoding = self.request.response.getHeader("Content-Encoding")
-        if contentEncoding and contentEncoding in ("zip", "deflate", "compress",):
+        if contentEncoding and contentEncoding in (
+            "zip",
+            "deflate",
+            "compress",
+        ):
             return None
 
         if isinstance(result, list) and len(result) == 1:
@@ -79,6 +84,8 @@ class ProtectHoneyTransform(object):
         result = self.parseTree(result, encoding)
         if result is None:
             return None
+        if IHoneypotDisabledForm.providedBy(self.request):
+            return result
         root = result.tree.getroot()
 
         for form in root.cssselect("form"):

@@ -6,7 +6,8 @@ Changelog
 ----------------
 
 - Test on GitHub Actions instead of Travis.  [maurits]
-
+- Add marker interface to disable automatic field insertion in forms.
+  [cekk]
 
 2.0 (2021-01-27)
 ----------------
