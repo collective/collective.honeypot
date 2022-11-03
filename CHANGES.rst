@@ -5,9 +5,13 @@ Changelog
 2.1 (unreleased)
 ----------------
 
-- Test on GitHub Actions instead of Travis.  [maurits]
 - Add support for restapi POST.
   [cekk]
+
+- Support Plone 5.2 on Py 2.7+3.7+3.8 and Plone 6.0 on Py 3.8+3.9+3.10.  [maurits]
+
+- Test on GitHub Actions instead of Travis.  [maurits]
+
 
 2.0 (2021-01-27)
 ----------------

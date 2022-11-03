@@ -1,7 +1,5 @@
-# Keep these the same as in base.cfg please.
-pip==22.2.2
-setuptools==65.3.0
-zc.buildout>=3.0.0rc3
+setuptools==42.0.2
+zc.buildout==2.13.8
 wheel==0.37.1
 
 # Windows specific down here (has to be installed here, fails in buildout)
@@ -11,4 +9,3 @@ pywin32 ; platform_system == 'Windows'
 certifi ; platform_system == 'Windows'
 # Dependency of collective.recipe.omelette:
 ntfsutils ; platform_system == 'Windows' and python_version < '3.0'
-
