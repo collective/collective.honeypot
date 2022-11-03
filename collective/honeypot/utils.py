@@ -8,10 +8,14 @@ from collective.honeypot.config import SPAMMER_LOG_LEVEL
 from collective.honeypot.config import WHITELISTED_ACTIONS
 from collective.honeypot.config import WHITELISTED_START
 from copy import deepcopy
-from plone.restapi.deserializer import json_body
 from zExceptions import Forbidden
 from zope.globalrequest import getRequest
 from zope.i18n import translate
+
+try:
+    from plone.restapi.deserializer import json_body
+except ImportError:
+    json_body = None
 
 import logging
 import six
@@ -78,7 +82,11 @@ def whitelisted(action):
 
 def get_form(request):
     form = getattr(request, "form", {})
-    if not form and getattr(request, "CONTENT_TYPE", "") == "application/json":
+    if (
+        not form
+        and getattr(request, "CONTENT_TYPE", "") == "application/json"
+        and json_body
+    ):
         # restapi post
         form = json_body(request)
     if not form and isinstance(request, dict):
