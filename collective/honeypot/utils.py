@@ -1,3 +1,4 @@
+from collective.honeypot import _
 from collective.honeypot.config import ACCEPTED_LOG_LEVEL
 from collective.honeypot.config import DISALLOW_ALL_POSTS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
@@ -8,6 +9,13 @@ from collective.honeypot.config import WHITELISTED_ACTIONS
 from collective.honeypot.config import WHITELISTED_START
 from copy import deepcopy
 from zExceptions import Forbidden
+from zope.globalrequest import getRequest
+from zope.i18n import translate
+
+try:
+    from plone.restapi.deserializer import json_body
+except ImportError:
+    json_body = None
 
 import logging
 import six
@@ -51,9 +59,13 @@ def found_honeypot(form, required):
 def deny(msg=None):
     # Deny access.
     if msg is None:
-        msg = (
-            "Posting denied due to possible spamming. "
-            "Please contact us if we are wrong."
+        msg = translate(
+            _(
+                "post_denied_label",
+                default="Posting denied due to possible spamming. "
+                "Please contact us if we are wrong.",
+            ),
+            context=getRequest(),
         )
     raise Forbidden(msg)
 
@@ -69,10 +81,17 @@ def whitelisted(action):
 
 
 def get_form(request):
-    if hasattr(request, "form"):
-        form = request.form
-    else:
+    form = getattr(request, "form", {})
+    if (
+        not form
+        and getattr(request, "CONTENT_TYPE", "") == "application/json"
+        and json_body
+    ):
+        # restapi post
+        form = json_body(request)
+    if not form and isinstance(request, dict):
         form = request
+
     # We may need to make a copy of the form.  This may be expensive
     # in memory, so we make sure to do this only once when needed.
     copied = False

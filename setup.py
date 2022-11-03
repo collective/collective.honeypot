@@ -28,11 +28,20 @@ setup(
     namespace_packages=["collective"],
     include_package_data=True,
     zip_safe=False,
-    install_requires=["setuptools", "z3c.jbot",],
-    extras_require={"test": ["plone.app.testing",],},
+    install_requires=[
+        "setuptools",
+        "z3c.jbot",
+    ],
+    extras_require={
+        "test": [
+            "plone.app.testing",
+            "plone.app.robotframework[debug]",
+            "collective.MockMailHost",
+            "plone.restapi",
+        ],
+    },
     entry_points="""
       # -*- Entry points: -*-
-
       [z3c.autoinclude.plugin]
       target = plone
       """,

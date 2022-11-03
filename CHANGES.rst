@@ -6,7 +6,8 @@ Changelog
 ----------------
 
 - Test on GitHub Actions instead of Travis.  [maurits]
-
+- Add support for restapi POST.
+  [cekk]
 
 2.0 (2021-01-27)
 ----------------
