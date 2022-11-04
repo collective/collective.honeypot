@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.1 (unreleased)
+2.1 (2022-11-04)
 ----------------
 
 - Add support for restapi POST.
