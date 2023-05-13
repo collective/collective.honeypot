@@ -5,7 +5,8 @@ Changelog
 2.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add Spanish translations.
+  [macagua]
 
 
 2.1 (2022-11-04)
