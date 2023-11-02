@@ -2,7 +2,7 @@
 # so you may get incompatible versions.
 # See https://github.com/buildout/buildout/issues/613
 # So we pin an older one.
-pip==22.1.2
+pip==23.3
 setuptools==65.4.1
 wheel==0.37.1
 zc.buildout==3.0.0rc3
