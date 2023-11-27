@@ -2,8 +2,20 @@ Changelog
 =========
 
 
-2.1 (unreleased)
+2.1.1 (unreleased)
+------------------
+
+- Add Spanish translations.
+  [macagua]
+
+
+2.1 (2022-11-04)
 ----------------
+
+- Add support for restapi POST.
+  [cekk]
+
+- Support Plone 5.2 on Py 2.7+3.7+3.8 and Plone 6.0 on Py 3.8+3.9+3.10.  [maurits]
 
 - Test on GitHub Actions instead of Travis.  [maurits]
 - Add marker interface to disable automatic field insertion in forms.
