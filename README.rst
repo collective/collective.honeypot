@@ -7,10 +7,6 @@ Introduction
 
 This package gives honeypot protection for forms.
 
-.. image:: https://secure.travis-ci.org/collective/collective.honeypot.png?branch=master
-   :target: https://travis-ci.org/#!/collective/collective.honeypot
-
-
 Use cases
 =========
 
