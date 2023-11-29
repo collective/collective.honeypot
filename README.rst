@@ -300,6 +300,14 @@ As an aside, if you have such a setup, you should make sure the
 script directly.  And he can bypass the honeypot checks by using a
 ``GET`` request.
 
+If you don't need honeypot automatic field creation in some forms,
+you only need to provide ``IHoneypotDisabledForm`` interface to the current request::
+  
+  from collective.honeypot.interfaces import IHoneypotDisabledForm
+  from zope.interface import alsoProvides
+
+  alsoProvides(request, IHoneypotDisabledForm)
+
 
 z3c.form
 ========
