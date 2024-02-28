@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="collective.honeypot",
-    version="2.1.1.dev0",
+    version="2.2.dev0",
     description="Anti-spam honeypot for Plone",
     long_description=(open("README.rst").read() + "\n" + open("CHANGES.rst").read()),
     # Get more strings from https://pypi.org/classifiers
