@@ -1,4 +1,10 @@
-<div style="display: none">
+<div tal:attributes="id string:${view/honeypot_field_name}">
   <input type="text" value=""
-         tal:attributes="name view/honeypot_field_name" />
+         tal:attributes="name string:${view/honeypot_field_name}" />
 </div>
+
+<style>
+#${view/honeypot_field_name}{
+  display: none;
+}
+</style>

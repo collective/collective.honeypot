@@ -74,9 +74,16 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
         honeypot = getMultiAdapter((portal, portal.REQUEST), name="honeypot_field")()
         text = textwrap.dedent(
             """
-            <div style="display: none">
+            <div id="protected_1">
               <input type="text" value="" name="protected_1" />
-            </div>"""
+            </div>
+
+            <style>
+            #protected_1{
+              display: none;
+            }
+            </style>
+            """
         )
         self.assertEqual(honeypot.strip(), text.strip())
 
