@@ -4,7 +4,7 @@ import logging
 
 
 logger = logging.getLogger("collective.honeypot")
-logger.info("Loading plone6 patches.")
+logger.info("Loading plone61 patches.")
 
 protected = [
     "sendto_form",
