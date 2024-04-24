@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.2 (unreleasd)
+---------------
+
+- Add Plone 6 override for plone.app.z3cform.templates.macros.pt
+  [szakitibi]
+
 
 2.1.1 (unreleased)
 ------------------
