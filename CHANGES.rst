@@ -4,8 +4,10 @@ Changelog
 2.2 (unreleasd)
 ---------------
 
-- Add Plone 6 override for plone.app.z3cform.templates.macros.pt
-  [szakitibi]
+- Drop support for Python older than 3.7.  [maurits]
+
+- Add Plone 6.0 and 6.1 override for ``plone.app.z3cform.templates.macros.pt``.
+  [szakitibi, maurits]
 
 
 2.1.1 (unreleased)
