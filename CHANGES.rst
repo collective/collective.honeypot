@@ -9,7 +9,7 @@ Changelog
   Fixes `issue 20 <https://github.com/collective/collective.honeypot/issues/20>`_.
   [maurits]
 
-- Drop support for Python older than 3.7.  [maurits]
+- Drop support for Python older than 3.8.  [maurits]
 
 - Add Plone 6.0 and 6.1 override for ``plone.app.z3cform.templates.macros.pt``.
   [szakitibi, maurits]
