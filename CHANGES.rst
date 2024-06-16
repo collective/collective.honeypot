@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.2 (unreleasd)
----------------
+3.0.0 (unreleased)
+------------------
 
 - Replace "WHITELISTED" by "ALLOWLISTED" in all environment variables.
   The old spelling is still checked as well for backwards compatibility.
