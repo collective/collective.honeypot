@@ -7,6 +7,16 @@ logger = logging.getLogger("collective.honeypot")
 
 def get_multi(key, default):
     value = os.environ.get(key, None)
+    if value is None and "ALLOWLISTED" in key:
+        # Fall back to old name.
+        old_key = key.replace("ALLOWLISTED", "WHITELISTED")
+        value = os.environ.get(old_key, None)
+        if value:
+            logger.info(
+                "Found environment variable %s. You can use %s.",
+                old_key,
+                key
+            )
     if value is None:
         return set(default)
     value = value.strip().replace(",", " ").replace("@", " ")
@@ -28,8 +38,8 @@ EXTRA_PROTECTED_ACTIONS = get_multi("EXTRA_PROTECTED_ACTIONS", ())
 logger.info("Extra protected actions: %r", EXTRA_PROTECTED_ACTIONS)
 
 # Actions that are not checked:
-WHITELISTED_ACTIONS = get_multi(
-    "WHITELISTED_ACTIONS",
+ALLOWLISTED_ACTIONS = get_multi(
+    "ALLOWLISTED_ACTIONS",
     (
         "at_validate_field",
         "atct_edit",
@@ -39,11 +49,11 @@ WHITELISTED_ACTIONS = get_multi(
         "z3cform_validate_field",
     ),
 )
-logger.info("Whitelisted actions: %r", WHITELISTED_ACTIONS)
+logger.info("Allowed actions: %r", ALLOWLISTED_ACTIONS)
 # Actions starting with these strings are not checked.  Note: regular
 # expressions are too easily done wrong, so we do not support them.
-WHITELISTED_START = get_multi("WHITELISTED_START", ())
-logger.info("Whitelisted action start strings: %r", WHITELISTED_START)
+ALLOWLISTED_START = get_multi("ALLOWLISTED_START", ())
+logger.info("Allowed action start strings: %r", ALLOWLISTED_START)
 
 # Fields that are not logged:
 IGNORED_FORM_FIELDS = get_multi("IGNORED_FORM_FIELDS", ())
@@ -77,7 +87,7 @@ logger.info("Accepted log level: %r", ACCEPTED_LOG_LEVEL)
 SPAMMER_LOG_LEVEL = get_log_level("SPAMMER_LOG_LEVEL", logging.ERROR)
 logger.info("Spammer log level: %r", SPAMMER_LOG_LEVEL)
 
-# Disallow all posts, even whitelisted ones.
+# Disallow all posts, even allowlisted ones.
 DISALLOW_ALL_POSTS = os.environ.get("DISALLOW_ALL_POSTS", "")
 if DISALLOW_ALL_POSTS and DISALLOW_ALL_POSTS.lower() in ["1", "on", "true", "yes"]:
     DISALLOW_ALL_POSTS = True

@@ -16,11 +16,11 @@ from zope.component import queryUtility
 import collective.honeypot.config
 import plone.restapi
 
-# We want WHITELISTED_START to be empty by default currently, but we
+# We want ALLOWLISTED_START to be empty by default currently, but we
 # do want to test it.
-start = list(collective.honeypot.config.WHITELISTED_START)
+start = list(collective.honeypot.config.ALLOWLISTED_START)
 start.append("jq_")
-collective.honeypot.config.WHITELISTED_START = set(start)
+collective.honeypot.config.ALLOWLISTED_START = set(start)
 
 
 def patch_mailhost(portal):

@@ -5,8 +5,8 @@ from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
 from collective.honeypot.config import SPAMMER_LOG_LEVEL
-from collective.honeypot.config import WHITELISTED_ACTIONS
-from collective.honeypot.config import WHITELISTED_START
+from collective.honeypot.config import ALLOWLISTED_ACTIONS
+from collective.honeypot.config import ALLOWLISTED_START
 from copy import deepcopy
 from zExceptions import Forbidden
 from zope.globalrequest import getRequest
@@ -70,12 +70,12 @@ def deny(msg=None):
     raise Forbidden(msg)
 
 
-def whitelisted(action):
-    if action in WHITELISTED_ACTIONS:
+def allowlisted(action):
+    if action in ALLOWLISTED_ACTIONS:
         return True
     # Check action start strings.
-    for white in WHITELISTED_START:
-        if action.startswith(white):
+    for allow in ALLOWLISTED_START:
+        if action.startswith(allow):
             return True
     return False
 
@@ -146,8 +146,8 @@ def check_post(request):
     action = url.split("/")[-1]  # last part of url
     action = action.lstrip("@")
 
-    if whitelisted(action):
-        logger.debug("Action whitelisted: %s.", action)
+    if allowlisted(action):
+        logger.debug("Action allowlisted: %s.", action)
         return
     form = get_form(request)
     if action in EXTRA_PROTECTED_ACTIONS:
