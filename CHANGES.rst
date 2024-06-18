@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.0 (unreleased)
+3.0.0 (2024-06-18)
 ------------------
 
 - Replace "WHITELISTED" by "ALLOWLISTED" in all environment variables.
