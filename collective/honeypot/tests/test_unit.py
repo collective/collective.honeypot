@@ -5,7 +5,7 @@ from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.utils import check_post
 from collective.honeypot.utils import found_honeypot
 from collective.honeypot.utils import get_form
-from collective.honeypot.utils import whitelisted
+from collective.honeypot.utils import allowlisted
 from Testing import makerequest
 from zExceptions import Forbidden
 from zope.publisher.browser import TestRequest
@@ -83,16 +83,16 @@ class UtilsTestCase(unittest.TestCase):
         request = self._request(dest="/join_form", form={HONEYPOT_FIELD: ""})
         self.assertEqual(check_post(self._request()), None)
 
-    def test_whitelisted(self):
-        self.assertEqual(whitelisted(""), False)
-        self.assertEqual(whitelisted("random"), False)
-        self.assertEqual(whitelisted("jq_reveal_email"), True)
-        self.assertEqual(whitelisted("at_validate_field"), True)
-        self.assertEqual(whitelisted("z3cform_validate_field"), True)
+    def test_allowlisted(self):
+        self.assertEqual(allowlisted(""), False)
+        self.assertEqual(allowlisted("random"), False)
+        self.assertEqual(allowlisted("jq_reveal_email"), True)
+        self.assertEqual(allowlisted("at_validate_field"), True)
+        self.assertEqual(allowlisted("z3cform_validate_field"), True)
         # Various jquery methods may use this.  Note: the next test fails when
         # run on its own, because testing.py is not loaded.  But 'bin/test -u'
         # should work fine.
-        self.assertEqual(whitelisted("jq_"), True)
-        self.assertEqual(whitelisted("jq"), False)
-        self.assertEqual(whitelisted("jq_foo_bar"), True)
-        self.assertEqual(whitelisted("foo_jq_"), False)
+        self.assertEqual(allowlisted("jq_"), True)
+        self.assertEqual(allowlisted("jq"), False)
+        self.assertEqual(allowlisted("jq_foo_bar"), True)
+        self.assertEqual(allowlisted("foo_jq_"), False)

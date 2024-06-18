@@ -1,16 +1,4 @@
-# With pip>=22.2, buildout fails to check the python-requires of a package,
-# so you may get incompatible versions.
-# See https://github.com/buildout/buildout/issues/613
-# So we pin an older one.
-pip==22.1.2
-setuptools==65.4.1
-wheel==0.37.1
-zc.buildout==3.0.0rc3
-
-# Windows specific down here (has to be installed here, fails in buildout)
-# Dependency of zope.sendmail:
-pywin32 ; platform_system == 'Windows'
-# SSL Certs on Windows, because Python is missing them otherwise:
-certifi ; platform_system == 'Windows'
-# Dependency of collective.recipe.omelette:
-ntfsutils ; platform_system == 'Windows' and python_version < '3.0'
+pip==24.0
+setuptools==69.5.1
+wheel==0.43.0
+zc.buildout==3.0.1

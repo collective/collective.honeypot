@@ -1,10 +1,15 @@
 Changelog
 =========
 
-2.2 (unreleasd)
----------------
+3.0.0 (unreleased)
+------------------
 
-- Drop support for Python older than 3.7.  [maurits]
+- Replace "WHITELISTED" by "ALLOWLISTED" in all environment variables.
+  The old spelling is still checked as well for backwards compatibility.
+  Fixes `issue 20 <https://github.com/collective/collective.honeypot/issues/20>`_.
+  [maurits]
+
+- Drop support for Python older than 3.8.  [maurits]
 
 - Add Plone 6.0 and 6.1 override for ``plone.app.z3cform.templates.macros.pt``.
   [szakitibi, maurits]
@@ -84,7 +89,7 @@ Changelog
 
 - First official public release.
 
-- Add kssValidateField to the default WHITELIST_ACTIONS to suppress kss inline
+- Add kssValidateField to the default ALLOWLISTED_ACTIONS to suppress kss inline
   validation being logged on Plone <= 4.2 .
   [fredvd]
 
@@ -103,7 +108,7 @@ Changelog
 0.6 (2014-04-17)
 ----------------
 
-- Whitelist edit forms by default.
+- Allow edit forms by default.
   [maurits]
 
 - Log when we load patches and add extra protected actions.
@@ -116,7 +121,7 @@ Changelog
 - Support disallowing all posts.
   [maurits]
 
-- Support checking start strings for white listed actions.
+- Support checking start strings for allowed actions.
   [maurits]
 
 - Allow configuring log levels.

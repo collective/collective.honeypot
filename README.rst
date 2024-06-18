@@ -170,8 +170,8 @@ and it will get picked up.  But the usual way would be to do this in
   environment-vars =
       HONEYPOT_FIELD pooh
       EXTRA_PROTECTED_ACTIONS discussion_reply join_form sendto_form
-      WHITELISTED_ACTIONS jq_reveal_email
-      WHITELISTED_START jq_*
+      ALLOWLISTED_ACTIONS jq_reveal_email
+      ALLOWLISTED_START jq_*
       IGNORED_FORM_FIELDS secret_field
       ACCEPTED_LOG_LEVEL info
       SPAMMER_LOG_LEVEL error
@@ -208,13 +208,13 @@ EXTRA_PROTECTED_ACTIONS
     you can add it here and it will stop functioning.  For ``@@view``
     simply use ``view`` and it will match both.
 
-WHITELISTED_ACTIONS
+ALLOWLISTED_ACTIONS
     These form actions are not checked.  List here actions that are
     harmless, for example actions that load some data via an AJAX
     call.  Generally, actions that change nothing in the database and
     do not send emails are safe to add here.  If you add this
     environment variable but leave it empty, you override the
-    default and do not whitelist anything.  By default we whitelist
+    default and do not allow anything.  By default we allow
     these actions:
 
     - ``at_validate_field`` (inline validation)
@@ -231,9 +231,9 @@ WHITELISTED_ACTIONS
 
 
 
-WHITELISTED_START
+ALLOWLISTED_START
     Form actions starting with one of these strings are not checked.
-    See ``WHITELISTED_ACTIONS`` for more info.  If you have lots of
+    See ``ALLOWLISTED_ACTIONS`` for more info.  If you have lots of
     harmless actions that start with ``jq_`` you can add that string
     to this list.  Regular expression are too easy to get wrong, so we
     do not support it.
