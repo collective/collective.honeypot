@@ -168,7 +168,7 @@ and it will get picked up.  But the usual way would be to do this in
 
   [instance]
   environment-vars =
-      HONEYPOT_FIELD pooh
+      HONEYPOT_FIELD form.widgets.pooh
       EXTRA_PROTECTED_ACTIONS discussion_reply join_form sendto_form
       ALLOWLISTED_ACTIONS jq_reveal_email
       ALLOWLISTED_START jq_*
@@ -267,6 +267,19 @@ DISALLOW_ALL_POSTS
     zope instance and want to keep the old instance alive for the time
     being.  Note that, like the rest of the checks, this only has an
     effect in a Plone (or CMF) site, not in the Zope root.
+
+
+Hiding the field with CSS
+=========================
+
+With the given value of HONEYPOT_FIELD being `form.widgets.secrete_honey_field`, you have to put some CSS rules oin place to hide the field for normal users.
+
+.. code-block:: CSS
+
+    [name="form.widgets.secrete_honey_field"]{
+      margin-left: -3000px;
+      pointer-events: none;
+    }
 
 
 When are the checks *not* done?
