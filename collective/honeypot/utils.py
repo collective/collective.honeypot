@@ -8,6 +8,8 @@ from collective.honeypot.config import SPAMMER_LOG_LEVEL
 from collective.honeypot.config import ALLOWLISTED_ACTIONS
 from collective.honeypot.config import ALLOWLISTED_START
 from copy import deepcopy
+from plone.restapi.exceptions import DeserializationError
+from zExceptions import BadRequest
 from zExceptions import Forbidden
 from zope.globalrequest import getRequest
 from zope.i18n import translate
@@ -149,7 +151,10 @@ def check_post(request):
     if allowlisted(action):
         logger.debug("Action allowlisted: %s.", action)
         return
-    form = get_form(request)
+    try:
+        form = get_form(request)
+    except DeserializationError as e:
+        raise BadRequest(e)
     if action in EXTRA_PROTECTED_ACTIONS:
         result = found_honeypot(form, required=True)
     else:
