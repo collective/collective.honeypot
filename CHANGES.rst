@@ -4,7 +4,7 @@ Changelog
 3.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Simplify logging for successful POSTs: log the form keys, but not the values. [davisagli]
 
 
 3.0.0 (2024-06-18)

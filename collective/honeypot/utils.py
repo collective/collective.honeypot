@@ -113,19 +113,6 @@ def get_form(request):
     return form
 
 
-def get_small_form(form):
-    # Avoid printing large textareas or complete file uploads.
-    small_form = {}
-    for key, value in form.items():
-        if not isinstance(value, six.string_types):
-            small_form[key] = value
-            continue
-        if len(value) > 250:
-            small_form[key] = value[:250] + "..."
-
-    return small_form
-
-
 def check_post(request):
     """Log a POST request.
 
@@ -156,18 +143,14 @@ def check_post(request):
         result = found_honeypot(form, required=False)
     logger.debug("Checking honeypot fields for action %s. Result: %s.", action, result)
     if not result:
-        try:
-            form = get_small_form(form)
-        except Exception:
-            # Do not crash just because we want to log something.
-            pass
+        form_keys = sorted(form.keys())
         logger.log(
             ACCEPTED_LOG_LEVEL,
-            "ACCEPTED POST from ip %s, url %r, referer %r, with form " "%r",
+            "ACCEPTED POST from ip %s, url %r, referer %r, with form keys " "%r",
             ip,
             url,
             referer,
-            form,
+            form_keys,
         )
         return
     logger.log(
