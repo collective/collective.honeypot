@@ -37,6 +37,7 @@ setup(
     ],
     extras_require={
         "test": [
+            "plone.app.discussion",
             "plone.app.testing",
             "plone.app.robotframework[debug]",
             "collective.MockMailHost",
