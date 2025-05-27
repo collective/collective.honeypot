@@ -5,6 +5,7 @@ from plone.app.discussion.interfaces import IDiscussionSettings
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.base.utils import get_installer
 from plone.registry.interfaces import IRegistry
 from plone.testing import zope
 from plone.testing import z2
@@ -48,18 +49,16 @@ class HoneypotFixture(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         # Load ZCML
         import collective.honeypot
+        import plone.app.discussion
 
         self.loadZCML(package=collective.honeypot)
-        # Install product and call its initialize() function
-        zope.installProduct(app, "collective.honeypot")
-
-    def tearDownZope(self, app):
-        # Uninstall product
-        zope.uninstallProduct(app, "collective.honeypot")
+        self.loadZCML(package=plone.app.discussion)
 
     def setUpPloneSite(self, portal):
         patch_mailhost(portal)
         # Enable commenting, self registration, and sending mail.
+        installer = get_installer(portal)
+        installer.install_product("plone.app.discussion")
         registry = queryUtility(IRegistry)
         settings = registry.forInterface(IDiscussionSettings)
         settings.globally_enabled = True

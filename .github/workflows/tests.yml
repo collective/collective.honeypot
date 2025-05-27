@@ -13,18 +13,19 @@ jobs:
       matrix:
         config:
         # [Python version, tox env]
-        - ["3.8",  "py38-plone52"]
-        - ["3.8",  "py38-plone60"]
+        - ["3.9",  "py39-plone60"]
         - ["3.12",  "py312-plone60"]
+        - ["3.10",  "py310-plone61"]
+        - ["3.13",  "py313-plone61"]
     name: ${{ matrix.config[1] }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.config[0] }}
     - name: Pip cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ matrix.config[0] }}-${{ hashFiles('setup.*', 'tox.ini') }}
