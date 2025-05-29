@@ -251,7 +251,7 @@ ACCEPTED_LOG_LEVEL
     Log level for accepted posts.  This accepts standard lower or
     upper case log levels: debug, info, warn, warning, error,
     critical.  When an unknown level is used or the setting is empty,
-    we fall back to the default: ``INFO``.
+    we fall back to the default: ``DEBUG``.
 
 SPAMMER_LOG_LEVEL
     Log level for caught spammers.  This accepts standard lower or
