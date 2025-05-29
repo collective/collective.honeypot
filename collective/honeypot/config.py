@@ -81,7 +81,7 @@ def get_log_level(key, default):
 
 
 # Log level for accepted posts.
-ACCEPTED_LOG_LEVEL = get_log_level("ACCEPTED_LOG_LEVEL", logging.INFO)
+ACCEPTED_LOG_LEVEL = get_log_level("ACCEPTED_LOG_LEVEL", logging.DEBUG)
 logger.info("Accepted log level: %r", ACCEPTED_LOG_LEVEL)
 # Log level for caught spammers.
 SPAMMER_LOG_LEVEL = get_log_level("SPAMMER_LOG_LEVEL", logging.ERROR)
