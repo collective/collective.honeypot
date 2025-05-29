@@ -6,6 +6,8 @@ Changelog
 
 - Drop support for Plone 5.2 and Python 3.8.  [maurits]
 
+- Change the default ``ACCEPTED_LOG_LEVEL`` to DEBUG. [davisagli]
+
 
 3.0.0 (2024-06-18)
 ------------------
