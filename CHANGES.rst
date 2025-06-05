@@ -1,7 +1,7 @@
 Changelog
 =========
 
-4.0.0 (unreleased)
+4.0.0 (2025-06-05)
 ------------------
 
 - Drop support for Plone 5.2 and Python 3.8.  [maurits]
