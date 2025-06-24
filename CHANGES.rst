@@ -4,6 +4,8 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
+- Added more improvements about i18n support. [macagua]
+
 - Fixed the README file. [macagua]
 
 - Reorganizing the logging mechanism for this package. [macagua]

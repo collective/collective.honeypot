@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-09-01 15:28+0000\n"
+"POT-Creation-Date: 2025-06-24 15:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,11 @@ msgstr ""
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: collective.honeypot\n"
+
+#. Default: "All posts are disallowed."
+#: collective/honeypot/utils.py:139
+msgid "all_posts_are_disallowed_label"
+msgstr ""
 
 #. Default: "Posting denied due to possible spamming. Please contact us if we are wrong."
 #: collective/honeypot/utils.py:59

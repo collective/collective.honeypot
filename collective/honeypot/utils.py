@@ -134,7 +134,15 @@ def check_post(request):
     if DISALLOW_ALL_POSTS:
         logger.warn("All posts are disallowed.")
         # block the request:
-        deny(msg="All posts are disallowed.")
+        deny(
+            msg = translate(
+                _(
+                    "all_posts_are_disallowed_label",
+                    default="All posts are disallowed.",
+                ),
+                context=getRequest(),
+            )
+        )
     ip = request.get("HTTP_X_FORWARDED_FOR") or request.get("REMOTE_ADDR", "unknown")
     referer = request.get("HTTP_REFERER", "")
     url = request.get("ACTUAL_URL", "")
