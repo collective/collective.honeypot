@@ -4,6 +4,8 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
+- Added missing Spanish translations. [macagua]
+
 - Added more improvements about i18n support. [macagua]
 
 - Fixed the README file. [macagua]
