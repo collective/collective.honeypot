@@ -1,9 +1,5 @@
-from collective.honeypot import config
+from collective.honeypot import config, logger
 
-import logging
-
-
-logger = logging.getLogger("collective.honeypot")
 logger.info("Loading plone60 patches.")
 
 protected = [

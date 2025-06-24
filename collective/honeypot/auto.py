@@ -1,4 +1,4 @@
-from collective.honeypot import config
+from collective.honeypot import config, logger
 from lxml import etree
 from lxml import html
 from plone.transformchain.interfaces import ITransform
@@ -7,11 +7,6 @@ from repoze.xmliter.utils import getHTMLSerializer
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
-
-import logging
-
-
-logger = logging.getLogger("collective.honeypot")
 
 
 @implementer(ITransform)

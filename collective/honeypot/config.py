@@ -1,8 +1,5 @@
-import logging
+from collective.honeypot import logging, logger
 import os
-
-
-logger = logging.getLogger("collective.honeypot")
 
 
 def get_multi(key, default):

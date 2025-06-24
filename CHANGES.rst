@@ -4,7 +4,7 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Reorganizing the logging mechanism for this package. [macagua]
 
 
 4.0.0 (2025-06-05)

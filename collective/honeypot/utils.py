@@ -1,4 +1,4 @@
-from collective.honeypot import _
+from collective.honeypot import _, logger
 from collective.honeypot.config import ACCEPTED_LOG_LEVEL
 from collective.honeypot.config import DISALLOW_ALL_POSTS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
@@ -17,11 +17,7 @@ try:
 except ImportError:
     json_body = None
 
-import logging
 import six
-
-
-logger = logging.getLogger("collective.honeypot")
 
 
 def found_honeypot(form, required):
