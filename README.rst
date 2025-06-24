@@ -11,7 +11,7 @@ Use cases
 =========
 
 Spammers have found you and are pounding various forms on your
-website.  Prime victims are the join form, contact form, sendto form
+website. Prime victims are the join form, contact form, sendto form
 and comment form.
 
 Maybe you have some captcha protection in place but spammers have
@@ -54,22 +54,34 @@ selected forms we require that the invisible field is in the submitted
 form, although it must be empty.
 
 
+Translations
+============
+
+This product has been translated into
+
+- Italian
+
+- Spanish
+
+
 Installation and usage
 ======================
 
-Add ``collective.honeypot`` to the eggs of your zope instance in your
-buildout config::
+Add ``collective.honeypot`` to the eggs of your Zope instance in your
+buildout config:
+
+::
 
   [instance]
   eggs =
       collective.honeypot
 
-Run buildout and start the zope instance.
+Run buildout and start the Zope instance.
 
 What does this do?
 
 - This registers overrides for several templates and scripts (using
-  ``z3c.jbot``).
+  `z3c.jbot <https://github.com/zopefoundation/z3c.jbot>`_).
 
 - It adds those templates and scripts to the list of extra protected
   actions.  This means that a ``POST`` request to these actions now
@@ -86,7 +98,7 @@ policy and has fixes to require a ``POST`` request.
 When using ``z3c.jbot``, the package detects which fixes are needed.
 Some add-ons may or may not be
 available, so we only load fixes that can be applied, especially for
-``plone.app.discussion``.
+`plone.app.discussion <https://github.com/plone/plone.app.discussion>`_.
 
 If you override a script or template in an own skin layer or via some
 zcml, then our fixes may have no effect, so you need to do a fix
@@ -96,7 +108,7 @@ So, what are the actual fixes that this package contains?
 
 - Some forms may get the invisible honeypot field automatically.  This
   package registers an override for the ``@@authenticator`` view from
-  ``plone.protect`` that is used in several templates for csrf
+  `plone.protect <https://github.com/plone/plone.protect>`_ that is used in several templates for CSRF
   protection (cross site request forgery).  So any template that
   already uses this, is automatically loading our honeypot field.
 
@@ -128,7 +140,9 @@ So, what are the actual fixes that this package contains?
 Protecting your own forms
 =========================
 
-In a form that you want to protect, you must add this::
+In a form that you want to protect, you must add this:
+
+::
 
   <div tal:replace="structure context/@@honeypot_field|nothing" />
 
@@ -138,7 +152,7 @@ invisible field that captures spammers if they fill it in.  A
 
 Some forms may get this invisible field automatically.  This package
 registers an override for the ``@@authenticator`` view from
-``plone.protect`` that is used in several templates for csrf
+``plone.protect`` that is used in several templates for CSRF
 protection (cross site request forgery).  So any template that already
 uses this, is automatically loading our honeypot field.
 
@@ -161,10 +175,12 @@ undo the damage.  Also, with multiple Plone Sites in one Zope instance
 this would get even trickier.  So we chose a different approach.
 
 You can configure settings via environment variables in the
-``zope.conf`` of your zope instance.  For testing you could set an
-environment variable in your command shell and start the zope instance
+``zope.conf`` of your Zope instance.  For testing you could set an
+environment variable in your command shell and start the Zope instance
 and it will get picked up.  But the usual way would be to do this in
-``buildout.cfg``::
+``buildout.cfg``:
+
+::
 
   [instance]
   environment-vars =
@@ -264,7 +280,7 @@ DISALLOW_ALL_POSTS
     ``POST`` requests.  This may be handy if you want to effectively
     make a Plone Site read-only, for example in preparation of a
     security release or when you are doing a big migration in a new
-    zope instance and want to keep the old instance alive for the time
+    Zope instance and want to keep the old instance alive for the time
     being.  Note that, like the rest of the checks, this only has an
     effect in a Plone (or CMF) site, not in the Zope root.
 
@@ -307,7 +323,9 @@ z3c.form
 You can easily add a honeypot field to a ``z3c.form``.  Just add a
 ``TextLine`` field to your form ``Interface`` definition, set the
 ``widgetFactory`` to the widget that ``collective.honeypot`` supplies,
-and make it hidden.  Something like this::
+and make it hidden. Something like this:
+
+::
 
   from collective.honeypot.z3cform.widget import HoneypotFieldWidget
   from z3c.form import form, interfaces
@@ -333,4 +351,10 @@ form in ``plone.app.discussion``.
 Compatibility
 =============
 
-This works on Plone 5.2.
+This works on:
+
+- Plone 5.2.
+
+- Plone 6.0.
+
+- Plone 6.1.

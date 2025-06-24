@@ -4,6 +4,8 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
+- Fixed the README file. [macagua]
+
 - Reorganizing the logging mechanism for this package. [macagua]
 
 
