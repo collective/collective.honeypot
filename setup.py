@@ -1,4 +1,3 @@
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -26,13 +25,10 @@ setup(
     author_email="maurits@vanrees.org",
     url="https://github.com/collective/collective.honeypot",
     license="GPL",
-    packages=find_packages(),
-    namespace_packages=["collective"],
     include_package_data=True,
     zip_safe=False,
     python_requires=">=3.9",
     install_requires=[
-        "setuptools",
         "z3c.jbot",
     ],
     extras_require={

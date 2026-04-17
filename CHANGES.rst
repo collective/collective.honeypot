@@ -12,6 +12,8 @@ Changelog
 
 - Reorganizing the logging mechanism for this package. [macagua]
 
+- Replace ``pkg_resources`` namespace with PEP 420 native namespace. [szakitibi]
+
 
 4.0.0 (2025-06-05)
 ------------------
