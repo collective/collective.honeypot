@@ -32,10 +32,12 @@ setup(
     extras_require={
         "test": [
             "plone.app.discussion",
+            "plone.app.iterate",
             "plone.app.testing",
             "plone.app.robotframework[debug]",
             "collective.MockMailHost",
             "plone.restapi",
+            "requests",
         ],
     },
     entry_points="""

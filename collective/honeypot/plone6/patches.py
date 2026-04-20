@@ -1,7 +1,7 @@
 from collective.honeypot import config
 from collective.honeypot import logger
 
-logger.info("Loading patches.")
+logger.info("Loading plone6 patches.")
 
 protected = [
     "sendto_form",

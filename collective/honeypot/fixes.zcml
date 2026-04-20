@@ -1,12 +1,15 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:zcml="http://namespaces.zope.org/zcml"
     zcml:condition="installed z3c.jbot"
     >
 
   <include package="z3c.jbot" />
-  <browser:jbot directory="overrides" />
+  <configure zcml:condition="have plone-60">
+    <include
+        package=".plone6"
+        />
+  </configure>
 
   <adapter
       factory=".z3cform.honeypotextender.HoneypotExtender"
