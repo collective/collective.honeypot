@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
 from collective.honeypot.testing import HONEYPOT_API_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
-from plone.app.testing import TEST_USER_NAME
-from plone.app.testing import TEST_USER_PASSWORD
 from plone.restapi.testing import RelativeSession
-from zExceptions import Forbidden
 
-import transaction
 import unittest
 
 

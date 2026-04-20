@@ -9,8 +9,7 @@ from zope.schema.interfaces import ITextLine
 
 
 class IHoneypotWidget(IWidget):
-    """Marker interface for the honeypot widget
-    """
+    """Marker interface for the honeypot widget"""
 
 
 @implementer_only(IHoneypotWidget)
@@ -18,7 +17,7 @@ class HoneypotWidget(text.TextWidget):
     honeypot_field_name = config.HONEYPOT_FIELD
 
     def update(self):
-        super(HoneypotWidget, self).update()
+        super().update()
         # Force the configured name of our honeypot field.
         self.name = self.id = config.HONEYPOT_FIELD
 

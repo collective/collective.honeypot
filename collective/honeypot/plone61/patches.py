@@ -1,4 +1,5 @@
-from collective.honeypot import logger, config
+from collective.honeypot import config
+from collective.honeypot import logger
 
 logger.info("Loading plone61 patches.")
 

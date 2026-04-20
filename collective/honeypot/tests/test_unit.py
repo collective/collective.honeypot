@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 from Acquisition import Implicit
 from collective.honeypot.config import HONEYPOT_FIELD
+from collective.honeypot.utils import allowlisted
 from collective.honeypot.utils import check_post
 from collective.honeypot.utils import found_honeypot
 from collective.honeypot.utils import get_form
-from collective.honeypot.utils import allowlisted
 from Testing import makerequest
 from zExceptions import Forbidden
 from zope.publisher.browser import TestRequest

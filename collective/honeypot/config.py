@@ -1,4 +1,6 @@
-from collective.honeypot import logging, logger
+from collective.honeypot import logger
+from collective.honeypot import logging
+
 import os
 
 
@@ -9,11 +11,7 @@ def get_multi(key, default):
         old_key = key.replace("ALLOWLISTED", "WHITELISTED")
         value = os.environ.get(old_key, None)
         if value:
-            logger.info(
-                "Found environment variable %s. You can use %s.",
-                old_key,
-                key
-            )
+            logger.info("Found environment variable %s. You can use %s.", old_key, key)
     if value is None:
         return set(default)
     value = value.strip().replace(",", " ").replace("@", " ")

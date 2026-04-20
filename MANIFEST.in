@@ -2,3 +2,6 @@ graft collective
 graft docs
 include *.rst
 global-exclude *.pyc
+include requirements.txt
+include constraints.txt
+prune news

@@ -5,29 +5,38 @@
     >
 
   <include package="z3c.jbot" />
-  <include zcml:condition="not-have plone-60" package=".plone5" />
+  <include
+      package=".plone5"
+      zcml:condition="not-have plone-60"
+      />
   <configure zcml:condition="have plone-60">
-    <include zcml:condition="not-have plone-61" package=".plone60" />
-    <include zcml:condition="have plone-61" package=".plone61" />
+    <include
+        package=".plone60"
+        zcml:condition="not-have plone-61"
+        />
+    <include
+        package=".plone61"
+        zcml:condition="have plone-61"
+        />
   </configure>
 
   <adapter
-      name="honeypot"
+      factory=".z3cform.honeypotextender.HoneypotExtender"
       provides="plone.z3cform.fieldsets.interfaces.IFormExtender"
       for="zope.interface.Interface
            zope.publisher.interfaces.browser.IDefaultBrowserLayer
            plone.app.discussion.browser.comments.CommentForm"
-      factory=".z3cform.honeypotextender.HoneypotExtender"
+      name="honeypot"
       zcml:condition="installed plone.app.discussion"
       />
 
   <adapter
-      name="honeypot"
+      factory=".z3cform.honeypotextender.HoneypotExtender"
       provides="plone.z3cform.fieldsets.interfaces.IFormExtender"
       for="zope.interface.Interface
            zope.publisher.interfaces.browser.IDefaultBrowserLayer
            collective.easyform.browser.view.EasyFormForm"
-      factory=".z3cform.honeypotextender.HoneypotExtender"
+      name="honeypot"
       zcml:condition="installed collective.easyform"
       />
 

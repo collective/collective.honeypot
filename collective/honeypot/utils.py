@@ -1,12 +1,13 @@
-from collective.honeypot import _, logger
+from collective.honeypot import _
+from collective.honeypot import logger
 from collective.honeypot.config import ACCEPTED_LOG_LEVEL
+from collective.honeypot.config import ALLOWLISTED_ACTIONS
+from collective.honeypot.config import ALLOWLISTED_START
 from collective.honeypot.config import DISALLOW_ALL_POSTS
 from collective.honeypot.config import EXTRA_PROTECTED_ACTIONS
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.config import IGNORED_FORM_FIELDS
 from collective.honeypot.config import SPAMMER_LOG_LEVEL
-from collective.honeypot.config import ALLOWLISTED_ACTIONS
-from collective.honeypot.config import ALLOWLISTED_START
 from copy import deepcopy
 from zExceptions import Forbidden
 from zope.globalrequest import getRequest
@@ -16,8 +17,6 @@ try:
     from plone.restapi.deserializer import json_body
 except ImportError:
     json_body = None
-
-import six
 
 
 def found_honeypot(form, required):
@@ -113,7 +112,7 @@ def get_small_form(form):
     # Avoid printing large textareas or complete file uploads.
     small_form = {}
     for key, value in form.items():
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             small_form[key] = value
             continue
         if len(value) > 250:
@@ -135,7 +134,7 @@ def check_post(request):
         logger.warn("All posts are disallowed.")
         # block the request:
         deny(
-            msg = translate(
+            msg=translate(
                 _(
                     "all_posts_are_disallowed_label",
                     default="All posts are disallowed.",

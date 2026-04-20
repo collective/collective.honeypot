@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from collective.honeypot.testing import HONEYPOT_FUNCTIONAL_TESTING
 from plone.app.discussion.interfaces import IConversation
 from plone.app.testing import setRoles
@@ -38,7 +36,7 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
 
     def _create_commentable_doc(self):
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        self.portal.invokeFactory("Document", "doc", title=u"Document 1")
+        self.portal.invokeFactory("Document", "doc", title="Document 1")
         self.portal.doc.allow_discussion = True
         # Need to commit, otherwise the browser does not see it.
         transaction.commit()
@@ -59,7 +57,7 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
         # does not mean it only works for posts to the site root.
         # First create a folder.
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        self.portal.invokeFactory("Folder", "f1", title=u"Folder 1")
+        self.portal.invokeFactory("Folder", "f1", title="Folder 1")
         folder = self.portal.f1
         with self.assertRaises(Forbidden):
             self.browser.post(folder.absolute_url(), "protected_1=bad")
@@ -72,12 +70,10 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
     def test_honeypot_field_view(self):
         portal = self.layer["portal"]
         honeypot = getMultiAdapter((portal, portal.REQUEST), name="honeypot_field")()
-        text = textwrap.dedent(
-            """
+        text = textwrap.dedent("""
             <div style="display: none">
               <input type="text" value="" name="protected_1" />
-            </div>"""
-        )
+            </div>""")
         self.assertEqual(honeypot.strip(), text.strip())
 
     # Tests for the sendto form.
@@ -92,19 +88,17 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
     def test_sendto_normal(self):
         self.login()
         self.browser.open(self.portal_url + "/sendto_form")
-        self.browser.getControl(
-            name="form.widgets.send_to_address"
-        ).value = "joe@example.org"
-        self.browser.getControl(
-            name="form.widgets.send_from_address"
-        ).value = "spammer@example.org"
-        self.browser.getControl(
-            name="form.widgets.comment"
-        ).value = "Spam, bacon and eggs"
-        self.browser.getControl(name="form.buttons.send").click()
-        self.assertTrue(
-            "There were some errors." not in self.browser.contents
+        self.browser.getControl(name="form.widgets.send_to_address").value = (
+            "joe@example.org"
         )
+        self.browser.getControl(name="form.widgets.send_from_address").value = (
+            "spammer@example.org"
+        )
+        self.browser.getControl(name="form.widgets.comment").value = (
+            "Spam, bacon and eggs"
+        )
+        self.browser.getControl(name="form.buttons.send").click()
+        self.assertTrue("There were some errors." not in self.browser.contents)
         self.assertEqual(len(self.mailhost.messages), 1)
 
     def test_sendto_post_honey(self):
@@ -123,15 +117,15 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
         self.login()
         self.browser.open(self.portal_url + "/sendto_form")
         form = self.browser.getForm(id="form")
-        self.browser.getControl(
-            name="form.widgets.send_to_address"
-        ).value = "joe@example.org"
-        self.browser.getControl(
-            name="form.widgets.send_from_address"
-        ).value = "spammer@example.org"
-        self.browser.getControl(
-            name="form.widgets.comment"
-        ).value = "Spam, bacon and eggs"
+        self.browser.getControl(name="form.widgets.send_to_address").value = (
+            "joe@example.org"
+        )
+        self.browser.getControl(name="form.widgets.send_from_address").value = (
+            "spammer@example.org"
+        )
+        self.browser.getControl(name="form.widgets.comment").value = (
+            "Spam, bacon and eggs"
+        )
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1").value = "Spammity spam"
         with self.assertRaises(Forbidden):
@@ -163,16 +157,16 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
 
     def test_contact_info_normal(self):
         self.browser.open(self.portal_url + "/contact-info")
-        self.browser.getControl(
-            name="form.widgets.sender_fullname"
-        ).value = "Mr. Spammer"
-        self.browser.getControl(
-            name="form.widgets.sender_from_address"
-        ).value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.sender_fullname").value = (
+            "Mr. Spammer"
+        )
+        self.browser.getControl(name="form.widgets.sender_from_address").value = (
+            "spammer@example.org"
+        )
         self.browser.getControl(name="form.widgets.subject").value = "Spammmmmm"
-        self.browser.getControl(
-            name="form.widgets.message"
-        ).value = "Spam, bacon and eggs"
+        self.browser.getControl(name="form.widgets.message").value = (
+            "Spam, bacon and eggs"
+        )
         form = self.browser.getForm(action="contact-info")
         form.submit(name="form.buttons.send")
         self.assertTrue("There were some errors." not in self.browser.contents)
@@ -189,16 +183,16 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
 
     def test_contact_info_spammer(self):
         self.browser.open(self.portal_url + "/contact-info")
-        self.browser.getControl(
-            name="form.widgets.sender_fullname"
-        ).value = "Mr. Spammer"
-        self.browser.getControl(
-            name="form.widgets.sender_from_address"
-        ).value = "spammer@example.org"
+        self.browser.getControl(name="form.widgets.sender_fullname").value = (
+            "Mr. Spammer"
+        )
+        self.browser.getControl(name="form.widgets.sender_from_address").value = (
+            "spammer@example.org"
+        )
         self.browser.getControl(name="form.widgets.subject").value = "Spammmmmm"
-        self.browser.getControl(
-            name="form.widgets.message"
-        ).value = "Spam, bacon and eggs"
+        self.browser.getControl(name="form.widgets.message").value = (
+            "Spam, bacon and eggs"
+        )
         # Yummy, a honeypot!
         self.browser.getControl(name="protected_1").value = "Spammity spam"
         form = self.browser.getForm(action="contact-info")

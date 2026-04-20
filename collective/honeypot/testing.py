@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.discussion.interfaces import IDiscussionSettings
@@ -7,7 +6,6 @@ from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.base.utils import get_installer
 from plone.registry.interfaces import IRegistry
-from plone.testing import zope
 from plone.testing import z2
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
@@ -83,7 +81,7 @@ class HoneypotRestApiFixture(HoneypotFixture):
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        super(HoneypotRestApiFixture, self).setUpZope(app, configurationContext)
+        super().setUpZope(app, configurationContext)
         self.loadZCML(package=plone.restapi)
 
 

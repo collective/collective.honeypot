@@ -1,4 +1,5 @@
-from collective.honeypot import config, logger
+from collective.honeypot import config
+from collective.honeypot import logger
 from lxml import etree
 from lxml import html
 from plone.transformchain.interfaces import ITransform
@@ -11,7 +12,7 @@ from zope.interface import Interface
 
 @implementer(ITransform)
 @adapter(Interface, Interface)
-class ProtectHoneyTransform(object):
+class ProtectHoneyTransform:
 
     order = 8200
 
@@ -36,7 +37,11 @@ class ProtectHoneyTransform(object):
             return None
 
         contentEncoding = self.request.response.getHeader("Content-Encoding")
-        if contentEncoding and contentEncoding in ("zip", "deflate", "compress",):
+        if contentEncoding and contentEncoding in (
+            "zip",
+            "deflate",
+            "compress",
+        ):
             return None
 
         if isinstance(result, list) and len(result) == 1:
@@ -85,7 +90,7 @@ class ProtectHoneyTransform(object):
                 continue
             action = form.attrib.get("action", "").strip()
             # check if the element is already on the form..
-            hidden = form.cssselect('[name="{}"]'.format(config.HONEYPOT_FIELD))
+            hidden = form.cssselect(f'[name="{config.HONEYPOT_FIELD}"]')
             if len(hidden) == 0:
                 # Change compared to original: add honeypot field.
                 # We create this:

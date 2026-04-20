@@ -6,8 +6,7 @@ from z3c.form.field import Fields
 
 
 class HoneypotExtender(extensible.FormExtender):
-    """Extends the comment form with a honeypot field.
-    """
+    """Extends the comment form with a honeypot field."""
 
     fields = Fields(IHoneypot)
 
