@@ -1,12 +1,11 @@
 from Acquisition import aq_base
-from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.discussion.interfaces import IDiscussionSettings
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.base.utils import get_installer
 from plone.registry.interfaces import IRegistry
-from plone.testing import z2
+from plone.testing.zope import WSGI_SERVER_FIXTURE
 from Products.CMFPlone.tests.utils import MockMailHost
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getSiteManager
@@ -78,7 +77,7 @@ HONEYPOT_FUNCTIONAL_TESTING = FunctionalTesting(
 
 class HoneypotRestApiFixture(HoneypotFixture):
 
-    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
+    defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
         super().setUpZope(app, configurationContext)
@@ -88,6 +87,6 @@ class HoneypotRestApiFixture(HoneypotFixture):
 HONEYPOT_API_FIXTURE = HoneypotRestApiFixture()
 
 HONEYPOT_API_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(HONEYPOT_API_FIXTURE, z2.ZSERVER_FIXTURE),
+    bases=(HONEYPOT_API_FIXTURE, WSGI_SERVER_FIXTURE),
     name="HoneypotRestApiFixture:Functional",
 )
