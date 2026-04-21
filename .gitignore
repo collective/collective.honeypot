@@ -22,7 +22,6 @@ __pycache__/
 node_modules/
 forest.dot
 forest.json
-share/
 
 # venv / buildout related
 bin/
