@@ -6,9 +6,7 @@
 
   <include package="z3c.jbot" />
   <configure zcml:condition="have plone-60">
-    <include
-        package=".plone6"
-        />
+    <include package=".plone6" />
   </configure>
 
   <adapter
