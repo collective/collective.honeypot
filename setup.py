@@ -36,6 +36,7 @@ setup(
             "plone.app.testing",
             "plone.app.robotframework[debug]",
             "collective.MockMailHost",
+            "plone.api",
             "plone.restapi",
             "requests",
         ],
