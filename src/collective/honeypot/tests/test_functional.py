@@ -5,12 +5,10 @@ from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.testing.zope import Browser
+from urllib.parse import urlencode
 from zExceptions import Forbidden
 from zope.component import getMultiAdapter
 
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 import textwrap
 import transaction
 import unittest
@@ -136,7 +134,7 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
         self.login()
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = six.moves.urllib.parse.urlencode(
+        qs = urlencode(
             {
                 "send_to_address": "joe@example.org",
                 "send_from_address": "spammer@example.org",
@@ -203,7 +201,7 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
     def test_contact_info_get(self):
         # Try a GET.  This does not trigger our honeypot checks, but
         # still it should not result in the sending of an email.
-        qs = six.moves.urllib.parse.urlencode(
+        qs = urlencode(
             {
                 "sender_fullname": "Mr. Spammer",
                 "sender_from_address": "spammer@example.org",
