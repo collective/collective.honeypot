@@ -29,12 +29,8 @@ setup(
     install_requires=[
         "Products.CMFCore",
         "Zope",
-        "collective.easyform",
         "lxml",
-        "plone.app.discussion",
-        "plone.app.z3cform",
         "plone.protect",
-        "plone.restapi",
         "plone.transformchain",
         "plone.z3cform",
         "repoze.xmliter",
@@ -43,6 +39,7 @@ setup(
     ],
     extras_require={
         "test": [
+            "plone.app.discussion",
             "Products.CMFPlone",
             "plone.app.testing",
             "plone.base",

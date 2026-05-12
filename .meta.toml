@@ -3,7 +3,11 @@
 # See the inline comments on how to expand/tweak this configuration file
 [meta]
 template = "default"
-commit-id = "2.8.0"
+commit-id = "2.8.1.dev0"
+
+[pyproject]
+dependencies_ignores = "['collective.easyform', 'plone.app.z3cform', 'plone.restapi', 'plone.app.discussion']"
+
 
 [tox]
 test_matrix = {"6.2" = ["*"]}
