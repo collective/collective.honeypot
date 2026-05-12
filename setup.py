@@ -1,10 +1,8 @@
-from setuptools import find_packages
 from setuptools import setup
-
 
 setup(
     name="collective.honeypot",
-    version="4.0.1.dev0",
+    version="5.0.0.dev0",
     description="Anti-spam honeypot for Plone",
     long_description=(open("README.rst").read() + "\n" + open("CHANGES.rst").read()),
     # Get more strings from https://pypi.org/classifiers
@@ -13,6 +11,7 @@ setup(
         "Framework :: Plone",
         "Framework :: Plone :: 6.0",
         "Framework :: Plone :: 6.1",
+        "Framework :: Plone :: 6.2",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.9",
@@ -20,28 +19,35 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
     keywords="honeypot antispam form protection plone",
     author="Maurits van Rees",
     author_email="maurits@vanrees.org",
     url="https://github.com/collective/collective.honeypot",
     license="GPL",
-    packages=find_packages(),
-    namespace_packages=["collective"],
     include_package_data=True,
     zip_safe=False,
     python_requires=">=3.9",
     install_requires=[
-        "setuptools",
+        "Products.CMFCore",
+        "Zope",
+        "lxml",
+        "plone.protect",
+        "plone.transformchain",
+        "plone.z3cform",
+        "repoze.xmliter",
+        "z3c.form",
         "z3c.jbot",
     ],
     extras_require={
         "test": [
             "plone.app.discussion",
+            "Products.CMFPlone",
             "plone.app.testing",
-            "plone.app.robotframework[debug]",
-            "collective.MockMailHost",
-            "plone.restapi",
+            "plone.base",
+            "plone.restapi[test]",
+            "plone.testing",
         ],
     },
     entry_points="""

@@ -1,0 +1,15 @@
+from collective.honeypot import config
+from collective.honeypot import logger
+
+logger.info("Loading plone6 patches.")
+
+protected = [
+    "sendto_form",
+    "sendto",
+    "contact-info",
+    "send_feedback_site",
+    "register",
+]
+# Explicitly add the actions that we protect.
+config.EXTRA_PROTECTED_ACTIONS.update(protected)
+logger.info("Extra protected actions: %r", config.EXTRA_PROTECTED_ACTIONS)

@@ -1,8 +1,8 @@
 Changelog
 =========
 
-4.0.1 (unreleased)
-------------------
+5.0.0.dev0 (unreleased)
+-----------------------
 
 - Added missing Spanish translations. [macagua]
 
@@ -11,6 +11,8 @@ Changelog
 - Fixed the README file. [macagua]
 
 - Reorganizing the logging mechanism for this package. [macagua]
+
+- Replace ``pkg_resources`` namespace with PEP 420 native namespace. [szakitibi]
 
 
 4.0.0 (2025-06-05)

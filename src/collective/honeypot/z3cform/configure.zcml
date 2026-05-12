@@ -1,0 +1,24 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    >
+
+  <include package="plone.app.z3cform" />
+
+  <adapter factory=".widget.HoneypotValueConverter" />
+
+  <z3c:widgetTemplate
+      widget=".widget.IHoneypotWidget"
+      template="../honeypot.pt"
+      layer="z3c.form.interfaces.IFormLayer"
+      mode="hidden"
+      />
+
+  <z3c:widgetTemplate
+      widget=".widget.IHoneypotWidget"
+      template="widget_display.pt"
+      layer="z3c.form.interfaces.IFormLayer"
+      mode="display"
+      />
+
+</configure>
