@@ -9,9 +9,12 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Plone",
+        "Framework :: Plone :: 6.0",
+        "Framework :: Plone :: 6.1",
         "Framework :: Plone :: 6.2",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
@@ -25,7 +28,7 @@ setup(
     license="GPL",
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.10",
+    python_requires=">=3.9",
     install_requires=[
         "Products.CMFCore",
         "Zope",

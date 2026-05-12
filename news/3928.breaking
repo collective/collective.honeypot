@@ -1,3 +1,3 @@
 Replace ``pkg_resources`` namespace with PEP 420 native namespace.
-Support only Plone 6.2 and Python 3.10+.
+Support Plone 6.0, 6.1, and Plone 6.2 on all their supported Python versions (3.9+ for 6.0, 3.10+ for the others).
 [szakitibi]

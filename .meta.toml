@@ -10,4 +10,4 @@ dependencies_ignores = "['collective.easyform', 'plone.app.z3cform', 'plone.rest
 
 
 [tox]
-test_matrix = {"6.2" = ["*"]}
+test_matrix = {"6.0" = ["*"], "6.1" = ["*"], "6.2" = ["*"]}
