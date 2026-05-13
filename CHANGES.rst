@@ -10,6 +10,18 @@ Changelog
 
 .. towncrier release notes start
 
+5.0.0 (2026-05-13)
+------------------
+
+Breaking changes:
+
+
+- Replace ``pkg_resources`` namespace with PEP 420 native namespace.
+  Support Plone 6.0, 6.1, and Plone 6.2 on all their supported Python versions (3.9+ for 6.0, 3.10+ for the others).
+  When you use ``collective.honeypot`` with other packages in the ``collective`` namespace, and you get a ``ModuleNotFoundError``, you may need to install ``horse-with-no-namespace``, or use ``zc.buildout`` 5.
+  [szakitibi] (#3928)
+
+
 4.0.1 (2026-05-13)
 ------------------
 
