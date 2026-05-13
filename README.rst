@@ -78,6 +78,8 @@ buildout config:
 
 Run buildout and start the Zope instance.
 
+Or of course use `pip install collective.honepot`
+
 What does this do?
 
 - This registers overrides for several templates and scripts (using
@@ -245,8 +247,6 @@ ALLOWLISTED_ACTIONS
 
     - ``z3cform_validate_field``  (inline validation)
 
-
-
 ALLOWLISTED_START
     Form actions starting with one of these strings are not checked.
     See ``ALLOWLISTED_ACTIONS`` for more info.  If you have lots of
@@ -353,8 +353,8 @@ Compatibility
 
 This works on:
 
-- Plone 5.2.
+- Plone 6.0
+- Plone 6.1
+- Plone 6.1
 
-- Plone 6.0.
-
-- Plone 6.1.
+When you use ``collective.honeypot`` with other packages in the ``collective`` namespace, and you get a ``ModuleNotFoundError``, you may need to install ``horse-with-no-namespace``, or use ``zc.buildout`` 5.
