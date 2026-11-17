@@ -65,6 +65,11 @@ class HoneypotFunctionalTestCase(unittest.TestCase):
                 "protected_1=bad",
             )
 
+    def test_subscriber_non_str_list(self):
+        # Marshalled non-string list items must be caught, not raise a TypeError.
+        with self.assertRaises(Forbidden):
+            self.browser.post(self.portal_url, "protected_1:int:list=1")
+
     def test_honeypot_field_view(self):
         portal = self.layer["portal"]
         honeypot = getMultiAdapter((portal, portal.REQUEST), name="honeypot_field")()
