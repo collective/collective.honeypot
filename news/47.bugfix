@@ -1,0 +1,2 @@
+Fix ``TypeError`` in ``found_honeypot`` when the honeypot field is posted as a list of non-strings.
+[szakitibi]
