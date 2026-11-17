@@ -28,6 +28,18 @@ class UtilsTestCase(unittest.TestCase):
             "has forbidden field",
         )
 
+    def test_found_honeypot_non_str_list(self):
+        # A client can post the field as a list of non-strings, e.g. protected_1:int:list=1.
+        self.assertEqual(
+            found_honeypot({HONEYPOT_FIELD: [1]}, required=False),
+            "has forbidden field",
+        )
+        self.assertEqual(
+            found_honeypot({HONEYPOT_FIELD: [0, ""]}, required=False),
+            "has forbidden field",
+        )
+        self.assertFalse(found_honeypot({HONEYPOT_FIELD: ["", ""]}, required=False))
+
     def test_get_form(self):
         # get_form gets the form fields, leaving out password fields.
         self.assertEqual(get_form({}), {})
