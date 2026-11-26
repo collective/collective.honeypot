@@ -44,7 +44,7 @@ def found_honeypot(form, required):
     # But: we could have made a mistake and put in the honeypot
     # field twice, which means it gets submitted as a list.
     if isinstance(value, list):
-        value = "".join(value)
+        value = "".join(str(item) for item in value)
         if not value:
             # All clear
             return False
